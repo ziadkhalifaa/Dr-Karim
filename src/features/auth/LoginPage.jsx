@@ -1,4 +1,151 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
-export default function LoginPage() { const { login, authError } = useAuth(); const [form, setForm] = useState({ identifier: "", password: "" }); const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const submit = async (e) => { e.preventDefault(); setBusy(true); setError(""); try { const session = await login(form); navigate(session.user.role === "patient" ? "/patient" : "/doctor"); } catch (err) { setError(err.message); } finally { setBusy(false); } }; return <main className="auth-page"><div className="auth-card"><span className="eyebrow">DR. KAREEM ELIETHY</span><h1>Welcome back</h1><p className="muted">Sign in to your secure care workspace.</p><form onSubmit={submit}><label>Email or phone<input required value={form.identifier} onChange={(e) => setForm({ ...form, identifier: e.target.value })} autoComplete="username" /></label><label>Password<input required type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="current-password" /></label>{(error || authError) && <p className="form-error" role="alert">{error || authError.message}</p>}<button className="primary-button" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button></form><button className="text-button" onClick={() => navigate("/")}>← Back to clinic website</button></div></main>; }
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import Logo from "../../components/Logo";
+
+export default function LoginPage() {
+  const { t } = useTranslation();
+  const { login, authError } = useAuth();
+  const [form, setForm] = useState({ identifier: "", password: "" });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const session = await login(form);
+      navigate(session.user.role === "patient" ? "/patient" : "/doctor");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, var(--surface-brand) 0%, var(--deep) 100%)", padding: "20px" }}>
+      <motion.div 
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        style={{
+          background: "var(--card-bg)",
+          padding: "40px",
+          borderRadius: "var(--radius-xl)",
+          boxShadow: "var(--shadow-lg)",
+          width: "100%",
+          maxWidth: "440px",
+          textAlign: "center"
+        }}
+      >
+        <motion.div 
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", delay: 0.2 }}
+          style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}
+        >
+          <Logo size={70} />
+        </motion.div>
+        
+        <h1 style={{ fontSize: "28px", fontWeight: "800", color: "var(--text)", marginBottom: "8px" }}>
+          {t("nav.login", "تسجيل الدخول")}
+        </h1>
+        <p style={{ color: "var(--text-muted)", marginBottom: "32px", fontSize: "15px" }}>
+          مرحباً بك مجدداً في عيادة دكتور كريم الليثي
+        </p>
+
+        <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "20px", textAlign: "start" }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
+            البريد الإلكتروني أو رقم الهاتف
+            <input 
+              required 
+              value={form.identifier} 
+              onChange={(e) => setForm({ ...form, identifier: e.target.value })} 
+              autoComplete="username" 
+              style={{
+                padding: "14px",
+                borderRadius: "12px",
+                border: "1px solid var(--line)",
+                background: "var(--bg-soft)",
+                color: "var(--text)",
+                outline: "none",
+                fontSize: "16px",
+                transition: "border 0.2s ease, box-shadow 0.2s ease"
+              }}
+              onFocus={(e) => { e.target.style.borderColor = "var(--primary)"; e.target.style.boxShadow = "0 0 0 3px rgba(18, 59, 74, 0.1)"; }}
+              onBlur={(e) => { e.target.style.borderColor = "var(--line)"; e.target.style.boxShadow = "none"; }}
+            />
+          </label>
+          
+          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
+            كلمة المرور
+            <input 
+              required 
+              type="password" 
+              value={form.password} 
+              onChange={(e) => setForm({ ...form, password: e.target.value })} 
+              autoComplete="current-password" 
+              style={{
+                padding: "14px",
+                borderRadius: "12px",
+                border: "1px solid var(--line)",
+                background: "var(--bg-soft)",
+                color: "var(--text)",
+                outline: "none",
+                fontSize: "16px",
+                transition: "border 0.2s ease, box-shadow 0.2s ease"
+              }}
+              onFocus={(e) => { e.target.style.borderColor = "var(--primary)"; e.target.style.boxShadow = "0 0 0 3px rgba(18, 59, 74, 0.1)"; }}
+              onBlur={(e) => { e.target.style.borderColor = "var(--line)"; e.target.style.boxShadow = "none"; }}
+            />
+          </label>
+
+          {(error || authError) && (
+            <motion.p 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              role="alert" 
+              style={{ color: "var(--highlight-text)", background: "var(--highlight-bg)", padding: "12px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", margin: 0 }}
+            >
+              {error || authError.message}
+            </motion.p>
+          )}
+
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="btn btn-primary" 
+            disabled={busy}
+            style={{ width: "100%", padding: "16px", borderRadius: "12px", fontSize: "16px", marginTop: "10px" }}
+          >
+            {busy ? "جاري الدخول..." : "تسجيل الدخول"}
+          </motion.button>
+        </form>
+
+        <button 
+          onClick={() => navigate("/")} 
+          style={{ 
+            background: "none", 
+            border: "none", 
+            color: "var(--text-muted)", 
+            marginTop: "24px", 
+            fontSize: "14px", 
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            fontWeight: "600"
+          }}
+          onMouseEnter={(e) => e.target.style.color = "var(--primary)"}
+          onMouseLeave={(e) => e.target.style.color = "var(--text-muted)"}
+        >
+          ← العودة للصفحة الرئيسية
+        </button>
+      </motion.div>
+    </main>
+  );
+}

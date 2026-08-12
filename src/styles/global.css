@@ -21,10 +21,10 @@
   --bg-soft: #f8fafb;
   --card-bg: #ffffff;
   --line: rgba(18, 59, 74, 0.16);
-  --shadow: 0 18px 45px rgba(18, 59, 74, 0.1);
-  --shadow-lg: 0 30px 70px rgba(9, 44, 56, 0.16);
-  --radius-lg: 24px;
-  --radius-xl: 30px;
+  --shadow: 0 20px 50px rgba(18, 59, 74, 0.08), 0 4px 15px rgba(18, 59, 74, 0.05);
+  --shadow-lg: 0 40px 80px rgba(9, 44, 56, 0.12), 0 10px 25px rgba(9, 44, 56, 0.08);
+  --radius-lg: 20px;
+  --radius-xl: 28px;
   --font-body: "Cairo", "Poppins", system-ui, -apple-system, sans-serif;
   --font-latin: "Poppins", "Cairo", system-ui, sans-serif;
 }
