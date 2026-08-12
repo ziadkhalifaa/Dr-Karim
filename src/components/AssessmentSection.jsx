@@ -110,7 +110,7 @@ export default function AssessmentSection() {
           </form>
 
           <div className="assessment__media anim-slideL">
-            <AssessmentArt className="assessment__art" />
+            <img src="/assets/runner.png" alt="Running" className="assessment__art" style={{ width: "100%", height: "auto", objectFit: "contain", filter: "drop-shadow(0 20px 30px rgba(0,0,0,0.15))" }} />
           </div>
         </div>
 

@@ -133,14 +133,14 @@ export default function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4, type: "spring" }}
           className="hero__wrap"
-          style={{ perspective: 1000, marginTop: "40px" }}
+          style={{ perspective: 1000 }}
         >
           <motion.div
             whileHover={{ rotateY: 5, rotateX: 5, scale: 1.02 }}
             transition={{ type: "spring", stiffness: 100 }}
             style={{
               position: "relative",
-              width: "min(560px, 88vw)",
+              width: "100%",
               height: "min(560px, 88vw)",
               borderRadius: "50%",
               background: "radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%)",
