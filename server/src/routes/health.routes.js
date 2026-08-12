@@ -17,7 +17,8 @@ export function healthRouter() {
   r.get("/setup", async (_req, res, next) => {
     try {
       import("child_process").then(({ exec }) => {
-        exec("npm run db:migrate && node scripts/seed.js", { cwd: process.cwd() }, (error, stdout, stderr) => {
+        const cmd = `"${process.execPath}" scripts/migrate.js && "${process.execPath}" scripts/seed.js`;
+        exec(cmd, { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
             res.status(500).json({ success: false, message: "Migration failed", error: error.message, stderr, stdout });
             return;
