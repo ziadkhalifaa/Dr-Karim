@@ -1,9 +1,11 @@
-﻿import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAssessment } from "../hooks/useAssessment";
 import { useIsMobile } from "../hooks/useMediaQuery";
 import { SECTIONS } from "../data/sections";
 import AssessmentHeader from "../components/AssessmentHeader";
+import Header from "../../../components/Header";
+import Footer from "../../../components/Footer";
 import Intro from "../components/Intro";
 import ResumeBanner from "../components/ResumeBanner";
 import ProgressBar from "../components/ProgressBar";
@@ -166,17 +168,18 @@ const handleSubmit = async () => {
   if (step === "success") {
     return (
       <div className="aq">
-        <AssessmentHeader />
+        <Header />
         <main className="aq-main">
           <SuccessScreen referenceNumber={state.referenceNumber} overallTier={state.overallTier} reviewState={state.reviewState} />
         </main>
+        <Footer />
       </div>
     );
   }
 
   return (
     <div className="aq">
-      <AssessmentHeader />
+      <Header />
       <main className="aq-main">
         {step === "intro" && (
           <Intro onStart={() => goTo("section", 0, 0)} />
@@ -230,7 +233,7 @@ const handleSubmit = async () => {
           <ResumeBanner onContinue={onContinue} onStartOver={onStartOver} />
         )}
       </main>
+      <Footer />
     </div>
   );
 }
-

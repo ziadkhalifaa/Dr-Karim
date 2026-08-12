@@ -27,10 +27,15 @@ export default function SectionView({
     ? questions.slice(mobileIndex, mobileIndex + 1)
     : questions;
 
-  // Focus management: section title on section change (desktop) / on mobile
-  // the current question becomes focusable and receives focus.
+  // Focus management: only focus the section title or question wrapper
+  // if the user is NOT currently typing in an input/textarea.
+  // This fixes the bug where focus was stolen after each keystroke on mobile.
   useEffect(() => {
     const id = window.setTimeout(() => {
+      const activeTag = document.activeElement?.tagName;
+      const isTyping = activeTag === "INPUT" || activeTag === "TEXTAREA" || activeTag === "SELECT";
+      if (isTyping) return; // Don't steal focus while user is typing
+
       if (isMobile && questions.length > 0) {
         const qid = questions[Math.min(mobileIndex, questions.length - 1)].id;
         const el = bodyRef.current?.querySelector(`[data-qid="${qid}"]`);
@@ -44,6 +49,7 @@ export default function SectionView({
     }, 60);
     return () => window.clearTimeout(id);
   }, [sectionNo, mobileIndex, isMobile, questions]);
+
 
   return (
     <div className="aq-section">
