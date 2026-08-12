@@ -109,21 +109,22 @@ export default function Hero() {
               style={{ borderRadius: 16 }}
             >
               <PulseIcon />
-              {t("hero.cta")}
+              {t("hero.cta", "احجز استشارة فيديو أونلاين")}
             </motion.a>
             <motion.a 
               whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.15)" }}
               whileTap={{ scale: 0.95 }}
-              href="#about" 
+              href="/about" 
               className="btn btn-outline"
               style={{ borderRadius: 16 }}
+              onClick={(e) => { e.preventDefault(); navigate("/about"); }}
             >
-              {t("hero.ctaSecondary")}
+              {t("hero.ctaSecondary", "من نحن")}
             </motion.a>
           </motion.div>
           
-          <motion.p variants={itemVariants} className="hero__trust" style={{ marginTop: 24, opacity: 0.8 }}>
-            {t("hero.trust")}
+          <motion.p variants={itemVariants} className="hero__trust" style={{ marginTop: 24, opacity: 0.9, fontSize: "16px", color: "var(--gold)" }}>
+            ✨ متابعة فيديو لايف سيشن مرة أسبوعياً مع د.كريم الليثي شخصياً
           </motion.p>
         </motion.div>
 
@@ -132,13 +133,33 @@ export default function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4, type: "spring" }}
           className="hero__wrap"
-          style={{ perspective: 1000 }}
+          style={{ perspective: 1000, marginTop: "40px" }}
         >
           <motion.div
             whileHover={{ rotateY: 5, rotateX: 5, scale: 1.02 }}
             transition={{ type: "spring", stiffness: 100 }}
+            style={{
+              position: "relative",
+              width: "min(560px, 88vw)",
+              height: "min(560px, 88vw)",
+              borderRadius: "50%",
+              background: "radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%)",
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "center",
+              overflow: "visible"
+            }}
           >
-            <PlateArt className="hero__art" />
+            <img 
+              src="/assets/drkarim.png" 
+              alt="Dr Kareem Eliethy" 
+              style={{ 
+                maxHeight: "110%", 
+                objectFit: "contain",
+                filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.3))",
+                zIndex: 2
+              }} 
+            />
           </motion.div>
 
           <motion.div 

@@ -16,11 +16,11 @@ import {
 import { LogIn } from "lucide-react";
 
 const NAV = [
-  { key: "home", href: "#home" },
-  { key: "about", href: "#about" },
-  { key: "services", href: "#services" },
-  { key: "articles", href: "#articles" },
-  { key: "contact", href: "#contact" },
+  { key: "home", href: "/" },
+  { key: "about", href: "/about" },
+  { key: "services", href: "/services" },
+  { key: "articles", href: "/articles" },
+  { key: "contact", href: "/contact" },
 ];
 
 export default function Header() {
@@ -90,6 +90,7 @@ export default function Header() {
               key={item.key}
               href={item.href}
               className="main-nav__link"
+              onClick={(e) => { e.preventDefault(); navigate(item.href); }}
             >
               {t(`nav.${item.key}`)}
             </motion.a>

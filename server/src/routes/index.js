@@ -1,5 +1,6 @@
-﻿import express from "express";
+import express from "express";
 import { healthRouter } from "./health.routes.js";
+import contentRouter from "./content.routes.js";
 import { assessmentRouter } from "./assessment.routes.js";
 import { placeholderRouter } from "./placeholder.routes.js";
 import { authRouter } from "./auth.routes.js";
@@ -14,6 +15,8 @@ import { authenticateOptional, requireTenantAccess } from "../middleware/auth.js
 
 export function routes(app) {
   const api = express.Router();
+  api.use("/content", contentRouter);
+
   api.use("/health", healthRouter());
   api.use("/auth", authRouter());
   api.use(authenticateOptional);
