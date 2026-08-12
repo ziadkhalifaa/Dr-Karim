@@ -1,4 +1,4 @@
-﻿// Phase 1 seed data (architecture §20).
+// Phase 1 seed data (architecture §20).
 //
 // Strategy: idempotent by natural key, version-aware, safe to re-run.
 // Sources of truth (SINGLE SOURCE):
@@ -505,12 +505,13 @@ async function seedClinicInfo(tenant) {
 // 7. platform settings + feature flags
 // ---------------------------------------------------------------------------
 
-async function seedPlatform() {
+async function seedPlatform(tenant) {
+  const tenantId = tenant.id;
   const settings = [
-    { key: "assessment_version_active", value: "1.0", value_type: "string", description: "Active assessment definition version (dr-kareem)." },
-    { key: "pregnancy_visibility_rule", value: JSON.stringify({ minAge: 12, maxAge: 55 }), value_type: "json", description: "Q04_03 visibility rule (spec §4 CL14) — configurable." },
-    { key: "draft_retention_days", value: "30", value_type: "number", description: "Draft session retention days (§9 policy proposal — unenforced until ratified)." },
-    { key: "contact_preference_default", value: "whatsapp", value_type: "string", description: "Default preferred contact method (C06)." },
+    { tenant_id: tenantId, key: "assessment_version_active", value: "1.0", value_type: "string", description: "Active assessment definition version (dr-kareem)." },
+    { tenant_id: tenantId, key: "pregnancy_visibility_rule", value: JSON.stringify({ minAge: 12, maxAge: 55 }), value_type: "json", description: "Q04_03 visibility rule (spec §4 CL14) — configurable." },
+    { tenant_id: tenantId, key: "draft_retention_days", value: "30", value_type: "number", description: "Draft session retention days (§9 policy proposal — unenforced until ratified)." },
+    { tenant_id: tenantId, key: "contact_preference_default", value: "whatsapp", value_type: "string", description: "Default preferred contact method (C06)." },
   ];
   const flags = [
     { key: "video_conferencing_enabled", enabled: false, description: "Live video sessions (Daily.co integration is a future phase)." },
@@ -522,7 +523,7 @@ async function seedPlatform() {
   let s = 0;
   let f = 0;
   for (const p of settings) {
-    const existing = await PlatformSetting.findOne({ where: { key: p.key } });
+    const existing = await PlatformSetting.findOne({ where: { key: p.key, tenant_id: tenantId } });
     if (!existing) { await PlatformSetting.create(p); s += 1; }
   }
   for (const fl of flags) {
@@ -603,7 +604,7 @@ async function main() {
     await seedClinicInfo(tenant);
     console.log("clinic info seeded (working_hour empty — no approved hours).");
 
-    const platform = await seedPlatform();
+    const platform = await seedPlatform(tenant);
     console.log("platform:", JSON.stringify(platform));
 
     const thin = await seedThinCatalogs();
