@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 import { sequelize } from "../config/database.js";
 import { ok } from "../middleware/api-response.js";
 import { AppError, ERROR_CODES } from "../utils/errors.js";
+import { models } from "../models/index.js";
+import { hashPassword } from "../utils/auth-crypto.js";
 
 export function healthRouter() {
   const r = Router();
@@ -31,6 +33,52 @@ export function healthRouter() {
           }
           res.json({ success: true, message: "Database migrated and seeded successfully!", output: stdout });
         });
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // One-time doctor account creation — use once then remove or protect
+  r.get("/init-doctor", async (req, res, next) => {
+    try {
+      const { AuthUser, AuthUserTenant, Doctor, Tenant } = models;
+      
+      const tenant = await Tenant.findOne({ where: { slug: "dr-kareem" } });
+      if (!tenant) return res.status(404).json({ success: false, message: "Tenant not found. Run /setup first." });
+      
+      const doctor = await Doctor.findOne({ where: { tenant_id: tenant.id } });
+      if (!doctor) return res.status(404).json({ success: false, message: "Doctor not found. Run /setup first." });
+
+      const email = doctor.email || "drkareemeliethy@gmail.com";
+      const password = "DrKareem@2026!";
+
+      // Check if account already exists
+      const existing = await AuthUser.findOne({ where: { email } });
+      if (existing) {
+        return res.json({ success: true, message: "Account already exists.", email, note: "Use the password you set." });
+      }
+
+      const password_hash = await hashPassword(password);
+      const authUser = await AuthUser.create({
+        email,
+        password_hash,
+        user_type: "doctor",
+        doctor_id: doctor.id,
+        status: "enabled",
+      });
+
+      await AuthUserTenant.create({
+        user_id: authUser.id,
+        tenant_id: tenant.id,
+        role: "doctor",
+        active: true,
+      });
+
+      res.json({
+        success: true,
+        message: "Doctor account created successfully!",
+        credentials: { email, password, note: "Change your password after first login!" }
       });
     } catch (err) {
       next(err);
