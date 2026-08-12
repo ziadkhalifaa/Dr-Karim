@@ -66,17 +66,24 @@ export default function Header() {
       }}
     >
       <div className="container site-header__bar">
-        <a href="#home" className="logo" aria-label={t("brand.name")}>
-          <motion.span 
-            whileHover={{ scale: 1.05, rotate: -5 }}
+        <a
+          href="/"
+          className="logo"
+          aria-label={t("brand.name")}
+          onClick={(e) => { e.preventDefault(); navigate("/"); }}
+        >
+          <motion.span
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="logo__mark"
           >
-            <Logo size={64} />
+            <img
+              src="/assets/logo.png"
+              alt={t("brand.name")}
+              style={{ height: "54px", width: "auto", objectFit: "contain" }}
+            />
           </motion.span>
           <span className="logo__text">
-            <span className="logo__name">{t("brand.name")}</span>
-            <br />
             <span className="logo__title">{t("brand.title")}</span>
           </span>
         </a>
@@ -173,9 +180,12 @@ export default function Header() {
             <div className="mobile-drawer__head">
               <span className="logo">
                 <span className="logo__mark">
-                  <Logo size={52} />
+                  <img
+                    src="/assets/logo.png"
+                    alt={t("brand.name")}
+                    style={{ height: "44px", width: "auto", objectFit: "contain" }}
+                  />
                 </span>
-                <span className="logo__name">{t("brand.name")}</span>
               </span>
               <button
                 type="button"
