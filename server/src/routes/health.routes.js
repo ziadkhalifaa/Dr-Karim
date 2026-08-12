@@ -12,6 +12,8 @@ export function healthRouter() {
     } catch {
       next(new AppError(503, ERROR_CODES.DB_UNAVAILABLE, "Database unavailable"));
     }
+  });
+
   r.get("/setup", async (_req, res, next) => {
     try {
       import("child_process").then(({ exec }) => {
