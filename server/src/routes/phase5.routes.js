@@ -1,0 +1,5 @@
+import express from "express";
+import { requireAuth, requireRole } from "../middleware/auth.js";
+import { notificationController } from "../controllers/notification.controller.js";
+import { configurationController } from "../controllers/configuration.controller.js";
+export function phase5Router(){const r=express.Router(); r.use(requireAuth); r.get("/notifications",notificationController.list); r.post("/notifications/:id/read",notificationController.read); r.post("/notifications/read-all",notificationController.readAll); r.get("/notification-preferences",notificationController.preferences); r.post("/notification-preferences",notificationController.setPreference); r.get("/admin/packages",requireRole("doctor"),configurationController.packages); r.patch("/admin/packages/:id",requireRole("doctor"),configurationController.updatePackage); r.get("/admin/payment-settings",requireRole("doctor"),configurationController.settings); r.patch("/admin/payment-settings",requireRole("doctor"),configurationController.updateSettings); return r;}

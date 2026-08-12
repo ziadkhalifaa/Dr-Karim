@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Keep API requests on the Node backend; only frontend routes use the SPA shell.
+RewriteRule ^api(?:/|$) - [L]
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+RewriteRule ^ index.html [L]

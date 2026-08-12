@@ -1,0 +1,4 @@
+import { ok } from "../middleware/api-response.js";
+import { configurationService } from "../services/configuration.service.js";
+import { paymentService } from "../services/payment.service.js";
+export const configurationController = { async packages(req,res,next){try{return ok(res,200,await configurationService.packages({tenantId:req.tenant.id}));}catch(e){return next(e);}}, async updatePackage(req,res,next){try{return ok(res,200,await configurationService.updatePackage({tenantId:req.tenant.id,auth:req.auth,id:req.params.id,body:req.body||{},ip:req.ip}));}catch(e){return next(e);}}, async settings(req,res,next){try{return ok(res,200,await paymentService.settings({tenantId:req.tenant.id}));}catch(e){return next(e);}}, async updateSettings(req,res,next){try{return ok(res,200,await configurationService.updateSettings({tenantId:req.tenant.id,auth:req.auth,body:req.body||{},ip:req.ip}));}catch(e){return next(e);}} };
