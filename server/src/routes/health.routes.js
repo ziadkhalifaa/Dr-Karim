@@ -12,7 +12,22 @@ export function healthRouter() {
     } catch {
       next(new AppError(503, ERROR_CODES.DB_UNAVAILABLE, "Database unavailable"));
     }
+  r.get("/setup", async (_req, res, next) => {
+    try {
+      import("child_process").then(({ exec }) => {
+        exec("npm run db:migrate && node scripts/seed.js", { cwd: process.cwd() }, (error, stdout, stderr) => {
+          if (error) {
+            res.status(500).json({ success: false, message: "Migration failed", error: error.message, stderr, stdout });
+            return;
+          }
+          res.json({ success: true, message: "Database migrated and seeded successfully!", output: stdout });
+        });
+      });
+    } catch (err) {
+      next(err);
+    }
   });
+
   return r;
 }
 
