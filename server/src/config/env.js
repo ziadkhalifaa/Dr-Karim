@@ -32,6 +32,7 @@ export const env = {
   AUTH_MAX_FAILED_LOGINS: Number(process.env.AUTH_MAX_FAILED_LOGINS || 5),
   AUTH_LOCKOUT_SECONDS: Number(process.env.AUTH_LOCKOUT_SECONDS || 900),
   PASSWORD_RESET_TTL_SECONDS: Number(process.env.PASSWORD_RESET_TTL_SECONDS || 900),
+  AUTH_SETUP_TOKEN: process.env.AUTH_SETUP_TOKEN || null,
   DAILY_PROVIDER_MODE: process.env.DAILY_PROVIDER_MODE || (NODE_ENV === "production" ? "daily" : "mock"),
   DAILY_API_KEY: process.env.DAILY_API_KEY || null,
   DAILY_API_BASE_URL: process.env.DAILY_API_BASE_URL || "https://api.daily.co/v1",

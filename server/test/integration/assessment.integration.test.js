@@ -21,7 +21,6 @@ let server = null;
 let baseUrl = "";
 let tenantA = null;
 let tenantB = null;
-let dbAvailable = false;
 
 async function dbReachable() {
   try {
@@ -32,12 +31,14 @@ async function dbReachable() {
   }
 }
 
-before(async () => {
-  dbAvailable = await dbReachable();
-  if (!dbAvailable) {
-    console.log("⏭  SKIP integration tests: MySQL not reachable (run with a live DB to enable)");
-    return;
-  }
+const dbAvailable = await dbReachable();
+
+describe("Integration: full submit (requires DB)", { skip: !dbAvailable }, () => {
+  before(async () => {
+    if (!dbAvailable) {
+      console.log("⏭  SKIP integration tests: MySQL not reachable (run with a live DB to enable)");
+      return;
+    }
   // Create two tenants for isolation test
   tenantA = await Tenant.findOne({ where: { slug: "dr-kareem" } });
   if (!tenantA) throw new Error("default tenant dr-kareem not found");
@@ -103,7 +104,6 @@ function basePayload() {
   };
 }
 
-describe("Integration: full submit (requires DB)", () => {
   it("default tenant works and unknown tenant is rejected", async () => {
     const defaultPayload = basePayload();
     defaultPayload.meta.sessionId = "default-tenant-" + Date.now();

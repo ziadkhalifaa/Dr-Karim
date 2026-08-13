@@ -1,11 +1,10 @@
 import { Router } from "express";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { sequelize } from "../config/database.js";
 import { ok } from "../middleware/api-response.js";
 import { AppError, ERROR_CODES } from "../utils/errors.js";
 import { models } from "../models/index.js";
-import { hashPassword } from "../utils/auth-crypto.js";
+import { hashPassword, randomToken } from "../utils/auth-crypto.js";
+import env from "../config/env.js";
 
 export function healthRouter() {
   const r = Router();
@@ -18,47 +17,35 @@ export function healthRouter() {
     }
   });
 
-  r.get("/setup", async (_req, res, next) => {
-    try {
-      import("child_process").then(({ exec }) => {
-        const __dirname = path.dirname(fileURLToPath(import.meta.url));
-        const migratePath = path.resolve(__dirname, "../../scripts/migrate.js");
-        const seedPath = path.resolve(__dirname, "../../scripts/seed.js");
-        const cmd = `"${process.execPath}" "${migratePath}" && "${process.execPath}" "${seedPath}"`;
-        
-        exec(cmd, (error, stdout, stderr) => {
-          if (error) {
-            res.status(500).json({ success: false, message: "Migration failed", error: error.message, stderr, stdout });
-            return;
-          }
-          res.json({ success: true, message: "Database migrated and seeded successfully!", output: stdout });
-        });
-      });
-    } catch (err) {
-      next(err);
-    }
-  });
-
-  // One-time doctor account creation — use once then remove or protect
+  // One-time doctor account creation. Disabled unless AUTH_SETUP_TOKEN is set,
+  // and requires Authorization: Bearer <AUTH_SETUP_TOKEN>. Generates a random
+  // password returned once to the caller. Delete the token from env after use.
   r.get("/init-doctor", async (req, res, next) => {
     try {
+      if (!env.AUTH_SETUP_TOKEN) {
+        return next(new AppError(404, ERROR_CODES.NOT_FOUND, "Setup endpoint is disabled"));
+      }
+      const supplied = String(req.headers.authorization || "").replace(/^Bearer\s+/iu, "");
+      if (!supplied || supplied !== env.AUTH_SETUP_TOKEN) {
+        return next(new AppError(403, "SETUP_FORBIDDEN", "Setup token is missing or invalid"));
+      }
+
       const { AuthUser, AuthUserTenant, Doctor, Tenant } = models;
-      
+
       const tenant = await Tenant.findOne({ where: { slug: "dr-kareem" } });
-      if (!tenant) return res.status(404).json({ success: false, message: "Tenant not found. Run /setup first." });
-      
+      if (!tenant) return res.status(404).json({ success: false, message: "Tenant not found. Run migrations and seed first." });
+
       const doctor = await Doctor.findOne({ where: { tenant_id: tenant.id } });
-      if (!doctor) return res.status(404).json({ success: false, message: "Doctor not found. Run /setup first." });
+      if (!doctor) return res.status(404).json({ success: false, message: "Doctor not found. Run migrations and seed first." });
 
       const email = doctor.email || "drkareemeliethy@gmail.com";
-      const password = "DrKareem@2026!";
 
-      // Check if account already exists
       const existing = await AuthUser.findOne({ where: { email } });
       if (existing) {
         return res.json({ success: true, message: "Account already exists.", email, note: "Use the password you set." });
       }
 
+      const password = randomToken(18);
       const password_hash = await hashPassword(password);
       const authUser = await AuthUser.create({
         email,

@@ -12,6 +12,7 @@ import { careCycleRouter } from "./care-cycle.routes.js";
 import { paymentRouter } from "./payment.routes.js";
 import { phase5Router } from "./phase5.routes.js";
 import { authenticateOptional, requireTenantAccess } from "../middleware/auth.js";
+import { tenantResolver } from "../middleware/tenant.js";
 
 export function routes(app) {
   const api = express.Router();
@@ -20,8 +21,10 @@ export function routes(app) {
   api.use("/health", healthRouter());
   api.use("/auth", authRouter());
   api.use(authenticateOptional);
+  // Public assessment intake: tenant is resolved anonymously so visitors can
+  // submit without an account; authenticated callers are still handled.
+  api.use("/assessment", tenantResolver, assessmentRouter());
   api.use(requireTenantAccess);
-  api.use("/assessment", assessmentRouter());
   api.use("/doctor/reviews", doctorReviewRouter());
   api.use("/nutrition-plans", nutritionPlanRouter());
   api.use("/exercise-plans", exercisePlanRouter());

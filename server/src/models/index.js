@@ -159,11 +159,11 @@ Service.belongsTo(ServiceCategory, { foreignKey: "service_category_id" });
 Service.hasMany(ServiceTranslation, { foreignKey: "service_id" });
 ServiceTranslation.belongsTo(Service, { foreignKey: "service_id" });
 
-ContentCategory.hasMany(ContentCategoryTranslation, { foreignKey: "content_category_id" });
+ContentCategory.hasMany(ContentCategoryTranslation, { foreignKey: "content_category_id", as: "translations" });
 ContentCategoryTranslation.belongsTo(ContentCategory, { foreignKey: "content_category_id" });
 ContentCategory.hasMany(Content, { foreignKey: "content_category_id" });
 Content.belongsTo(ContentCategory, { foreignKey: "content_category_id" });
-Content.hasMany(ContentTranslation, { foreignKey: "content_id" });
+Content.hasMany(ContentTranslation, { foreignKey: "content_id", as: "translations" });
 ContentTranslation.belongsTo(Content, { foreignKey: "content_id" });
 
 ClinicInfo.hasMany(WorkingHour, { foreignKey: "clinic_info_id" });

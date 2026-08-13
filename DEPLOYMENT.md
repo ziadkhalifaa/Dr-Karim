@@ -85,6 +85,7 @@ TRUST_PROXY        = true
 CORS_ORIGINS       = https://your-site.hostingersite.com
 AUTH_REQUIRED      = true
 AUTH_TOKEN_SECRET  = (64 حرف عشوائي — من random.org)
+AUTH_SETUP_TOKEN   = (توكين عشوائي لمرة واحدة لإنشاء حساب الطبيب — احذفه بعد الاستخدام)
 DEFAULT_TENANT_SLUG = dr-kareem
 DAILY_PROVIDER_MODE = mock
 ```
@@ -129,7 +130,21 @@ node scripts/seed.js
 
 ---
 
-## الخطوة 9 — Start التطبيق
+## الخطوة 9 — إنشاء حساب الطبيب (مرة واحدة)
+
+الـ seed لا ينشئ حساب تسجيل دخول. بعد تشغيل التطبيق:
+
+```bash
+curl -H "Authorization: Bearer $AUTH_SETUP_TOKEN" \
+  https://your-site.hostingersite.com/api/v1/health/init-doctor
+```
+
+- يرجع `credentials.email` + `credentials.password` (عشوائي) — غيّرها من أول دخول.
+- ثم **احذف** `AUTH_SETUP_TOKEN` من الـ env vars وشغّل Restart (بعدها الإيندبوينت بيتعطل تلقائياً).
+
+---
+
+## الخطوة 10 — Start التطبيق
 
 **hPanel** → **Node.js** → اضغط **Start** أو **Restart**
 
