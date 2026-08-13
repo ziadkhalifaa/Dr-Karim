@@ -20,6 +20,7 @@ import PaymentCenter from "./PaymentCenter";
 import DailyCare from "./DailyCare";
 import PatientProgress from "./Progress";
 import { useAuth } from "../../context/AuthProvider";
+import { navigate } from "../../lib/router";
 import {
   appointmentApi,
   checkinApi,
@@ -27,6 +28,7 @@ import {
   nutritionApi,
   exerciseApi,
   paymentApi,
+  patientApi,
 } from "../../api/client";
 
 function PlanCard({ title, plan, icon: Icon, status }) {
@@ -172,6 +174,70 @@ function Checkin({ userId, onDone }) {
   );
 }
 
+// Phase 6D onboarding gate: the patient home is state-driven by the server
+// aggregate (patientApi.home). Each onboarding state renders a guided card on
+// top of the regular workspace so the patient always knows the next step.
+function OnboardingGate({ state, onNavigate }) {
+  const { t } = useTranslation();
+  if (state === "assessment_not_linked")
+    return (
+      <section className="dash-panel dash-onboarding">
+        <div className="dash-panel__body">
+          <h3 className="dash-panel__title"><ClipboardList />{t("dashboard.patient.onboardingAssessmentTitle")}</h3>
+          <p>{t("dashboard.patient.onboardingAssessmentBody")}</p>
+          <div className="dash-row-actions">
+            <button className="dash-btn dash-btn--primary" onClick={() => onNavigate("/assessment")}>
+              {t("dashboard.patient.onboardingAssessmentCta")}
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  if (state === "choose_package")
+    return (
+      <section className="dash-panel dash-panel--accent dash-onboarding">
+        <div className="dash-panel__body">
+          <h3 className="dash-panel__title"><Wallet />{t("dashboard.patient.onboardingChooseTitle")}</h3>
+          <p>{t("dashboard.patient.onboardingChooseBody")}</p>
+          <div className="dash-row-actions">
+            <button className="dash-btn dash-btn--primary" onClick={() => onNavigate("/patient/payments")}>
+              <Wallet />{t("dashboard.patient.getStarted")}
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  if (state === "awaiting_payment_review")
+    return (
+      <section className="dash-panel dash-onboarding">
+        <div className="dash-panel__body">
+          <h3 className="dash-panel__title"><Clock />{t("dashboard.patient.onboardingPendingTitle")}</h3>
+          <p>{t("dashboard.patient.onboardingPendingBody")}</p>
+          <div className="dash-row-actions">
+            <button className="dash-btn dash-btn--ghost" onClick={() => onNavigate("/patient/payments")}>
+              {t("dashboard.patient.viewPayments")}
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  if (state === "unsubscribed")
+    return (
+      <section className="dash-panel dash-onboarding">
+        <div className="dash-panel__body">
+          <h3 className="dash-panel__title"><Wallet />{t("dashboard.patient.onboardingExpiredTitle")}</h3>
+          <p>{t("dashboard.patient.onboardingExpiredBody")}</p>
+          <div className="dash-row-actions">
+            <button className="dash-btn dash-btn--ghost" onClick={() => onNavigate("/patient/payments")}>
+              {t("dashboard.patient.getStarted")}
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  return null;
+}
+
 export default function PatientDashboard({ path }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -182,16 +248,18 @@ export default function PatientDashboard({ path }) {
     appointments: [],
     entitlements: [],
   });
+  const [home, setHome] = useState(null);
   const [busy, setBusy] = useState(false);
 
   const load = async () => {
     if (!user.patientId) return;
-    const [nutrition, exercise, checkins, appointments, entitlements] = await Promise.all([
+    const [nutrition, exercise, checkins, appointments, entitlements, homeData] = await Promise.all([
       nutritionApi.patient(user.patientId),
       exerciseApi.patient(user.patientId),
       checkinApi.list(user.patientId),
       appointmentApi.patientList(user.patientId),
       paymentApi.entitlements(),
+      patientApi.home().catch(() => null),
     ]);
     setData({
       nutrition,
@@ -200,6 +268,7 @@ export default function PatientDashboard({ path }) {
       appointments: appointments || [],
       entitlements: entitlements || [],
     });
+    setHome(homeData);
   };
 
   useEffect(() => {
@@ -287,6 +356,8 @@ export default function PatientDashboard({ path }) {
           <h2>{t("dashboard.patient.overviewTitle")}</h2>
           <p>{t("dashboard.patient.overviewSubtitle")}</p>
         </div>
+
+        <OnboardingGate state={home?.onboarding?.state} onNavigate={navigate} />
 
         <div className="dash-stat-grid">
           <section className="dash-stat dash-stat--primary">

@@ -13,6 +13,7 @@ import { paymentRouter } from "./payment.routes.js";
 import { phase5Router } from "./phase5.routes.js";
 import { careRouter } from "./care.routes.js";
 import { progressRouter } from "./progress.routes.js";
+import { patientRouter } from "./patient.routes.js";
 import { authenticateOptional, requireTenantAccess } from "../middleware/auth.js";
 import { tenantResolver } from "../middleware/tenant.js";
 
@@ -39,7 +40,7 @@ export function routes(app) {
   api.use(phase5Router());
   api.use(careRouter());
   api.use(progressRouter());
-  api.use("/patients", placeholderRouter("patients"));
+api.use("/patients", patientRouter());
   api.use("/services", placeholderRouter("services"));
   api.use("/appointments", placeholderRouter("appointments"));
   app.use("/api/v1", api);

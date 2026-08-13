@@ -31,6 +31,7 @@ async function request(path, options = {}, retried = false) {
 
 export const api = { get: (path, options) => request(path, { ...options, method: "GET" }), post: (path, body, options) => request(path, { ...options, method: "POST", body }), patch: (path, body, options) => request(path, { ...options, method: "PATCH", body }), put: (path, body, options) => request(path, { ...options, method: "PUT", body }) };
 export const authApi = {
+  register: (body) => api.post("/auth/register", body),
   login: (body) => api.post("/auth/login", body),
   refresh: (refreshToken) => api.post("/auth/refresh", { refreshToken }),
   me: () => api.get("/auth/me"),
@@ -38,7 +39,13 @@ export const authApi = {
 };
 export const assessmentApi = { submit: (body) => api.post("/assessment/submit", body) };
 export const reviewApi = { list: (query = "") => api.get(`/doctor/reviews${query}`), get: (id) => api.get(`/doctor/reviews/${id}`), assign: (id, body) => api.post(`/doctor/reviews/${id}/assign`, body), open: (id) => api.post(`/doctor/reviews/${id}/open`, {}), clarify: (id, body) => api.post(`/doctor/reviews/${id}/clarification`, body), approve: (id, body) => api.post(`/doctor/reviews/${id}/approve`, body), reject: (id, body) => api.post(`/doctor/reviews/${id}/reject`, body) };
-export const patientApi = { profile: (id) => reviewApi.get(id) };
+export const patientApi = {
+  list: (query = "") => api.get(`/patients${query}`),
+  get: (id) => api.get(`/patients/${id}`),
+  planVersions: (id) => api.get(`/patients/${id}/plan-versions`),
+  home: () => api.get("/patients/me/home"),
+  profile: (id) => reviewApi.get(id),
+};
 export const planApi = (domain) => ({ create: (body) => api.post(`/${domain}-plans`, body), get: (id) => api.get(`/${domain}-plans/${id}`), patient: (id) => api.get(`/patients/${id}/${domain}-plan`), version: (id, body) => api.post(`/${domain}-plans/${id}/versions`, body), note: (id, body) => api.post(`/${domain}-plans/${id}/notes`, body), submit: (id) => api.post(`/${domain}-plan-versions/${id}/submit-review`, {}), approve: (id) => api.post(`/${domain}-plan-versions/${id}/approve`, {}), activate: (id) => api.post(`/${domain}-plan-versions/${id}/activate`, {}), archive: (id) => api.post(`/${domain}-plan-versions/${id}/archive`, {}) });
 export const nutritionApi = planApi("nutrition");
 export const exerciseApi = planApi("exercise");

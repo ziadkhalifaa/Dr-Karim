@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Scale, Target, Plus, Save, Play, X, Inbox, TrendingDown, TrendingUp, Minus, History,
+  Target, Plus, Save, Play, X, Inbox, TrendingDown, TrendingUp, Minus, History,
 } from "lucide-react";
 import { progressApi } from "../../api/client";
+import PatientSelector from "../shared/PatientSelector";
 
 const goalStatusTone = (s) =>
   ({ draft: "dash-badge--neutral", active: "dash-badge--primary", closed: "dash-badge--success", cancelled: "dash-badge--danger", superseded: "dash-badge--neutral" }[s] || "dash-badge--neutral");
@@ -163,19 +164,20 @@ function GoalList({ goals, onAction }) {
   );
 }
 
-export default function DoctorProgress() {
+// Phase 6D: patient-contextual progress. In context mode (`patientId` from the
+// patient profile) the workspace is already scoped to that person; in standalone
+// mode the doctor picks the patient by name/phone — never by typing an id.
+export default function DoctorProgress({ patientId, patientLabel }) {
   const { t } = useTranslation();
-  const [patientId, setPatientId] = useState("");
-  const [loaded, setLoaded] = useState(null);
+  const [loaded, setLoaded] = useState(patientId || null);
+  const [loadedPatient, setLoadedPatient] = useState(patientId ? { id: patientId, fullName: patientLabel } : null);
   const [data, setData] = useState(null);
   const [goals, setGoals] = useState([]);
   const [activeView, setActiveView] = useState("overview");
   const [error, setError] = useState("");
-  const [busyReset, setBusyReset] = useState(false);
 
   const load = (id) => {
     if (!id) return;
-    setBusyReset(true);
     setError("");
     Promise.all([
       progressApi.dashboard(id),
@@ -184,15 +186,20 @@ export default function DoctorProgress() {
       setData(dash);
       setGoals(g.items || []);
       setLoaded(id);
-    }).catch((err) => setError(err.message || String(err))).finally(() => setBusyReset(false));
+    }).catch((err) => setError(err.message || String(err)));
   };
 
-  const reload = () => load(loaded);
-  const resetView = () => { setPatientId(""); setLoaded(null); setData(null); setGoals([]); setActiveView("overview"); };
+  useEffect(() => {
+    if (patientId) load(patientId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientId]);
 
-  const open = (id) => {
-    setPatientId(id);
-    load(id);
+  const reload = () => load(loaded);
+  const resetView = () => { setLoaded(null); setLoadedPatient(null); setData(null); setGoals([]); setActiveView("overview"); };
+
+  const open = (patient) => {
+    setLoadedPatient(patient);
+    load(patient.id);
     setActiveView("overview");
   };
 
@@ -216,32 +223,28 @@ export default function DoctorProgress() {
     </div>
   );
 
+  const isContext = Boolean(patientId);
+
   return (
     <div className="dash-stack">
-      <ActionBar title={t("doctorProgress.subtitle")} showBack={false} />
+      <ActionBar title={t("doctorProgress.subtitle")} showBack={!isContext} />
 
       {!loaded ? (
         <section className="dash-panel">
           <div className="dash-panel__head">
             <h3 className="dash-panel__title"><Target />{t("doctorProgress.selectPatient")}</h3>
           </div>
-          <form
-            className="dash-form"
-            onSubmit={(e) => { e.preventDefault(); open(new FormData(e.currentTarget).get("patientId")); }}
-          >
-            <div className="dash-form--grid">
-              <label className="dash-field">
-                <span>{t("doctorProgress.patientId")}</span>
-                <input type="text" value={patientId} onChange={(e) => setPatientId(e.target.value)} required placeholder="123" />
-              </label>
-            </div>
+          <div className="dash-form">
+            <PatientSelector
+              value={loadedPatient}
+              onSelect={(p) => { if (p?.id) open(p); }}
+            />
             {error && <p className="dash-muted" style={{ color: "var(--dash-danger)" }}>{error}</p>}
-            <button className="dash-btn dash-btn--primary" disabled={busyReset}><Scale />{busyReset ? t("doctorProgress.loading") : t("doctorProgress.open")}</button>
-          </form>
+          </div>
         </section>
       ) : (
         <>
-          <ActionBar title={`${t("doctorProgress.patientLabel")} #${loaded}`} showBack />
+          <ActionBar title={loadedPatient?.fullName || `${t("doctorProgress.patientLabel")} #${loaded}`} showBack={!isContext} />
           <div className="dash-tabs">
             <button className={`dash-tab ${activeView === "overview" ? "dash-tab--active" : ""}`} onClick={() => setActiveView("overview")}>{t("doctorProgress.tabOverview")}</button>
             <button className={`dash-tab ${activeView === "goals" ? "dash-tab--active" : ""}`} onClick={() => setActiveView("goals")}>{t("doctorProgress.tabGoals")}</button>

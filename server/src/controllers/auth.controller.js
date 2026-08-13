@@ -2,6 +2,7 @@ import { ok } from "../middleware/api-response.js";
 import { authService } from "../services/auth.service.js";
 
 export const authController = {
+  async register(req, res, next) { try { return ok(res, 201, await authService.register({ ...req.body, tenantSlug: req.body?.tenantSlug || req.headers["x-tenant-slug"], userAgent: req.get("user-agent"), ip: req.ip })); } catch (err) { return next(err); } },
   async login(req, res, next) { try { return ok(res, 200, await authService.login({ ...req.body, tenantSlug: req.body?.tenantSlug || req.headers["x-tenant-slug"], userAgent: req.get("user-agent"), ip: req.ip })); } catch (err) { return next(err); } },
   async refresh(req, res, next) { try { return ok(res, 200, await authService.refresh(req.body?.refreshToken, req.get("user-agent"), req.ip)); } catch (err) { return next(err); } },
   async logout(req, res, next) { try { await authService.logout(req.body?.refreshToken, req.auth?.token?.familyId); return ok(res, 200, { loggedOut: true }); } catch (err) { return next(err); } },

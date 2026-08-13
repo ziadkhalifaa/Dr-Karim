@@ -9,7 +9,7 @@
 
 export const ENUM = {
   SEX: ["female", "male"],
-  PATIENT_STATUS: ["active", "inactive", "archived"], // §8 soft-archive
+  PATIENT_STATUS: ["active", "inactive", "archived", "pending_payment"], // §8 soft-archive + Phase 6D onboarding
   SUBJECT: ["self", "someone_else"],
   LANGUAGE: ["ar", "en"],
   SESSION_STATUS: ["draft", "submitted"], // draft purge per §9; submitted immutable

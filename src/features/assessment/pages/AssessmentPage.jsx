@@ -145,6 +145,11 @@ export default function AssessmentPage() {
       dispatch({ type: "SUBMIT", referenceNumber: data.referenceNumber, overallTier: data.overallTier, reviewState: data.reviewState, submittedAt: new Date().toISOString() });
       clearDraft();
       actions.setPosition({ step: "success", sectionIndex: 0, questionIndex: 0 });
+      try {
+        sessionStorage.setItem("drke-register-name", (state.contact?.patientName || state.answers.Q01_03 || "").toString());
+        sessionStorage.setItem("drke-register-phone", (state.contact?.patientPhone || state.contact?.handoffPhone || "").toString());
+        sessionStorage.setItem("drke-register-assessment", String(data.referenceNumber || ""));
+      } catch { /* ignore storage errors */ }
     } catch (error) {
       setSubmitError(error.message || "Unable to submit assessment");
     }

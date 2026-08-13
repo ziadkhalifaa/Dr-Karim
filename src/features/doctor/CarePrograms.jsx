@@ -1,17 +1,67 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox,
+  ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox, UserRound,
 } from "lucide-react";
-import { careApi } from "../../api/client";
+import { careApi, patientApi } from "../../api/client";
+import PatientSelector from "../shared/PatientSelector";
 
 const statusTone = (s) =>
   ({ draft: "dash-badge--neutral", scheduled: "dash-badge--info", active: "dash-badge--primary", paused: "dash-badge--warning", completed: "dash-badge--success", cancelled: "dash-badge--danger", expired: "dash-badge--neutral" }[s] || "dash-badge--neutral");
 
-function CreateProgram({ onCreate, onCancel }) {
+// Phase 6D: patient-contextual. The patient is picked by name/phone from the
+// directory (never by typing an internal id). When `patientId` is provided the
+// workspace is already scoped to that patient.
+function PlanVersionSelect({ options, label, value, onChange, busy }) {
+  const { t } = useTranslation();
+  if (!options || busy)
+    return (
+      <label className="dash-field">
+        <span>{label}</span>
+        {busy ? <p className="dash-muted">{t("dashboard.common.loading")}</p> : <p className="dash-muted">{t("doctorCare.selectPatientFirst")}</p>}
+      </label>
+    );
+  return (
+    <label className="dash-field">
+      <span>{label}</span>
+      <select
+        className="dash-select"
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value || null)}
+      >
+        <option value="">{t("doctorCare.noVersion")}</option>
+        {options.map((v) => (
+          <option key={v.id} value={v.id}>
+            {t("doctorCare.planVersionPicker", { n: v.versionNo })}{" "}
+            <span dir="ltr">({v.effectiveFrom || "?"} → {v.effectiveTo || "∞"})</span>
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [selected, setSelected] = useState(patientId ? { id: patientId, fullName: patientLabel || "…" } : null);
+  const [versions, setVersions] = useState(null);
+  const [versionsBusy, setVersionsBusy] = useState(false);
+  const [nutritionVersionId, setNutritionVersionId] = useState("");
+  const [exerciseVersionId, setExerciseVersionId] = useState("");
+
+  useEffect(() => {
+    if (!selected?.id) { setVersions(null); setNutritionVersionId(""); setExerciseVersionId(""); return; }
+    let cancelled = false;
+    setVersionsBusy(true);
+    patientApi.planVersions(selected.id)
+      .then((res) => { if (!cancelled) setVersions({ nutrition: res.nutrition || [], exercise: res.exercise || [] }); })
+      .catch(() => { if (!cancelled) setVersions({ nutrition: [], exercise: [] }); })
+      .finally(() => { if (!cancelled) setVersionsBusy(false); });
+    return () => { cancelled = true; };
+  }, [selected?.id]);
+
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true);
@@ -19,12 +69,12 @@ function CreateProgram({ onCreate, onCancel }) {
     try {
       const f = new FormData(e.currentTarget);
       await onCreate({
-        patientId: f.get("patientId"),
+        patientId: selected?.id,
         startDate: f.get("startDate"),
         endDate: f.get("endDate"),
         status: f.get("status") || "draft",
-        nutritionPlanVersionId: f.get("nutritionPlanVersionId") || null,
-        exercisePlanVersionId: f.get("exercisePlanVersionId") || null,
+        nutritionPlanVersionId: nutritionVersionId || null,
+        exercisePlanVersionId: exerciseVersionId || null,
         programInstructions: f.get("programInstructions") || null,
       });
     } catch (err) {
@@ -44,10 +94,13 @@ function CreateProgram({ onCreate, onCancel }) {
       </div>
       <form className="dash-form" onSubmit={submit}>
         <div className="dash-form--grid">
-          <label className="dash-field">
-            <span>{t("doctorCare.patientId")}</span>
-            <input type="text" name="patientId" required />
-          </label>
+          {patientId ? (
+            <p className="dash-hint dash-patient-context">
+              <UserRound /> {t("patientSelector.selected")}: <strong>{selected?.fullName}</strong>
+            </p>
+          ) : (
+            <PatientSelector value={selected} onSelect={setSelected} />
+          )}
           <label className="dash-field">
             <span>{t("doctorCare.startDate")}</span>
             <input type="date" name="startDate" required />
@@ -58,26 +111,32 @@ function CreateProgram({ onCreate, onCancel }) {
           </label>
           <label className="dash-field">
             <span>{t("doctorCare.programStatus")}</span>
-            <select name="status">
+            <select className="dash-select" name="status">
               <option value="draft">{t("dashboard.status.draft") || "Draft"}</option>
               <option value="scheduled">{t("doctorCare.scheduled")}</option>
             </select>
           </label>
-          <label className="dash-field">
-            <span>{t("doctorCare.nutritionVersion")}</span>
-            <input type="text" name="nutritionPlanVersionId" />
-          </label>
-          <label className="dash-field">
-            <span>{t("doctorCare.exerciseVersion")}</span>
-            <input type="text" name="exercisePlanVersionId" />
-          </label>
+          <PlanVersionSelect
+            options={versions?.nutrition}
+            busy={versionsBusy}
+            label={t("doctorCare.nutritionVersion")}
+            value={nutritionVersionId}
+            onChange={setNutritionVersionId}
+          />
+          <PlanVersionSelect
+            options={versions?.exercise}
+            busy={versionsBusy}
+            label={t("doctorCare.exerciseVersion")}
+            value={exerciseVersionId}
+            onChange={setExerciseVersionId}
+          />
         </div>
         <label className="dash-field">
           <span>{t("doctorCare.instructions")}</span>
           <textarea name="programInstructions" rows="2" />
         </label>
         {error && <p className="dash-muted" style={{ color: "var(--dash-danger)" }}>{error}</p>}
-        <button className="dash-btn dash-btn--primary" disabled={busy}>
+        <button className="dash-btn dash-btn--primary" disabled={busy || !selected?.id}>
           <Save />{busy ? t("dashboard.common.loading") : t("doctorCare.create")}
         </button>
       </form>
@@ -170,7 +229,7 @@ function AddDefinitions({ onAdd }) {
   );
 }
 
-function ProgramDetail({ id, onBack, onChanged }) {
+function ProgramDetail({ id, patientLabel, onBack, onChanged }) {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -231,7 +290,7 @@ function ProgramDetail({ id, onBack, onChanged }) {
           <ClipboardList />
           {t("doctorCare.programDetail")}
         </span>
-        <h2>#{program.id} · {program.patient_id}</h2>
+        <h2>{patientLabel ? `${patientLabel}` : `#${program.id}`}</h2>
         <div className="dash-row-actions">
           <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={onBack}>
             <ArrowLeft />{t("doctorCare.back")}
@@ -287,22 +346,23 @@ function ProgramDetail({ id, onBack, onChanged }) {
   );
 }
 
-export default function CarePrograms() {
+export default function CarePrograms({ patientId, patientLabel }) {
   const { t } = useTranslation();
   const [rows, setRows] = useState([]);
   const [selected, setSelected] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
 
   const load = async () => {
-    const list = await careApi.programList();
+    const list = await careApi.programList(patientId ? `?patientId=${patientId}` : "");
     setRows(list || []);
   };
 
   useEffect(() => {
     load().catch(() => {});
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientId]);
 
-  if (selected) return <ProgramDetail id={selected} onBack={() => setSelected(null)} onChanged={load} />;
+  if (selected) return <ProgramDetail id={selected} patientLabel={patientLabel} onBack={() => setSelected(null)} onChanged={load} />;
 
   return (
     <>
@@ -311,11 +371,11 @@ export default function CarePrograms() {
           <ClipboardList />
           {t("doctorCare.title")}
         </span>
-        <h2>{t("doctorCare.title")}</h2>
+        <h2>{patientLabel ? patientLabel : t("doctorCare.title")}</h2>
         <p>{t("doctorCare.subtitle")}</p>
       </div>
 
-      {showCreate && <CreateProgram onCreate={async (body) => { const p = await careApi.createProgram(body); setShowCreate(false); await load(); setSelected(String(p.program.id)); }} onCancel={() => setShowCreate(false)} />}
+      {showCreate && <CreateProgram patientId={patientId} patientLabel={patientLabel} onCreate={async (body) => { const p = await careApi.createProgram(body); setShowCreate(false); await load(); setSelected(String(p.program.id)); }} onCancel={() => setShowCreate(false)} />}
 
       <section className="dash-panel">
         <div className="dash-panel__head">
@@ -335,8 +395,6 @@ export default function CarePrograms() {
             <table className="dash-table">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>{t("doctorCare.patient")}</th>
                   <th>{t("doctorCare.range")}</th>
                   <th>{t("doctorCare.status")}</th>
                   <th></th>
@@ -345,8 +403,6 @@ export default function CarePrograms() {
               <tbody>
                 {rows.map((p) => (
                   <tr key={p.id}>
-                    <td className="dash-cell-muted">#{p.id}</td>
-                    <td><span className="dash-cell-main">{p.patient_id}</span></td>
                     <td className="dash-cell-muted">{p.start_date} → {p.end_date}</td>
                     <td><span className={`dash-badge ${statusTone(p.status)}`}>{p.status}</span></td>
                     <td>

@@ -9,6 +9,11 @@ export default function SuccessScreen({ referenceNumber, overallTier, reviewStat
     "next3",
   ];
 
+  const createAccount = () => {
+    // Prefill data + reference were stashed at submit time in sessionStorage.
+    navigate("/register");
+  };
+
   return (
     <div className="aq-screen aq-success">
       <div className="aq-card aq-success__card">
@@ -43,13 +48,22 @@ export default function SuccessScreen({ referenceNumber, overallTier, reviewStat
 
         <p className="aq-success__note">{t("success.note")}</p>
 
-        <button
-          type="button"
-          className="aq-btn aq-btn--accent aq-success__home"
-          onClick={() => navigate("/")}
-        >
-          {t("success.home")}
-        </button>
+<div className="aq-success__actions">
+          <button
+            type="button"
+            className="aq-btn aq-btn--accent"
+            onClick={createAccount}
+          >
+            {t("success.createAccount")}
+          </button>
+          <button
+            type="button"
+            className="aq-btn aq-btn--ghost aq-success__home"
+            onClick={() => navigate("/")}
+          >
+            {t("success.home")}
+          </button>
+        </div>
       </div>
     </div>
   );

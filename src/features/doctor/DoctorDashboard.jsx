@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   ClipboardList,
   Scale,
+  Users,
 } from "lucide-react";
 import DashboardShell from "../shared/DashboardShell";
 import NotificationsPanel from "../shared/NotificationsPanel";
@@ -21,6 +22,8 @@ import PaymentReview from "./PaymentReview";
 import AdminConfiguration from "./AdminConfiguration";
 import CarePrograms from "./CarePrograms";
 import DoctorProgress from "./ProgressManager";
+import PatientsList from "./PatientsList";
+import PatientProfile from "./PatientProfile";
 import { reviewApi, appointmentApi, notificationApi } from "../../api/client";
 import { useAuth } from "../../context/AuthProvider";
 
@@ -275,6 +278,7 @@ export default function DoctorDashboard({ path }) {
 
   const nav = [
     { path: "/doctor", label: t("dashboard.nav.overview"), icon: LayoutDashboard },
+    { path: "/doctor/patients", label: t("dashboard.nav.patients"), icon: Users },
     { path: "/doctor/reviews", label: t("dashboard.nav.reviewQueue"), icon: ListChecks },
     { path: "/doctor/care", label: t("doctorCare.title"), icon: ClipboardList },
     { path: "/doctor/progress", label: t("doctorProgress.nav"), icon: Scale },
@@ -284,8 +288,12 @@ export default function DoctorDashboard({ path }) {
     { path: "/doctor/notifications", label: t("dashboard.nav.notifications"), icon: Bell },
   ];
 
+  const patientProfileMatch = path.match(/^\/doctor\/patients\/(\d+)$/);
+
   let page;
-  if (path === "/doctor/payments") page = <PaymentReview />;
+  if (patientProfileMatch) page = <PatientProfile patientId={patientProfileMatch[1]} />;
+  else if (path === "/doctor/patients") page = <PatientsList />;
+  else if (path === "/doctor/payments") page = <PaymentReview />;
   else if (path === "/doctor/configuration") page = <AdminConfiguration />;
   else if (path === "/doctor/notifications") page = <NotificationsPanel />;
   else if (path === "/doctor/reviews") page = <Reviews rows={reviews} reload={reload} />;

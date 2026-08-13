@@ -10,6 +10,7 @@ import { simpleRateLimit } from "../utils/rate-limit.js";
 export function authRouter() {
   const r = Router();
   const loginLimit = simpleRateLimit({ windowMs: 60000, max: 10, key: (req) => `${req.ip}:${String(req.body?.identifier || "").toLowerCase()}` });
+  r.post("/register", simpleRateLimit({ windowMs: 60000, max: 10 }), authController.register);
   r.post("/login", loginLimit, authController.login);
   r.post("/refresh", simpleRateLimit({ max: 20 }), authController.refresh);
   r.post("/logout", authenticateOptional, authController.logout);

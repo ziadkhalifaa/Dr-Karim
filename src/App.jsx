@@ -14,6 +14,7 @@ import { useRoute } from "./lib/router";
 import AssessmentPage from "./features/assessment/pages/AssessmentPage";
 import { AuthProvider } from "./context/AuthProvider";
 import LoginPage from "./features/auth/LoginPage";
+import RegisterPage from "./features/auth/RegisterPage";
 import DoctorDashboard from "./features/doctor/DoctorDashboard";
 import PatientDashboard from "./features/patient/PatientDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -27,6 +28,7 @@ export default function App() {
   const path = useRoute();
 
   if (path === "/login") return <AppProvider><AuthProvider><LoginPage /></AuthProvider></AppProvider>;
+  if (path === "/register") return <AppProvider><AuthProvider><RegisterPage /></AuthProvider></AppProvider>;
   if (path.startsWith("/doctor")) return <AppProvider><AuthProvider><ProtectedRoute roles={["doctor", "staff"]}><DoctorDashboard path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
   if (path.startsWith("/patient")) return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PatientDashboard path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
 

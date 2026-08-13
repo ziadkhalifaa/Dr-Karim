@@ -1169,3 +1169,44 @@
   width: 84px; padding: 7px 9px; border: 1px solid var(--dash-border);
   border-radius: 8px; background: var(--dash-card-bg); color: var(--dash-text);
 }
+.dash-def-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.dash-def-list div {
+  display: flex; justify-content: space-between; gap: 12px; align-items: baseline;
+  border-bottom: 1px dashed var(--dash-border); padding-bottom: 8px;
+}
+.dash-def-list div:last-child { border-bottom: none; padding-bottom: 0; }
+.dash-def-list dt { color: var(--dash-text-muted); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.dash-def-list dd { margin: 0; font-size: 14px; font-weight: 700; text-align: start; flex: 1; }
+.dash-pagination {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 14px; border-top: 1px solid var(--dash-border);
+}
+.dash-onboarding {
+  border: 1px dashed var(--dash-primary);
+  background: linear-gradient(120deg, var(--dash-primary-soft), var(--dash-card-bg));
+  margin-block-end: 16px;
+}
+.dash-onboarding .dash-panel__title { font-size: 16px; }
+.dash-patient-selector { position: relative; }
+.dash-patient-selector__control {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--dash-border); border-radius: 10px;
+  padding: 0 10px; background: var(--dash-card-bg);
+}
+.dash-patient-selector__control .dash-input {
+  border: none; box-shadow: none; padding: 9px 0; background: transparent; flex: 1;
+}
+.dash-patient-selector__menu {
+  position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--dash-card-bg); border: 1px solid var(--dash-border);
+  border-radius: 12px; box-shadow: var(--dash-shadow); max-height: 280px;
+  overflow: auto; padding: 6px; pointer-events: auto;
+}
+.dash-patient-selector__option {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: start;
+  padding: 10px 12px; border-radius: 8px; cursor: pointer; border: none;
+  background: none; color: var(--dash-text); font-size: 14px; font-family: inherit;
+}
+.dash-patient-selector__option:hover { background: var(--dash-primary-soft); }
+.dash-patient-selector__option-main { font-weight: 700; }
+.dash-patients-filters { align-items: end; }
