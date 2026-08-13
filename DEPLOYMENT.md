@@ -86,12 +86,16 @@ CORS_ORIGINS       = https://your-site.hostingersite.com
 AUTH_REQUIRED      = true
 AUTH_TOKEN_SECRET  = (64 حرف عشوائي — من random.org)
 AUTH_SETUP_TOKEN   = (توكين عشوائي لمرة واحدة لإنشاء حساب الطبيب — احذفه بعد الاستخدام)
+DB_AUTO_SYNC       = true  (افتراضي: مفعّل في production — يشغّل migrate+seed تلقائياً عند كل Start/Restart)
 DEFAULT_TENANT_SLUG = dr-kareem
 DAILY_PROVIDER_MODE = mock
 ```
 
 > AUTH_TOKEN_SECRET لازم يكون 32 حرف على الأقل!
 > لا تحط localhost في CORS_ORIGINS في production!
+> DB_AUTO_SYNC يعمل بشكل **Additive فقط**: يشغّل `db:migrate` ثم `db:seed`
+> ويضيف/يحدّث بيانات التهيئة المستخلصة من الكود، **ولا يحذف أي بيانات أبداً**
+> (بيانات المرضى والجداول القديمة تفضل كما هي). ضع `DB_AUTO_SYNC=false` لتعطيله.
 
 ---
 
@@ -110,23 +114,26 @@ npm install --production
 
 ---
 
-## الخطوة 7 — تشغيل Database Migrations (SSH)
+## الخطوة 7 — Migration + Seed (تلقائي وإضافي)
 
+**أصبحت تلقائية:** عند بدء التطبيق في production يشغّل السيرفر `db:sync`
+(`db:migrate` ثم `db:seed`) بنفسه قبل الاستماع للطلبات. كل ما تحتاجه هو
+**Start/Restart** من hPanel بعد الرفع — الجداول الجديدة بتتعمل وبيانات
+الكتالوج الجديدة بتتضاف، والبيانات القديمة **ما بتتشيلش أبداً**.
+
+لو عايز تشغّلها يدوياً (اختياري):
 ```bash
 cd ~/domains/your-site.com/server
-npm run db:migrate
+npm run db:sync      # migrate + seed معاً
 ```
 
-يجب أن تنتهي بـ: `All migrations applied.`
-
----
-
-## الخطوة 8 — Seed Data (SSH)
-
+للتحقق من التطابق (يسمح بالزيادة من الأسئلة القديمة كلها كملاحظات):
 ```bash
-cd ~/domains/your-site.com/server
-node scripts/seed.js
+npm run db:verify
 ```
+
+> البداية الفاشلة بتخلي التطبيق **لا يشتغل** (ليس تشغيلاً بقاعدة قديمة).
+> لو حصل خطأ في migration (مثلاً checksum) راجع الخطأ من السجل.
 
 ---
 

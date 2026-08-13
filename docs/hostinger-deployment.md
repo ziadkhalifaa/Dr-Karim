@@ -9,8 +9,8 @@ These are requirements derived from the repository. No Hostinger values are inve
 - Node.js: use a supported version satisfying `server/package.json` (`>=18`); validate the selected Hostinger version against the current lockfile before deployment.
 - Frontend build: `npm run build` from the project root.
 - Backend start: `npm start` from `server` (`node src/server.js`).
-- Database migration: `npm run db:migrate` from `server`, as a controlled release step before starting the new application version.
-- Seeding: `npm run db:seed` only for an explicitly approved empty/non-production database; never seed test data into production.
+- Database migration: `npm run db:migrate` from `server`, as a controlled release step — also auto-run at startup via `DB_AUTO_SYNC` (default on in production) through `src/db-bootstrap.js`.
+- Seeding: `npm run db:seed` is **additive-only** (creates/updates derived catalog rows, never deletes) and runs automatically alongside migrate at startup. No test data is seeded; the seed converges the reference catalog from the frontend single-source files. Set `DB_AUTO_SYNC=false` to disable the automatic step.
 
 ## Required environment/configuration
 

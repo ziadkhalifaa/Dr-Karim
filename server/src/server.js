@@ -2,6 +2,7 @@ import { createApp } from "./app.js";
 import { sequelize } from "./config/database.js";
 import { logger } from "./utils/logger.js";
 import env from "./config/env.js";
+import { ensureDatabaseSync } from "./db-bootstrap.js";
 
 const app = createApp();
 
@@ -16,6 +17,11 @@ async function start() {
       if (env.DAILY_PROVIDER_MODE === "daily" && !env.DAILY_API_KEY) throw new Error("DAILY_API_KEY must be configured when Daily mode is enabled in production");
     }
     logger.info("starting", { version: "1.0.0", node: process.version });
+    if (env.DB_AUTO_SYNC) {
+      // Additive, idempotent migrate + seed so every deploy converges the DB
+      // catalog with the frontend single-source files (never deletes data).
+      ensureDatabaseSync();
+    }
     await sequelize.authenticate();
     logger.info("database connected", { host: env.HOST, port: env.PORT });
 

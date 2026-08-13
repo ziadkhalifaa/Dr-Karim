@@ -9,6 +9,7 @@
     "dev": "node --watch src/server.js",
     "db:migrate": "node scripts/migrate.js",
     "db:seed": "node scripts/seed.js",
+    "db:sync": "node scripts/migrate.js && node scripts/seed.js",
     "db:verify": "node scripts/verify-assessment-consistency.js",
     "test": "node --test \"test/unit/*.test.js\" \"test/integration/*.test.js\"",
     "test:unit": "node --test \"test/unit/*.test.js\"",

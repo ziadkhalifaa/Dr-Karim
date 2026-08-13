@@ -33,6 +33,11 @@ export const env = {
   AUTH_LOCKOUT_SECONDS: Number(process.env.AUTH_LOCKOUT_SECONDS || 900),
   PASSWORD_RESET_TTL_SECONDS: Number(process.env.PASSWORD_RESET_TTL_SECONDS || 900),
   AUTH_SETUP_TOKEN: process.env.AUTH_SETUP_TOKEN || null,
+  // Additive DB sync on startup: runs db:migrate + db:seed before the app
+  // listens. Defaults to ON in production (every deploy/restart converges the
+  // catalog); set DB_AUTO_SYNC=false to disable. Seeds are additive-only and
+  // never delete data.
+  DB_AUTO_SYNC: process.env.DB_AUTO_SYNC === undefined ? NODE_ENV === "production" : process.env.DB_AUTO_SYNC === "true",
   DAILY_PROVIDER_MODE: process.env.DAILY_PROVIDER_MODE || (NODE_ENV === "production" ? "daily" : "mock"),
   DAILY_API_KEY: process.env.DAILY_API_KEY || null,
   DAILY_API_BASE_URL: process.env.DAILY_API_BASE_URL || "https://api.daily.co/v1",

@@ -7,6 +7,9 @@
 //     (migrations/seeds must run first).
 //   - Compares seeded question_version_cfg / flag_rule_version rows against
 //     the frontend expectation and prints a per-item mismatch report.
+//   - Additive-only semantics: the seeded DB may hold a SUPERSET of the
+//     frontend catalog (legacy/removed questions stay, never deleted). Missing
+//     or mismatched rows are errors; extra legacy rows are informational notes.
 //   - Exit code 0 when consistent, 1 on any mismatch (CI/verify gate).
 //
 // Usage: node scripts/verify-assessment-consistency.js
@@ -61,10 +64,9 @@ async function verifyCatalog(def) {
   const catalogRows = await QuestionCatalog.findAll({ raw: true });
   const byCode = new Map(catalogRows.map((r) => [r.code, r]));
 
-  if (catalogRows.length !== EXPECTED.length) {
-    report("count", `question_catalog has ${catalogRows.length} rows; frontend source has ${EXPECTED.length}.`);
-  }
-
+  // Additive-only policy: the seeded catalog may be a SUPERSET of the frontend
+  // source (legacy/removed questions are kept, never deleted). Missing rows are
+  // errors; extra rows are tolerated and reported as a note.
   const missingCodes = [];
   for (const q of EXPECTED) {
     if (!byCode.has(q.id)) {
@@ -85,6 +87,10 @@ async function verifyCatalog(def) {
   if (missingCodes.length) {
     report("catalog", `missing question_catalog rows: ${missingCodes.join(", ")}.`);
   }
+  const extraCodes = catalogRows.filter((r) => !EXPECTED.some((q) => q.id === r.code)).map((r) => r.code);
+  if (extraCodes.length) {
+    NOTES.push(`question_catalog extra (legacy, kept by additive policy): ${extraCodes.join(", ")}.`);
+  }
 
   const cfgRows = await QuestionVersionCfg.findAll({
     where: { definition_id: def.id },
@@ -92,10 +98,6 @@ async function verifyCatalog(def) {
     raw: true,
   });
   const cfgByCode = new Map(cfgRows.map((r) => [r["question_catalog.code"], r]));
-
-  if (cfgRows.length !== EXPECTED.length) {
-    report("count", `question_version_cfg has ${cfgRows.length} rows for def v${def.version}; expected ${EXPECTED.length}.`);
-  }
 
   for (const q of EXPECTED) {
     const row = cfgByCode.get(q.id);

@@ -9,7 +9,10 @@
 // The ESM loader hook resolves the frontend's extensionless relative imports
 // so this script reads the EXACT same files the UI renders.
 //
-// NEVER edits applied migrations. Seeds only add idempotent reference data.
+// NEVER edits applied migrations. Additive-only policy (auto-run on every
+// deploy/restart via src/db-bootstrap.js): missing rows are created and
+// existing derived rows are refreshed toward the frontend single source,
+// but NO row is ever deleted — legacy/removed questions stay intact.
 
 import { register } from "node:module";
 
@@ -70,6 +73,9 @@ async function seedCodeTable(Model, rows) {
     if (!existing) {
       await Model.create(r);
       created += 1;
+    } else {
+      // Additive convergence: refresh labels/sort on existing codes, never delete.
+      await existing.update({ name_ar: r.name_ar, name_en: r.name_en, sort_order: r.sort_order });
     }
   }
   return created;
@@ -272,9 +278,10 @@ async function seedAssessmentDefinition(tenant) {
     ...buildQ10Snippets(),
     ...contactQuestions,
   ];
-  let sort = 0;
+let sort = 0;
   let catCreated = 0;
   let cfgCreated = 0;
+  let cfgUpdated = 0;
 
   for (const q of allQuestions) {
     sort += 1;
@@ -291,26 +298,33 @@ async function seedAssessmentDefinition(tenant) {
     );
     if (cat.code === normalized.code) catCreated += 1; // counters only
 
+    const cfgValues = {
+      definition_id: def.id,
+      question_catalog_id: cat.id,
+      sort_order: sort,
+      label_ar: normalized.label_ar,
+      label_en: normalized.label_en,
+      help_ar: normalized.help_ar,
+      help_en: normalized.help_en,
+      placeholder_ar: normalized.placeholder_ar,
+      placeholder_en: normalized.placeholder_en,
+      required: normalized.required,
+      options_json: normalized.options_json,
+      validation_json: normalized.validation_json,
+      conditional_json: normalized.conditional_json,
+    };
+
     const existingCfg = await QuestionVersionCfg.findOne({
       where: { definition_id: def.id, question_catalog_id: cat.id },
     });
     if (!existingCfg) {
-      await QuestionVersionCfg.create({
-        definition_id: def.id,
-        question_catalog_id: cat.id,
-        sort_order: sort,
-        label_ar: normalized.label_ar,
-        label_en: normalized.label_en,
-        help_ar: normalized.help_ar,
-        help_en: normalized.help_en,
-        placeholder_ar: normalized.placeholder_ar,
-        placeholder_en: normalized.placeholder_en,
-        required: normalized.required,
-        options_json: normalized.options_json,
-        validation_json: normalized.validation_json,
-        conditional_json: normalized.conditional_json,
-      });
+      await QuestionVersionCfg.create(cfgValues);
       cfgCreated += 1;
+    } else {
+      // Additive convergence: refresh the frozen config toward the frontend
+      // single source on every deploy; legacy rows are never removed.
+      await existingCfg.update(cfgValues);
+      cfgUpdated += 1;
     }
   }
 
@@ -318,7 +332,7 @@ async function seedAssessmentDefinition(tenant) {
   // so no tenant_id column; this call is a no-op kept for API symmetry.
   void tenant;
 
-  return { total: allQuestions.length, catCreated, cfgCreated };
+  return { total: allQuestions.length, catCreated, cfgCreated, cfgUpdated };
 }
 
 // ---------------------------------------------------------------------------
@@ -379,6 +393,7 @@ async function seedFlags() {
   const rules = [...FLAG_RULES, ...INERT_FLAGS];
   let ruleCreated = 0;
   let versionCreated = 0;
+  let versionUpdated = 0;
 
   for (const r of rules) {
     const { row: rule } = await upsert(
@@ -395,7 +410,24 @@ async function seedFlags() {
     const existingVersion = await FlagRuleVersion.findOne({
       where: { flag_rule_id: rule.id, version: "1.0" },
     });
-    if (existingVersion) continue;
+    if (existingVersion) {
+      // Additive convergence: refresh message/refs toward the frontend single
+      // source; existing (patient-bound) versions are never removed.
+      await existingVersion.update({
+        tier: r.tier,
+        trigger_json: {
+          source: "src/features/assessment/logic/flags.js",
+          ruleId: r.ruleId,
+          inert: !rule.active,
+          semantics: "Frontend derivation is NOT reimplemented server-side in Phase 1 (catalog/storage only).",
+        },
+        question_refs_json: r.refs,
+        message_ar: r.message.ar,
+        message_en: r.message.en,
+      });
+      versionUpdated += 1;
+      continue;
+    }
 
     await FlagRuleVersion.create({
       flag_rule_id: rule.id,
@@ -415,10 +447,10 @@ async function seedFlags() {
       effective_from: TODAY,
       effective_to: null,
     });
-    versionCreated += 1;
+versionCreated += 1;
   }
 
-  return { ruleCreated, versionCreated };
+  return { ruleCreated, versionCreated, versionUpdated };
 }
 
 // ---------------------------------------------------------------------------
@@ -593,10 +625,10 @@ async function main() {
     console.log("reference codes:", JSON.stringify(codes));
 
     const assessment = await seedAssessmentDefinition(tenant);
-    console.log(`assessment definition: ${assessment.total} questions, ${assessment.cfgCreated} config rows created.`);
+    console.log(`assessment definition: ${assessment.total} questions, ${assessment.cfgCreated} config rows created, ${assessment.cfgUpdated} refreshed.`);
 
-    const flags = await seedFlags();
-    console.log(`flag rules: ${flags.ruleCreated} rules, ${flags.versionCreated} versions created.`);
+const flags = await seedFlags();
+    console.log(`flag rules: ${flags.ruleCreated} rules, ${flags.versionCreated} versions created, ${flags.versionUpdated} refreshed.`);
 
     const services = await buildServices(tenant);
     console.log("services:", JSON.stringify(services));
