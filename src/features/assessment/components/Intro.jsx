@@ -7,6 +7,9 @@ export default function Intro({ onStart }) {
   return (
     <div className="aq-screen aq-intro">
       <div className="aq-card aq-card--intro">
+        <div className="aq-intro__media">
+          <img src="/assets/drkarim.png" alt="" className="aq-intro__img" />
+        </div>
         <p className="aq-intro__kicker">{t("intro.kicker")}</p>
         <h1 className="aq-intro__title">{t("intro.title")}</h1>
         <div className="aq-intro__copy">

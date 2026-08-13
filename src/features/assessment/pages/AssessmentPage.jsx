@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { AnimatePresence, motion } from "framer-motion";
 import { useAssessment } from "../hooks/useAssessment";
-import { useIsMobile } from "../hooks/useMediaQuery";
 import { SECTIONS } from "../data/sections";
-import AssessmentHeader from "../components/AssessmentHeader";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import Intro from "../components/Intro";
@@ -22,9 +21,15 @@ import { clearDraft } from "../utils/storage";
 const LAST_SECTION = SECTIONS.length - 1; // 8 → 9th (last question) section
 const EMPTY_QUESTIONS = [];
 
+const STEP_MOTION = {
+  initial: { opacity: 0, y: 26, scale: 0.995 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -22, scale: 0.995 },
+  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] },
+};
+
 export default function AssessmentPage() {
   const { t } = useTranslation("assessment");
-  const isMobile = useIsMobile();
   const {
     state,
     dispatch,
@@ -80,25 +85,18 @@ export default function AssessmentPage() {
     if (attempted[id]) setAttempted((p) => ({ ...p, [id]: false }));
   };
 
-  const sectionValid = useMemo(() => {
-    return !questions.some((q) => {
-      if (!isRequired(q.id, state)) return false;
-      return Boolean(validateQuestion(q.id, state.answers[q.id], state));
-    });
-  }, [questions, state]);
-
+  // One question per step on every screen size — focused, fast to answer.
   const currentQuestionValid = useMemo(() => {
     if (!currentQuestion) return true;
     if (!isRequired(currentQuestion.id, state)) return true;
     return !validateQuestion(currentQuestion.id, state.answers[currentQuestion.id], state);
   }, [currentQuestion, state]);
 
-  // Desktop: validate whole section. Mobile: validate current question.
-  const canNext = isMobile ? currentQuestionValid : sectionValid;
+  const canNext = currentQuestionValid;
 
   const handleBack = () => {
     if (step === "section") {
-      if (isMobile && questionIndex > 0) {
+      if (questionIndex > 0) {
         goTo("section", sectionIndex, questionIndex - 1);
       } else if (sectionIndex > 0) {
         goTo("section", sectionIndex - 1, 0);
@@ -117,18 +115,12 @@ export default function AssessmentPage() {
       return;
     }
     if (step === "section") {
-      if (isMobile) {
-        if (!currentQuestionValid) {
-          setAttempted((p) => ({ ...p, [currentQuestion.id]: true }));
-          return;
-        }
-        if (questionIndex < questions.length - 1) {
-          goTo("section", sectionIndex, questionIndex + 1);
-          return;
-        }
-      } else if (!sectionValid) {
-        const invalid = questions.find((q) => isRequired(q.id, state) && validateQuestion(q.id, state.answers[q.id], state));
-        if (invalid) setAttempted((p) => ({ ...p, [invalid.id]: true }));
+      if (!currentQuestionValid) {
+        if (currentQuestion) setAttempted((p) => ({ ...p, [currentQuestion.id]: true }));
+        return;
+      }
+      if (questionIndex < questions.length - 1) {
+        goTo("section", sectionIndex, questionIndex + 1);
         return;
       }
       if (sectionIndex < LAST_SECTION) {
@@ -142,10 +134,13 @@ export default function AssessmentPage() {
     // contact → submit handled by ContactScreen's onSubmit
   };
 
-const handleSubmit = async () => {
+  const handleSubmit = async (contactPatch) => {
     setSubmitError(null);
     try {
-      const result = await submitAssessment(state);
+      const result = await submitAssessment({
+        ...state,
+        contact: { ...state.contact, ...(contactPatch || {}) },
+      });
       const data = result.data || result;
       dispatch({ type: "SUBMIT", referenceNumber: data.referenceNumber, overallTier: data.overallTier, reviewState: data.reviewState, submittedAt: new Date().toISOString() });
       clearDraft();
@@ -154,6 +149,7 @@ const handleSubmit = async () => {
       setSubmitError(error.message || "Unable to submit assessment");
     }
   };
+
   const onStartOver = () => {
     actions.startOver();
     goTo("intro");
@@ -177,57 +173,61 @@ const handleSubmit = async () => {
     );
   }
 
+  const stepKey = step === "section" ? `section-${sectionIndex}-${questionIndex}` : step;
+
   return (
     <div className="aq">
       <Header />
       <main className="aq-main">
-        {step === "intro" && (
-          <Intro onStart={() => goTo("section", 0, 0)} />
-        )}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={stepKey} {...STEP_MOTION}>
+            {step === "intro" && (
+              <Intro onStart={() => goTo("section", 0, 0)} />
+            )}
 
-        {step === "section" && (
-          <>
-            <ProgressBar
-              sectionNo={sectionNo}
-              progress={progress}
-              tier={tier}
-              lang={langMeta}
-              ariaLive={t("ui.step", { n: sectionNo })}
-            />
-            <SectionView
-              sectionNo={sectionNo}
-              questions={questions}
-              state={state}
-              mobileIndex={questionIndex}
-              isMobile={isMobile}
-              onAnswer={onAnswer}
-              errors={attempted}
-              warnings={warnings}
-            />
-            <StepActions onBack={handleBack} onNext={handleNext} nextDisabled={!canNext} />
-          </>
-        )}
+            {step === "section" && (
+              <>
+                <ProgressBar
+                  sectionNo={sectionNo}
+                  progress={progress}
+                  tier={tier}
+                  lang={langMeta}
+                  ariaLive={t("ui.step", { n: sectionNo })}
+                />
+                <SectionView
+                  sectionNo={sectionNo}
+                  questions={questions}
+                  state={state}
+                  mobileIndex={questionIndex}
+                  onAnswer={onAnswer}
+                  errors={attempted}
+                  warnings={warnings}
+                />
+                <StepActions onBack={handleBack} onNext={handleNext} nextDisabled={!canNext} />
+              </>
+            )}
 
-        {step === "safety" && (
-          <SafetyScreen
-            state={state}
-            flags={flags}
-            onAck={actions.setAck}
-            onNext={() => goTo("contact", 0, 0)}
-            onBack={handleBack}
-          />
-        )}
+            {step === "safety" && (
+              <SafetyScreen
+                state={state}
+                flags={flags}
+                onAck={actions.setAck}
+                onNext={() => goTo("contact", 0, 0)}
+                onBack={handleBack}
+              />
+            )}
 
-        {step === "contact" && (
-          <ContactScreen
-            state={state}
-            setContact={actions.setContact}
-            setContactPerson={actions.setContactPerson}
-            onSubmit={handleSubmit}
-            submitError={submitError}
-            onBack={handleBack}
-          />
-        )}
+            {step === "contact" && (
+              <ContactScreen
+                state={state}
+                setContact={actions.setContact}
+                onSubmit={handleSubmit}
+                submitError={submitError}
+                onBack={handleBack}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
 
         {resumable && step !== "success" && (
           <ResumeBanner onContinue={onContinue} onStartOver={onStartOver} />

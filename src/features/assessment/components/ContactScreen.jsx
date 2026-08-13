@@ -5,42 +5,58 @@ import { validateQuestion } from "../validation/validate";
 import { QUESTIONS_BY_ID } from "../data/questions";
 import Field from "./Field";
 
+const GUARDIAN_RELATIONSHIPS = ["parent", "grandparent", "legal_guardian"];
+
 // Contact step (spec "Contact-Capture Step" + CL17). patient ≠ contact person.
-export default function ContactScreen({ state, setContact, setContactPerson, onSubmit, onBack, submitError }) {
+// C02/C03 (contact person name + relationship) are shown only when assessing
+// someone else or a minor — the relationship is prefilled from Q01_02 for
+// someone_else so the question is not asked twice.
+export default function ContactScreen({ state, setContact, onSubmit, onBack, submitError }) {
   const { t } = useTranslation("assessment");
   const lang = state.meta.language || "ar";
   const [errors, setErrors] = useState({});
 
   const someone = getSubject(state) === "someone_else";
   const age = getAgeYears(state);
-  const minor = someone && age !== null && age < 18;
+  const isMinor = age !== null && age < 18;
 
-  const contactIds = ["C01", someone && "C02", someone && "C03", "C04", "C05", "C06", "C07", "C08", "C09"].filter(Boolean);
+  const needsContactPerson = someone || isMinor;
+  const needsRelationship = isMinor && !someone;
+
+  const contactIds = [
+    "C01",
+    ...(needsContactPerson ? ["C02"] : []),
+    ...(needsRelationship ? ["C03"] : []),
+    "C04",
+    "C05",
+    "C06",
+    "C09",
+  ];
+
+  const relationDefault = state.answers.Q01_02 || state.contact.contactPerson.relationship || "";
 
   const contactValue = (id) => {
     const c = state.contact;
     switch (id) {
       case "C01": return c.patientName;
       case "C02": return c.contactPerson.name;
-      case "C03": return c.contactPerson.relationship;
+      case "C03": return c.contactPerson.relationship || relationDefault;
       case "C04": return c.handoffPhone;
       case "C05": return c.patientPhone;
       case "C06": return c.preference;
-      case "C07": return c.email;
-      case "C08": return c.bestTime;
       case "C09": return c.consent;
       default: return "";
     }
   };
 
   const changeValue = (id, value) => {
-    if (id === "C02" || id === "C03") setContactPerson({ [id === "C02" ? "name" : "relationship"]: value });
-    else if (id === "C01") setContact({ patientName: value });
+    const c = state.contact;
+    if (id === "C01") setContact({ patientName: value });
+    else if (id === "C02") setContact({ contactPerson: { ...c.contactPerson, name: value } });
+    else if (id === "C03") setContact({ contactPerson: { ...c.contactPerson, relationship: value } });
     else if (id === "C04") setContact({ handoffPhone: value });
     else if (id === "C05") setContact({ patientPhone: value });
     else if (id === "C06") setContact({ preference: value });
-    else if (id === "C07") setContact({ email: value });
-    else if (id === "C08") setContact({ bestTime: value });
     else if (id === "C09") setContact({ consent: value });
     if (errors[id]) setErrors((prev) => ({ ...prev, [id]: undefined }));
   };
@@ -49,7 +65,7 @@ export default function ContactScreen({ state, setContact, setContactPerson, onS
     const next = {};
     for (const id of contactIds) {
       const q = QUESTIONS_BY_ID[id];
-      const required = q.required === "*" || (q.required === "c" && (id === "C02" || id === "C03"));
+      const required = q.required === "*" || q.required === "c";
       if (required) {
         const err = validateQuestion(id, contactValue(id), state);
         if (err) next[id] = err;
@@ -65,7 +81,24 @@ export default function ContactScreen({ state, setContact, setContactPerson, onS
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    onSubmit();
+
+    const relationship =
+      state.contact.contactPerson.relationship || state.answers.Q01_02 || "";
+    const contactPerson = {
+      name:
+        state.contact.contactPerson.name ||
+        (someone ? state.contact.patientName : ""),
+      relationship,
+      isGuardian: isMinor && GUARDIAN_RELATIONSHIPS.includes(relationship),
+    };
+    onSubmit({
+      patientName: state.contact.patientName,
+      contactPerson,
+      handoffPhone: state.contact.handoffPhone,
+      patientPhone: state.contact.patientPhone,
+      preference: state.contact.preference,
+      consent: state.contact.consent,
+    });
   };
 
   return (
@@ -84,7 +117,7 @@ export default function ContactScreen({ state, setContact, setContactPerson, onS
                 value={contactValue(id)}
                 onChange={(v) => changeValue(id, v)}
                 error={errKey}
-                required={q.required === "*" || (q.required === "c" && (id === "C02" || id === "C03"))}
+                required={q.required === "*" || q.required === "c"}
                 lang={lang}
               />
             </div>
@@ -92,11 +125,11 @@ export default function ContactScreen({ state, setContact, setContactPerson, onS
         })}
       </div>
 
-      {minor && (
+      {isMinor && (
         <p className="aq-contact__note" role="status">
           {lang === "ar"
-            ? `المسؤول عن هذا التقييم هو ولي الأمر/مقدّم الرعاية (${state.contact.contactPerson.relationship || ""}).`
-            : `The responsible contact for this assessment is the guardian/caregiver (${state.contact.contactPerson.relationship || ""}).`}
+            ? `المسؤول عن هذا التقييم هو ولي الأمر/مقدّم الرعاية (${relationDefault}).`
+            : `The responsible contact for this assessment is the guardian/caregiver (${relationDefault}).`}
         </p>
       )}
 

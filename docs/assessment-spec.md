@@ -56,6 +56,15 @@ Plus two steps outside the sections: **Intro (disclaimer)** before §01 and **Co
 **Legend — Types:** `single` single-choice (radio) · `multi` multi-choice (checkbox) · `number` numeric with unit · `phone` · `email` · `text` short text · `textarea` · `scale` 1–N · `list` repeating rows · `consent` required checkbox · `toggle` yes/no
 **Req:** `*` = required · `o` = optional · `c` = conditionally required
 
+> **v2.0 curation note (2026-08):** the shipped form is a **curated subset** of the
+> full catalog below to reduce drop-off. Removed questions: `Q02_03`, `Q02_05`,
+> `Q02_08`, `Q03_04`, `Q03_L1–L3`, `Q03_G1–G4`, `Q03_M1`, `Q04_D4`, `Q04_IR1`,
+> `Q04_H1`, `Q04_GI1`, `Q04_P1`, `Q06_04`, and contact `C07`/`C08` (email,
+> best-time). **RS14** now triggers on cortisone/steroid use alone (`Q05_06` =
+> `yes`/`previously`) — it no longer combines with the removed `Q03_G4`. Every
+> red-flag feeding question is retained. `Contact` step = `C01–C06, C09`
+> (C02/C03 shown only when assessing someone else or a minor).
+
 ### Section 01 — Basic Information
 
 | Code | Question (AR) | Question (EN) | Type | Req | Branch / Condition | Validation | Data field |
@@ -138,7 +147,7 @@ Plus two steps outside the sections: **Intro (disclaimer)** before §01 and **Co
 | Q05_03 | مكملات غذائية؟ | Supplements? | list | o | always | name optional | `medications.supplements[]` |
 | Q05_04 | بتاخد إنسولين؟ | Do you take insulin? | toggle | o | only if diabetes | yes/no | `medications.insulin` |
 | Q05_05 | أعشاب أو أدوية بدون وصفة؟ | Herbal / over-the-counter products? | list | o | always | name optional | `medications.herbal[]` |
-| Q05_06 | هل بتاخد كورتيزون حاليًا؟ | Do you currently take cortisone/steroids? | single | * | always | never / yes / previously | `medications.steroids` — **yes + weight-gain purpose ⇒ prominent STANDARD / doctor-review flag (RS14, combined with Q03_G4); NOT automatic URGENT** |
+| Q05_06 | هل بتاخد كورتيزون حاليًا؟ | Do you currently take cortisone/steroids? | single | * | always | never / yes / previously | `medications.steroids` — **`yes` or `previously` ⇒ prominent STANDARD / doctor-review flag (RS14); NOT automatic URGENT** |
 
 ### Section 06 — Lifestyle & Physical Activity
 
@@ -244,7 +253,7 @@ Plus two steps outside the sections: **Intro (disclaimer)** before §01 and **Co
 | CL9 | `diabetes` selected | Show Q04_D1–D4 (type required) + Q05_04 |
 | CL10 | `thyroid` selected | Show Q04_T1 (type required) |
 | CL11 | `GI` selected | Show Q04_GI1 |
-| CL12 | Q03_G4 or Q05_06 = `currently` (cortisone for weight gain) | Combine → **prominent STANDARD / doctor-review flag (RS14)** — NOT automatic URGENT; severity kept configurable for future clinical decision |
+| CL12 | Q05_06 = `yes`/`previously` (cortisone/steroid use) | → **prominent STANDARD / doctor-review flag (RS14)** — NOT automatic URGENT; severity kept configurable for future clinical decision |
 | CL13 | Q04_E1 = `currently` | URGENT (RU1) + show sensitive support line (no judgemental copy) |
 | CL14 | Q04_03 relevant (female 12–55) | Require answer; pregnancy alone → doctor-required STANDARD (RS7); pregnant + chronic condition → URGENT (RU7). Visibility rule configurable |
 | CL15 | Q04_06 any acute symptom | Show Q10_04 emergency notice + URGENT (RU2) |
@@ -308,7 +317,7 @@ Plus two steps outside the sections: **Intro (disclaimer)** before §01 and **Co
 | RS11 | Bariatric history >12 months ago |
 | RS12 | Past (not current) eating disorder |
 | RS13 | Sleep <6h (Q06_05) |
-| RS14 | **Cortisone/steroid — current use, or used for weight gain (Q03_G4 / Q05_06). Prominent doctor-review flag.** Severity configurable in the future — not URGENT in this version |
+| RS14 | **Cortisone/steroid — current use (`yes`) or previous (`previously`) on Q05_06. Prominent doctor-review flag.** Severity configurable in the future — not URGENT in this version |
 
 **Severity combination rule:** if ≥1 URGENT and ≥1 STANDARD, overall tier = **URGENT**. Any URGENT flag blocks automatic review sorting and requires a doctor/expert to open the case first.
 

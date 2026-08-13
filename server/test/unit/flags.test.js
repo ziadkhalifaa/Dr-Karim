@@ -45,11 +45,9 @@ describe("Flag derivation (A, D, E, F, G)", () => {
     assert.equal(hasUrgentFlag(flags), false, "hasUrgentFlag should be false");
   });
 
-  it("D: weight_gain + cortisone currently → RS14 STANDARD", () => {
+  it("D: cortisone currently → RS14 STANDARD", () => {
     const state = answers({
       ...healthyAdult,
-      Q03_01: "weight_gain",
-      Q03_G4: "currently",
       Q05_06: "yes",
     });
     const flags = deriveFlags(state);
@@ -57,6 +55,26 @@ describe("Flag derivation (A, D, E, F, G)", () => {
     assert.ok(rs14, "RS14 should fire");
     assert.equal(rs14.tier, "standard", "RS14 is STANDARD (not URGENT)");
     assert.equal(overallTier(flags), "standard", "overallTier = standard when only standard flags");
+  });
+
+  it("D2: cortisone previously → RS14 STANDARD", () => {
+    const state = answers({
+      ...healthyAdult,
+      Q05_06: "previously",
+    });
+    const flags = deriveFlags(state);
+    const rs14 = flags.find((f) => f.ruleId === "RS14");
+    assert.ok(rs14, "RS14 should fire for previous cortisone use");
+    assert.equal(rs14.tier, "standard", "RS14 is STANDARD");
+  });
+
+  it("D3: no cortisone → no RS14", () => {
+    const state = answers({
+      ...healthyAdult,
+      Q05_06: "never",
+    });
+    const flags = deriveFlags(state);
+    assert.ok(!flags.find((f) => f.ruleId === "RS14"), "RS14 must not fire when cortisone never used");
   });
 
   it("E: acute symptoms (chest_pain) → RU2 URGENT", () => {

@@ -87,10 +87,6 @@ export function getHeightCm(state) {
   return raw === "" || raw === null || raw === undefined ? null : Number(raw);
 }
 
-export function hasUrgentNotice(state) {
-  return currentlyVisible(state, "Q10_04");
-}
-
 // Pregnancy visibility rule (spec CL14): females 12–55. Configurable.
 export const PREGNANCY_AGE_MIN = 12;
 export const PREGNANCY_AGE_MAX = 55;
@@ -122,20 +118,8 @@ const RULES = {
     const age = getAgeYears(s);
     return age !== null && age < 2;
   },
-  Q02_03: (s) => isAdult(s) !== false,
   Q02_04: (s) => isAdult(s) !== false,
-  Q02_05: (s) => isAdult(s) !== false,
   Q02_07: (s) => isMinor(s) === true,
-  Q02_08: (s) => hasGrowthConcern(s),
-
-  Q03_L1: (s) => getGoal(s) === "weight_loss",
-  Q03_L2: (s) => getGoal(s) === "weight_loss",
-  Q03_L3: (s) => getGoal(s) === "weight_loss",
-  Q03_G1: (s) => getGoal(s) === "weight_gain",
-  Q03_G2: (s) => getGoal(s) === "weight_gain",
-  Q03_G3: (s) => getGoal(s) === "weight_gain",
-  Q03_G4: (s) => getGoal(s) === "weight_gain",
-  Q03_M1: (s) => getGoal(s) === "maintain_weight",
 
   Q04_02: (s) => {
     const v = s.answers.Q04_01;
@@ -145,12 +129,7 @@ const RULES = {
   Q04_D1: (s) => hasCondition(s, "diabetes"),
   Q04_D2: (s) => hasCondition(s, "diabetes"),
   Q04_D3: (s) => hasCondition(s, "diabetes"),
-  Q04_D4: (s) => hasCondition(s, "diabetes"),
-  Q04_IR1: (s) => hasCondition(s, "insulin_resistance"),
   Q04_T1: (s) => hasCondition(s, "thyroid"),
-  Q04_H1: (s) => hasCondition(s, "hypertension"),
-  Q04_GI1: (s) => hasCondition(s, "GI"),
-  Q04_P1: (s) => hasCondition(s, "PCOS"),
   Q04_C1: (s) => hasCondition(s, "cancer"),
   Q04_03: (s) => pregnancyRelevant(s),
 
@@ -162,7 +141,6 @@ const RULES = {
   Q05_02: (s) => s.answers.Q05_01 === "yes",
   Q05_04: (s) => hasCondition(s, "diabetes"),
 
-  Q06_04: (s) => isAdult(s) !== false,
   Q06_05: (s) => isAdult(s) !== false,
   Q06_08: (s) => isAdult(s) !== false,
   Q06_09: (s) => isAdult(s) !== false,

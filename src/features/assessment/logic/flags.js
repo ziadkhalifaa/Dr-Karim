@@ -305,12 +305,11 @@ export const FLAG_RULES = [
   {
     ruleId: "RS14",
     tier: T.STANDARD,
-    refs: ["Q03_G4", "Q05_06"],
+    refs: ["Q05_06"],
     test: (s) => {
-      const forGain = s.answers.Q03_G4 === "currently";
-      const forGainPast = s.answers.Q03_G4 === "previously";
       const current = s.answers.Q05_06 === "yes";
-      return current || forGain || forGainPast;
+      const past = s.answers.Q05_06 === "previously";
+      return current || past;
     },
     message: msg(
       "استخدام كورتيزون/ستيرويد — بيانات سيراجعها الطبيب بتركيز.",
