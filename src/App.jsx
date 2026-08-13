@@ -7,7 +7,7 @@ import ValuesSection from "./components/ValuesSection";
 import Banner from "./components/Banner";
 import CareSection from "./components/CareSection";
 import ServicesSection from "./components/ServicesSection";
-import ProofSection from "./components/ProofSection";
+import TestimonialsSection from "./components/TestimonialsSection";
 import WarningSection from "./components/WarningSection";
 import Footer from "./components/Footer";
 import { useRoute } from "./lib/router";
@@ -57,7 +57,7 @@ export default function App() {
         <Banner />
         <CareSection />
         <ServicesSection />
-        <ProofSection />
+        <TestimonialsSection />
         <WarningSection />
         <div className="spacer" />
       </main>
