@@ -21,18 +21,7 @@ export default function AssessmentSection() {
     <section className="section assessment" id="assessment">
       <div className="container">
         <div className="assessment__head anim-rise">
-          <span
-            className="hero__kicker"
-            style={{
-              background: "var(--highlight-bg)",
-              color: "var(--highlight-text)",
-              marginBottom: 16,
-            }}
-          >
-            <PulseIcon />
-            {t("assessment.tag")}
-          </span>
-          <h2 className="sec-title">
+          <h2 className="sec-title" style={{ marginTop: 0 }}>
             {t("assessment.title")} <strong>{t("assessment.title2")}</strong>
           </h2>
           <p className="assessment__subtitle">{t("assessment.subtitle")}</p>

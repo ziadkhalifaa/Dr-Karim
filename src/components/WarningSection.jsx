@@ -10,17 +10,6 @@ export default function WarningSection() {
     <section className="section" id="articles">
       <div className="container">
         <div className="services__head anim-rise">
-          <span
-            className="hero__kicker"
-            style={{
-              background: "var(--tint)",
-              color: "var(--primary)",
-              marginBottom: 14,
-            }}
-          >
-            <PulseIcon />
-            {t("warning.tag")}
-          </span>
           <h2 className="sec-title">{t("warning.sectionTitle")}</h2>
         </div>
 

@@ -78,14 +78,7 @@ export default function Hero() {
           style={{ y: yContent, opacity: opacityContent }}
         >
           <motion.div variants={itemVariants}>
-            <motion.span 
-              whileHover={{ scale: 1.05 }}
-              className="hero__kicker"
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 15, fontWeight: 700, background: "rgba(255, 255, 255, 0.1)", color: "var(--gold)", borderRadius: 40, padding: "8px 18px", marginBottom: 22 }}
-            >
-              <PulseIcon />
-              {t("brand.title")}
-            </motion.span>
+            {/* Kicker removed per user request */}
           </motion.div>
           
           <motion.h1 variants={itemVariants} className="hero__title">

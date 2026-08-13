@@ -1,64 +1,72 @@
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { AppleIcon, PlanIcon, SupportIcon } from "./Icons"; // using generic icons for the chips
 
 export default function Banner() {
   const { t } = useTranslation();
   
-  // Custom parsing since the old banner was just a string with bullets
   const text = t("banner.text");
   const parts = text.split(" • ");
   const title = parts[0]?.replace(/\*\*/g, '') || "الاعتماد على وجبات متوازنة";
   const items = parts.slice(1).map(p => p.replace(/\*\*/g, ''));
 
-  // fallback if translation format changes
   const displayItems = items.length > 0 ? items : [
     "البروتين", "الكربوهيدرات", "الدهون الصحية", "الألياف", "تقليل السكريات المكررة", "نشاط بدني مناسب"
   ];
 
   return (
-    <section className="section" style={{ paddingBlock: "40px" }}>
+    <section className="section" style={{ paddingBlock: "60px", background: "var(--bg)" }}>
       <div className="container">
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           style={{
-            background: "linear-gradient(135deg, var(--surface-brand) 0%, var(--primary-deep) 100%)",
+            position: "relative",
+            background: "var(--card-bg)",
             borderRadius: "var(--radius-xl)",
-            padding: "40px",
-            color: "var(--on-brand)",
-            boxShadow: "var(--shadow-lg)",
-            textAlign: "center"
+            padding: "50px",
+            border: "1px solid var(--line)",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.06)",
+            overflow: "hidden"
           }}
         >
-          <h3 style={{ fontSize: "28px", fontWeight: "800", marginBottom: "30px" }}>
-            ✨ {title}
-          </h3>
-          
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px" }}>
-            {displayItems.map((item, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.05, y: -5 }}
-                style={{
-                  background: "rgba(255,255,255,0.15)",
-                  backdropFilter: "blur(10px)",
-                  padding: "12px 24px",
-                  borderRadius: "40px",
-                  fontWeight: "700",
-                  fontSize: "16px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  boxShadow: "0 8px 16px rgba(0,0,0,0.1)"
-                }}
-              >
-                <span style={{ color: "var(--gold)" }}>✓</span>
-                {item}
-              </motion.div>
-            ))}
+          {/* Decorative background shapes */}
+          <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "200px", height: "200px", background: "var(--primary-soft)", borderRadius: "50%", opacity: 0.5, filter: "blur(40px)" }} />
+          <div style={{ position: "absolute", bottom: "-50px", left: "-50px", width: "300px", height: "300px", background: "var(--highlight-bg)", borderRadius: "50%", opacity: 0.4, filter: "blur(50px)" }} />
+
+          <div style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
+            <h3 style={{ fontSize: "36px", fontWeight: "900", color: "var(--primary-deep)", marginBottom: "40px" }}>
+              {title}
+            </h3>
+            
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "16px" }}>
+              {displayItems.map((item, i) => (
+                <motion.div
+                  key={i}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  style={{
+                    background: "var(--bg)",
+                    padding: "16px 28px",
+                    borderRadius: "16px",
+                    fontWeight: "800",
+                    fontSize: "17px",
+                    color: "var(--text)",
+                    border: "2px solid var(--line)",
+                    boxShadow: "var(--shadow)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    transition: "border-color 0.3s ease"
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.borderColor = "var(--primary)"}
+                  onMouseOut={(e) => e.currentTarget.style.borderColor = "var(--line)"}
+                >
+                  <span style={{ color: "var(--primary)", fontSize: "20px" }}>•</span>
+                  {item}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </motion.div>
       </div>
