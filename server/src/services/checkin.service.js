@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import { models, sequelize } from "../models/index.js";
 import { AppError } from "../utils/errors.js";
 import { auditService } from "./audit.service.js";
+import { progressMeasurementService } from "./progress-measurement.service.js";
 
 const { Patient, PatientCheckin, PatientCheckinMeasurement, PatientCheckinAdherence, NutritionPlan, NutritionPlanVersion, ExercisePlan, ExercisePlanVersion } = models;
 
@@ -53,14 +54,23 @@ export const checkinService = {
     const created = await sequelize.transaction(async (transaction) => {
       await patientInTenant(patientId, tenantId, transaction);
       const context = await activeContext(patientId, tenantId, transaction);
+      const weightKg = numberInRange(body.weightKg, 0.1, 500, "weightKg");
       const checkin = await PatientCheckin.create({
         tenant_id: tenantId, patient_id: patientId, checkin_on: body.checkinOn || new Date().toISOString().slice(0, 10),
-        weight_kg: numberInRange(body.weightKg, 0.1, 500, "weightKg"),
+        weight_kg: weightKg,
         nutrition_adherence: numberInRange(body.nutritionAdherence, 0, 100, "nutritionAdherence"), exercise_adherence: numberInRange(body.exerciseAdherence, 0, 100, "exerciseAdherence"),
         patient_note: body.patientNote || null, status: "submitted", submitted_at: new Date(),
         context_assessment_session_id: context.nutritionVersion?.source_session_id || context.exerciseVersion?.source_session_id || null,
         context_nutrition_plan_version_id: context.nutritionVersion?.id || null, context_exercise_plan_version_id: context.exerciseVersion?.id || null,
       }, { transaction });
+      // Phase 6C: a check-in weight appends an immutable source=checkin
+      // measurement (single canonical truth for that check-in day; §23/§30).
+      if (weightKg != null) {
+        await progressMeasurementService.recordFromCheckin({
+          tenantId, patientId, checkinId: checkin.id, weightKg,
+          measuredOn: checkin.checkin_on, recordedBy: current.userId, transaction,
+        });
+      }
       for (const measurement of body.measurements || []) {
         await PatientCheckinMeasurement.create({ tenant_id: tenantId, checkin_id: checkin.id, measure_code: measurement.measureCode, value: numberInRange(measurement.value, 0.01, 1000, "measurement"), unit: measurement.unit || null, taken_by: measurement.takenBy || "patient" }, { transaction });
       }

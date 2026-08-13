@@ -1044,3 +1044,128 @@
   .dash-panel__head { flex-direction: column; align-items: flex-start; }
   .dash-topbar__title h1 { font-size: 18px; }
 }
+/* ---- Phase 6B: Daily Care ---------------------------------------- */
+.dash-btn--success {
+  background: var(--dash-primary);
+  color: #fff;
+}
+.dash-btn--success:hover:not(:disabled) { background: var(--dash-primary); filter: brightness(1.08); }
+.dash-badge--success { background: var(--dash-primary-soft); color: var(--dash-primary); }
+.dash-badge--care-planned { background: var(--dash-bg); color: var(--dash-text-muted); }
+.dash-badge--care-completed { background: var(--dash-primary-soft); color: var(--dash-primary); }
+.dash-badge--care-partial { background: var(--dash-warning-soft); color: var(--dash-warning); }
+.dash-badge--care-skipped { background: var(--dash-danger-soft); color: var(--dash-danger); }
+.dash-badge--care-not_recorded { background: var(--dash-bg); color: var(--dash-text-soft); }
+
+.dash-care-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.dash-care-grid__main { display: grid; gap: 20px; }
+.dash-care-grid__side { display: grid; gap: 20px; }
+.dash-care-instructions {
+  padding: 12px 14px;
+  background: var(--dash-primary-soft);
+  color: var(--dash-primary);
+  border-radius: var(--dash-radius-sm);
+  font-size: 14px;
+  margin: 0 0 14px;
+}
+.dash-care-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.dash-care-activity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--dash-border);
+  border-radius: var(--dash-radius-sm);
+  background: var(--dash-card-bg);
+}
+.dash-care-activity__name { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.dash-care-activity__emoji { font-size: 22px; line-height: 1; }
+.dash-care-activity__title { font-weight: 700; font-size: 14px; }
+.dash-care-activity__plan { color: var(--dash-text-muted); font-size: 12px; margin-top: 2px; }
+.dash-care-activity__controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dash-care-activity__done { display: flex; align-items: center; gap: 10px; }
+.dash-care-actions { display: flex; gap: 8px; }
+.dash-care-value { display: flex; align-items: center; gap: 8px; }
+.dash-care-value input {
+  width: 110px;
+  padding: 8px 10px;
+  border: 1px solid var(--dash-border);
+  border-radius: 8px;
+  background: var(--dash-card-bg);
+  color: var(--dash-text);
+}
+.dash-care-progress { margin-top: 16px; display: flex; align-items: center; gap: 10px; }
+.dash-care-progress__bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--dash-bg);
+  overflow: hidden;
+}
+.dash-care-progress__bar > span { display: block; height: 100%; background: var(--dash-primary); border-radius: 99px; transition: width 0.3s ease; }
+.dash-stat-grid--2 { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.dash-care-stats { display: grid; gap: 8px; margin-top: 16px; }
+.dash-care-stats__row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+@media (max-width: 900px) {
+  .dash-care-grid { grid-template-columns: 1fr; }
+}
+/* ---- Phase 6C: Progress & Measurements ------------------------------ */
+.dash-badge--care-ok { background: var(--dash-primary-soft); color: var(--dash-primary); }
+.dash-badge--care-due { background: var(--dash-danger-soft); color: var(--dash-danger); }
+.dash-inline-icon { width: 18px; height: 18px; }
+.dash-progress-kpis { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.dash-progress-kpi { display: flex; align-items: center; gap: 12px; }
+.dash-progress-kpi__icon {
+  width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--dash-primary-soft); color: var(--dash-primary);
+}
+.dash-progress-kpi__body { min-width: 0; }
+.dash-progress-kpi__value { font-size: 18px; font-weight: 800; line-height: 1.2; }
+.dash-progress-kpi__sub { margin-top: 2px; font-size: 12px; }
+.dash-progress-record { margin-block: 4px 18px; }
+.dash-progress-goal { margin-top: 4px; }
+.dash-progress-goal__target { font-size: 26px; font-weight: 800; }
+.dash-progress-goal__bar {
+  height: 10px; border-radius: 99px; background: var(--dash-bg);
+  overflow: hidden; margin: 10px 0 8px;
+}
+.dash-progress-goal__fill { height: 100%; background: var(--dash-primary); border-radius: 99px; transition: width 0.3s ease; }
+.dash-progress-goal__meta { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
+.dash-progress-history { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.dash-progress-history__row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 12px; border: 1px solid var(--dash-border);
+  border-radius: var(--dash-radius-sm); background: var(--dash-card-bg);
+  font-size: 14px; font-weight: 700;
+}
+.dash-error { color: var(--dash-danger); font-size: 13px; margin: 8px 0 0; }
+.dash-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.dash-tab {
+  border: 1px solid var(--dash-border); background: var(--dash-card-bg);
+  color: var(--dash-text-muted); padding: 8px 14px; border-radius: 99px;
+  font-size: 13.5px; cursor: pointer; font-weight: 600;
+}
+.dash-tab--active { background: var(--dash-primary-soft); color: var(--dash-primary); border-color: transparent; }
+.dash-list__row {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 12px 14px; border: 1px solid var(--dash-border);
+  border-radius: var(--dash-radius-sm); background: var(--dash-card-bg); flex-wrap: wrap;
+}
+.dash-list__row::before { content: none; }
+.dash-list__body { min-width: 0; }
+.dash-list__title { font-weight: 700; font-size: 14px; margin-top: 4px; }
+.dash-list__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dash-inline-form { display: flex; align-items: center; gap: 6px; }
+.dash-inline-form input {
+  width: 84px; padding: 7px 9px; border: 1px solid var(--dash-border);
+  border-radius: 8px; background: var(--dash-card-bg); color: var(--dash-text);
+}

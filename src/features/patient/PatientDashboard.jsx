@@ -7,6 +7,8 @@ import {
   CalendarDays,
   Bell,
   ClipboardCheck,
+  ClipboardList,
+  Scale,
   Wallet,
   Clock,
   Video,
@@ -15,6 +17,8 @@ import {
 import DashboardShell from "../shared/DashboardShell";
 import NotificationsPanel from "../shared/NotificationsPanel";
 import PaymentCenter from "./PaymentCenter";
+import DailyCare from "./DailyCare";
+import PatientProgress from "./Progress";
 import { useAuth } from "../../context/AuthProvider";
 import {
   appointmentApi,
@@ -220,6 +224,8 @@ export default function PatientDashboard({ path }) {
 
   const nav = [
     { path: "/patient", label: t("dashboard.nav.overview"), icon: LayoutDashboard },
+    { path: "/patient/care", label: t("dailyCare.nav"), icon: ClipboardList },
+    { path: "/patient/progress", label: t("patientProgress.nav"), icon: Scale },
     { path: "/patient/plan", label: t("dashboard.nav.myPlan"), icon: Salad },
     { path: "/patient/checkin", label: t("dashboard.patient.checkinTitle"), icon: ClipboardCheck },
     { path: "/patient/payments", label: t("dashboard.nav.payments"), icon: Wallet },
@@ -227,7 +233,9 @@ export default function PatientDashboard({ path }) {
   ];
 
   let page;
-  if (path === "/patient/payments") page = <PaymentCenter />;
+  if (path === "/patient/care") page = <DailyCare />;
+  else if (path === "/patient/progress") page = <PatientProgress />;
+  else if (path === "/patient/payments") page = <PaymentCenter />;
   else if (path === "/patient/notifications") page = <NotificationsPanel />;
   else if (path === "/patient/plan")
     page = (

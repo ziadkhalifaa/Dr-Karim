@@ -11,12 +11,16 @@ import {
   Clock,
   AlertTriangle,
   CheckCircle2,
+  ClipboardList,
+  Scale,
 } from "lucide-react";
 import DashboardShell from "../shared/DashboardShell";
 import NotificationsPanel from "../shared/NotificationsPanel";
 import StatusBadge from "../shared/StatusBadge";
 import PaymentReview from "./PaymentReview";
 import AdminConfiguration from "./AdminConfiguration";
+import CarePrograms from "./CarePrograms";
+import DoctorProgress from "./ProgressManager";
 import { reviewApi, appointmentApi, notificationApi } from "../../api/client";
 import { useAuth } from "../../context/AuthProvider";
 
@@ -272,6 +276,8 @@ export default function DoctorDashboard({ path }) {
   const nav = [
     { path: "/doctor", label: t("dashboard.nav.overview"), icon: LayoutDashboard },
     { path: "/doctor/reviews", label: t("dashboard.nav.reviewQueue"), icon: ListChecks },
+    { path: "/doctor/care", label: t("doctorCare.title"), icon: ClipboardList },
+    { path: "/doctor/progress", label: t("doctorProgress.nav"), icon: Scale },
     { path: "/doctor/payments", label: t("dashboard.nav.payments"), icon: Wallet },
     { path: "/doctor/configuration", label: t("dashboard.nav.configuration"), icon: Settings },
     { path: "/doctor/appointments", label: t("dashboard.nav.appointments"), icon: CalendarDays },
@@ -283,6 +289,8 @@ export default function DoctorDashboard({ path }) {
   else if (path === "/doctor/configuration") page = <AdminConfiguration />;
   else if (path === "/doctor/notifications") page = <NotificationsPanel />;
   else if (path === "/doctor/reviews") page = <Reviews rows={reviews} reload={reload} />;
+  else if (path === "/doctor/care") page = <CarePrograms />;
+  else if (path === "/doctor/progress") page = <DoctorProgress />;
   else if (path === "/doctor/appointments") page = <Appointments rows={appointments} reload={reload} />;
   else
     page = (

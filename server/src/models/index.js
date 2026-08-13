@@ -22,6 +22,8 @@ import { GROUP_14 } from "./14_authentication.js";
 import { GROUP_15 } from "./15_doctor_review_notes.js";
 import { GROUP_16 } from "./16_monetization.js";
 import { GROUP_17 } from "./17_notifications.js";
+import { GROUP_18 } from "./18_care_program.js";
+import { GROUP_19 } from "./19_progress.js";
 
 const {
   Tenant, Doctor, Patient, ContactPerson, PatientContact, PatientSession,
@@ -58,6 +60,13 @@ const { AuthUser, AuthUserTenant, AuthRefreshToken, AuthPasswordReset } = GROUP_
 const { DoctorReviewNote } = GROUP_15;
 const { Package, PackageEntitlement, Subscription, SubscriptionEntitlement, Payment, PaymentReceipt, PaymentReview } = GROUP_16;
 const { Notification, NotificationPreference } = GROUP_17;
+const {
+  CareProgram, CareProgramVersion, CareDay, CareActivityDefinition,
+  CareActivityInstance, CareActivityExecution, CareDailyCheckin,
+} = GROUP_18;
+const {
+  PatientProgress, ProgressMeasurement, PatientProgressGoal, PatientProgressGoalVersion,
+} = GROUP_19;
 
 // ---- Tenant scope (§7) ----
 const TENANT_SCOPED = [
@@ -72,6 +81,9 @@ const TENANT_SCOPED = [
   PatientCheckin, PatientCheckinMeasurement, PatientCheckinAdherence,
   Package, PackageEntitlement, Subscription, SubscriptionEntitlement, Payment, PaymentReceipt, PaymentReview,
   Notification, NotificationPreference,
+  CareProgram, CareProgramVersion, CareDay, CareActivityDefinition,
+  CareActivityInstance, CareActivityExecution, CareDailyCheckin,
+  PatientProgress, ProgressMeasurement, PatientProgressGoal, PatientProgressGoalVersion,
 ];
 for (const m of TENANT_SCOPED) {
   m.belongsTo(Tenant, { foreignKey: "tenant_id", as: "tenant" });
@@ -245,6 +257,62 @@ PatientCheckin.hasMany(PatientCheckinAdherence, { foreignKey: "checkin_id" });
 PatientCheckinMeasurement.belongsTo(PatientCheckin, { foreignKey: "checkin_id" });
 PatientCheckinAdherence.belongsTo(PatientCheckin, { foreignKey: "checkin_id" });
 
+// ---- Care program / daily care (Phase 6B) ----
+Patient.hasMany(CareProgram, { foreignKey: "patient_id" });
+CareProgram.belongsTo(Patient, { foreignKey: "patient_id" });
+Doctor.hasMany(CareProgram, { foreignKey: "doctor_id" });
+CareProgram.belongsTo(Doctor, { foreignKey: "doctor_id" });
+CareProgram.belongsTo(Package, { foreignKey: "package_id" });
+CareProgram.belongsTo(Subscription, { foreignKey: "subscription_id" });
+CareProgram.belongsTo(NutritionPlanVersion, { foreignKey: "nutrition_plan_version_id", as: "nutritionPlanVersion" });
+CareProgram.belongsTo(ExercisePlanVersion, { foreignKey: "exercise_plan_version_id", as: "exercisePlanVersion" });
+CareProgram.hasMany(CareProgramVersion, { foreignKey: "care_program_id" });
+CareProgram.hasMany(CareDay, { foreignKey: "care_program_id" });
+
+CareProgramVersion.belongsTo(CareProgram, { foreignKey: "care_program_id" });
+CareProgramVersion.belongsTo(CareProgramVersion, { foreignKey: "previous_version_id", as: "previousVersion" });
+CareProgramVersion.belongsTo(NutritionPlanVersion, { foreignKey: "nutrition_plan_version_id", as: "nutritionPlanVersion" });
+CareProgramVersion.belongsTo(ExercisePlanVersion, { foreignKey: "exercise_plan_version_id", as: "exercisePlanVersion" });
+CareProgramVersion.hasMany(CareActivityDefinition, { foreignKey: "care_program_version_id" });
+
+CareDay.belongsTo(CareProgram, { foreignKey: "care_program_id" });
+CareDay.belongsTo(CareProgramVersion, { foreignKey: "care_program_version_id" });
+CareDay.hasMany(CareActivityInstance, { foreignKey: "care_day_id" });
+
+CareActivityDefinition.belongsTo(CareProgramVersion, { foreignKey: "care_program_version_id" });
+CareActivityDefinition.hasMany(CareActivityInstance, { foreignKey: "care_activity_definition_id" });
+
+CareActivityInstance.belongsTo(CareDay, { foreignKey: "care_day_id" });
+CareActivityInstance.belongsTo(CareActivityDefinition, { foreignKey: "care_activity_definition_id" });
+CareActivityInstance.hasMany(CareActivityExecution, { foreignKey: "activity_instance_id" });
+
+CareActivityExecution.belongsTo(CareActivityInstance, { foreignKey: "activity_instance_id" });
+CareActivityExecution.belongsTo(CareDay, { foreignKey: "care_day_id" });
+CareActivityExecution.belongsTo(Patient, { foreignKey: "patient_id" });
+CareActivityExecution.belongsTo(CareActivityExecution, { foreignKey: "correction_of_id", as: "correctedBy" });
+
+CareDailyCheckin.belongsTo(CareProgram, { foreignKey: "care_program_id" });
+CareDailyCheckin.belongsTo(CareDay, { foreignKey: "care_day_id" });
+CareDailyCheckin.belongsTo(Patient, { foreignKey: "patient_id" });
+
+// ---- Progress & measurements (Phase 6C) ----
+Patient.hasOne(PatientProgress, { foreignKey: "patient_id" });
+PatientProgress.belongsTo(Patient, { foreignKey: "patient_id" });
+
+Patient.hasMany(ProgressMeasurement, { foreignKey: "patient_id" });
+ProgressMeasurement.belongsTo(Patient, { foreignKey: "patient_id" });
+ProgressMeasurement.belongsTo(CareProgram, { foreignKey: "care_program_id", as: "careProgram" });
+ProgressMeasurement.belongsTo(PatientCheckin, { foreignKey: "checkin_id", as: "checkin" });
+ProgressMeasurement.belongsTo(Appointment, { foreignKey: "appointment_id", as: "appointment" });
+ProgressMeasurement.belongsTo(ProgressMeasurement, { foreignKey: "correction_of_id", as: "correctedBy" });
+
+Patient.hasMany(PatientProgressGoal, { foreignKey: "patient_id" });
+PatientProgressGoal.belongsTo(Patient, { foreignKey: "patient_id" });
+PatientProgressGoal.belongsTo(Doctor, { foreignKey: "doctor_id", as: "doctor" });
+PatientProgressGoal.hasMany(PatientProgressGoalVersion, { foreignKey: "goal_id" });
+PatientProgressGoalVersion.belongsTo(PatientProgressGoal, { foreignKey: "goal_id" });
+PatientProgressGoalVersion.belongsTo(PatientProgressGoalVersion, { foreignKey: "previous_version_id", as: "previousVersion" });
+
 // ---- Reference code catalogs (read-only label tables) ----
 ConditionCode.hasMany(PatientCondition, { foreignKey: "condition_code", sourceKey: "code" });
 ReactionCode.hasMany(PatientAllergy, { foreignKey: "reaction_code", sourceKey: "code" });
@@ -293,14 +361,15 @@ export const models = {
   ...GROUP_15,
   ...GROUP_16,
   ...GROUP_17,
+  ...GROUP_18,
+  ...GROUP_19,
 };
 
 export { sequelize };
 export const MODEL_GROUPS = {
   GROUP_01, GROUP_02, GROUP_03, GROUP_04, GROUP_05, GROUP_06,
   GROUP_07, GROUP_08, GROUP_09, GROUP_10, GROUP_11, GROUP_12, GROUP_13,
-  GROUP_14, GROUP_15, GROUP_16,
-  GROUP_17,
+  GROUP_14, GROUP_15, GROUP_16, GROUP_17, GROUP_18, GROUP_19,
 };
 
 export default models;

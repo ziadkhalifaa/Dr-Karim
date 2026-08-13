@@ -11,6 +11,8 @@ import { nutritionPlanController, exercisePlanController } from "../controllers/
 import { careCycleRouter } from "./care-cycle.routes.js";
 import { paymentRouter } from "./payment.routes.js";
 import { phase5Router } from "./phase5.routes.js";
+import { careRouter } from "./care.routes.js";
+import { progressRouter } from "./progress.routes.js";
 import { authenticateOptional, requireTenantAccess } from "../middleware/auth.js";
 import { tenantResolver } from "../middleware/tenant.js";
 
@@ -35,6 +37,8 @@ export function routes(app) {
   api.use(careCycleRouter());
   api.use(paymentRouter());
   api.use(phase5Router());
+  api.use(careRouter());
+  api.use(progressRouter());
   api.use("/patients", placeholderRouter("patients"));
   api.use("/services", placeholderRouter("services"));
   api.use("/appointments", placeholderRouter("appointments"));

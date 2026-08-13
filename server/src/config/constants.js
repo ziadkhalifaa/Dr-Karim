@@ -57,6 +57,43 @@ export const ENUM = {
   DEFINITION_STATUS: ["draft", "published", "retired"], // §4
   CONTENT_STATUS: ["draft", "published", "archived"], // §16/§18
   LOCALE: ["ar", "en"],
+  // ---- Phase 6B: Daily Care Program (§3, §8, §10) ----
+  CARE_PROGRAM_STATUS: ["draft", "scheduled", "active", "completed", "paused", "cancelled", "expired"],
+  CARE_VERSION_STATUS: ["draft", "active", "superseded"], // care_program_version
+  CARE_ACTIVITY_TYPE: ["nutrition", "exercise", "medication"],
+  CARE_ACTIVITY_MEASURE: ["boolean", "sessions", "quantity", "duration"],
+  CARE_ACTIVITY_STATUS: ["planned", "completed", "partial", "skipped", "not_recorded"],
+  CARE_EXECUTION_KIND: ["initial", "correction"],
+  CARE_EXECUTION_SOURCE: ["patient", "doctor", "system"],
+  // ---- Phase 6C: Progress & Measurements (§2, §3, §7, §10) ----
+  // Approved measurement types preserved from patient_measurement (§2). Weight
+  // is kg; dimensions (waist/neck/hip) are cm (§25 unit consistency).
+  PROGRESS_MEASUREMENT_TYPE: ["weight", "waist", "neck", "hip"],
+  PROGRESS_SOURCE: ["patient", "doctor", "checkin", "assessment", "system", "appointment"],
+  PROGRESS_MEASUREMENT_KIND: ["initial", "correction"], // append-only correction chains
+  PROGRESS_UNIT_BY_TYPE: { weight: "kg", waist: "cm", neck: "cm", hip: "cm" },
+  PROGRESS_GOAL_TYPE: ["weight"], // no invented goal categories (§7)
+  PROGRESS_GOAL_STATUS: ["draft", "active", "closed", "superseded", "cancelled"], // §7/§9
+  PROGRESS_GOAL_VERSION_STATUS: ["draft", "active", "superseded"], // §8
+  PROGRESS_CADENCE: ["every_3_days", "weekly", "biweekly", "monthly", "custom"], // §10 (default weekly, §11)
+};
+
+// §10/§11 configurable measurement cadence presets (days between measurements).
+export const PROGRESS_CADENCE_PRESETS = {
+  every_3_days: 3,
+  weekly: 7, // safe default (§11)
+  biweekly: 14,
+  monthly: 30,
+  custom: null, // requires explicit cadence_days
+};
+export const PROGRESS_DEFAULT_CADENCE = "weekly";
+
+// §28 sane configurable numeric bounds (server-authoritative validation).
+export const PROGRESS_BOUNDS = {
+  weight: [20, 400], // kg
+  waist: [20, 300], // cm
+  neck: [20, 300], // cm
+  hip: [20, 300], // cm
 };
 
 export const IDS = {

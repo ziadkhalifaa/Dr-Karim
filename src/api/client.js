@@ -29,7 +29,7 @@ async function request(path, options = {}, retried = false) {
   return parse(response);
 }
 
-export const api = { get: (path, options) => request(path, { ...options, method: "GET" }), post: (path, body, options) => request(path, { ...options, method: "POST", body }), patch: (path, body, options) => request(path, { ...options, method: "PATCH", body }) };
+export const api = { get: (path, options) => request(path, { ...options, method: "GET" }), post: (path, body, options) => request(path, { ...options, method: "POST", body }), patch: (path, body, options) => request(path, { ...options, method: "PATCH", body }), put: (path, body, options) => request(path, { ...options, method: "PUT", body }) };
 export const authApi = {
   login: (body) => api.post("/auth/login", body),
   refresh: (refreshToken) => api.post("/auth/refresh", { refreshToken }),
@@ -48,3 +48,32 @@ export const liveSessionApi = { get: (id) => api.get(`/live-sessions/${id}`), cr
 export const paymentApi = { packages: () => api.get("/packages"), package: (id) => api.get(`/packages/${id}`), settings: () => api.get("/payment-settings"), create: (body) => api.post("/payments", body), list: () => api.get("/patient/payments"), get: (id) => api.get(`/patient/payments/${id}`), receipt: (id, body) => api.post(`/payments/${id}/receipt`, body), entitlements: () => api.get("/patient/entitlements"), doctorList: () => api.get("/doctor/payments"), doctorGet: (id) => api.get(`/doctor/payments/${id}`), approve: (id) => api.post(`/doctor/payments/${id}/approve`, {}), reject: (id, reason) => api.post(`/doctor/payments/${id}/reject`, { reason }) };
 export const notificationApi = { list: () => api.get("/notifications"), read: (id) => api.post(`/notifications/${id}/read`, {}), readAll: () => api.post("/notifications/read-all", {}) };
 export const adminApi = { packages: () => api.get("/admin/packages"), updatePackage: (id, body) => api.patch(`/admin/packages/${id}`, body), settings: () => api.get("/admin/payment-settings"), updateSettings: (body) => api.patch("/admin/payment-settings", body) };
+export const careApi = {
+  dashboard: () => api.get("/care/dashboard"),
+  program: (id) => api.get(`/care/programs/${id}`),
+  programList: (query = "") => api.get(`/care/programs${query}`),
+  createProgram: (body) => api.post("/care/programs", body),
+  createVersion: (id, body) => api.post(`/care/programs/${id}/versions`, body),
+  addDefinitions: (id, body) => api.post(`/care/programs/${id}/definitions`, body),
+  activate: (id, versionNo) => api.post(`/care/programs/${id}/activate${versionNo ? `?versionNo=${versionNo}` : ""}`, {}),
+  day: (dayId) => api.get(`/care/days/${dayId}`),
+  record: (instanceId, body) => api.post(`/care/instances/${instanceId}/record`, body),
+  correct: (executionId, body) => api.post(`/care/executions/${executionId}/correct`, body),
+  checkin: (dayId, body) => api.post(`/care/days/${dayId}/checkin`, body),
+  programSummary: (id, query = "") => api.get(`/care/programs/${id}/summary${query}`),
+};
+export const progressApi = {
+  dashboard: (patientId) => api.get(`/progress/dashboard${patientId ? `?patientId=${patientId}` : ""}`),
+  measurements: (query = "") => api.get(`/progress/measurements${query}`),
+  recordMeasurement: (body) => api.post("/progress/measurements", body),
+  correctMeasurement: (id, body) => api.post(`/progress/measurements/${id}/correct`, body),
+  summary: (type, patientId) => api.get(`/progress/measurements/${type}/summary${patientId ? `?patientId=${patientId}` : ""}`),
+  context: () => api.get("/progress/context"),
+  updateContext: (body) => api.put("/progress/context", body),
+  goals: (patientId, status) => api.get(`/progress/goals${patientId ? `?patientId=${patientId}` : ""}${status ? `${patientId ? "&" : "?"}status=${status}` : ""}`),
+  goal: (id) => api.get(`/progress/goals/${id}`),
+  createGoal: (body) => api.post("/progress/goals", body),
+  addVersion: (id, body) => api.post(`/progress/goals/${id}/versions`, body),
+  activateGoal: (id) => api.post(`/progress/goals/${id}/activate`, {}),
+  closeGoal: (id, body) => api.post(`/progress/goals/${id}/close`, body),
+};
