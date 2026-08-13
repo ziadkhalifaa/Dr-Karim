@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { waUrl } from "../config";
-import Logo from "./Logo";
 import { WhatsAppIcon } from "./Icons";
 
 export default function Mission() {
@@ -11,8 +10,8 @@ export default function Mission() {
       <div className="container">
         <div className="mission">
           <div className="stat-card anim-slideR">
-            <div className="stat-card__badge">
-              <Logo size={120} />
+            <div className="stat-card__badge" style={{ padding: "0" }}>
+              <img src="/assets/logo.png" alt="Dr Kareem Logo" style={{ width: "120px", height: "120px", objectFit: "contain" }} />
             </div>
             <p className="stat-card__meta">
               {t("mission.years")}

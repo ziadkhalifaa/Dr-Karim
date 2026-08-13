@@ -6,17 +6,9 @@ import { useRef } from "react";
 
 export default function CareSection() {
   const { t } = useTranslation();
-  const ref = useRef(null);
-  
-  // Create rotation based on scroll for the salad plate
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-  const spin = useTransform(scrollYProgress, [0, 1], [0, 180]);
 
   return (
-    <section className="section" ref={ref}>
+    <section className="section">
       <div className="container">
         <div className="care">
           <div className="care-card care-card--brand anim-slideR">
@@ -32,12 +24,12 @@ export default function CareSection() {
 
           <div className="care__img anim-pop" style={{ perspective: 1000, display: "flex", justifyContent: "center", alignItems: "center" }}>
             <motion.div
-              style={{ rotate: spin }}
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
               whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 50 }}
             >
               <img 
-                src="/assets/salad_plate.png" 
+                src="/assets/salad_user.png" 
                 alt="Healthy Salad" 
                 style={{ 
                   width: "100%", 

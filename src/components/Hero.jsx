@@ -151,7 +151,7 @@ export default function Hero() {
             }}
           >
             <img 
-              src="/assets/drkarim.png" 
+              src="/assets/dr_karim_hero.png" 
               alt="Dr Kareem Eliethy" 
               style={{ 
                 maxHeight: "110%", 
@@ -160,53 +160,6 @@ export default function Hero() {
                 zIndex: 2
               }} 
             />
-          </motion.div>
-
-          <motion.div 
-            className="hero__chip hero__chip--1"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0, y: [0, -10, 0] }}
-            transition={{ 
-              opacity: { delay: 0.8, duration: 0.5 },
-              x: { delay: 0.8, duration: 0.5 },
-              y: { repeat: Infinity, duration: 4, ease: "easeInOut", delay: 1 }
-            }}
-          >
-            <span className="chip-ico" style={{ background: "var(--secondary)" }}>
-              <AppleIcon />
-            </span>
-            <span>{t("hero.chip1")}</span>
-          </motion.div>
-
-          <motion.div 
-            className="hero__chip hero__chip--2"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0, y: [0, 10, 0] }}
-            transition={{ 
-              opacity: { delay: 1, duration: 0.5 },
-              x: { delay: 1, duration: 0.5 },
-              y: { repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1.5 }
-            }}
-          >
-            <span className="chip-ico" style={{ background: "var(--primary)" }}>
-              <PlanIcon />
-            </span>
-            <span>{t("hero.chip2")}</span>
-          </motion.div>
-
-          <motion.div 
-            className="hero__chip hero__chip--3"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: [0, -10, 0] }}
-            transition={{ 
-              opacity: { delay: 1.2, duration: 0.5 },
-              y: { repeat: Infinity, duration: 4.5, ease: "easeInOut", delay: 0.5 }
-            }}
-          >
-            <span className="chip-ico" style={{ background: "var(--gold)" }}>
-              <SupportIcon />
-            </span>
-            <span>{t("hero.chip3")}</span>
           </motion.div>
         </motion.div>
       </div>
