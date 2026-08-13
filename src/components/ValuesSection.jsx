@@ -97,10 +97,10 @@ export default function ValuesSection() {
                 key={active}
                 src={images[active]}
                 alt={items[active].title}
-                initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
-                transition={{ duration: 0.5 }}
+                initial={{ opacity: 0, scale: 0.5, rotateY: 90 }}
+                animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                exit={{ opacity: 0, scale: 1.2, rotateY: -90 }}
+                transition={{ duration: 0.6, type: "spring", bounce: 0.3 }}
                 style={{ width: "80%", height: "80%", objectFit: "contain", filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.2))" }}
               />
             </AnimatePresence>

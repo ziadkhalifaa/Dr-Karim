@@ -35,6 +35,25 @@ export default function Hero() {
     }
   };
 
+  const titleVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.9 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { type: "spring", stiffness: 50, damping: 20 }
+    }
+  };
+
+  const ctaVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { 
+      opacity: 1, 
+      scale: 1, 
+      transition: { delay: 0.4, type: "spring", stiffness: 100 }
+    }
+  };
+
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 80, damping: 15 } }
@@ -81,25 +100,50 @@ export default function Hero() {
             {/* Kicker removed per user request */}
           </motion.div>
           
-          <motion.h1 variants={itemVariants} className="hero__title">
+          <motion.h1 
+            variants={titleVariants} 
+            className="hero__title"
+            style={{ 
+              fontSize: "clamp(2.5rem, 5vw, 4rem)", 
+              lineHeight: 1.2, 
+              fontWeight: 900, 
+              marginBottom: 20 
+            }}
+          >
             {t("hero.title1")}
             <strong style={{ color: "var(--secondary)", display: "block", marginTop: 8 }}>
               {t("hero.title2")}
             </strong>
           </motion.h1>
           
-          <motion.p variants={itemVariants} className="hero__subtitle">
+          <motion.p 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="hero__subtitle" 
+            style={{ 
+              fontSize: "clamp(1.1rem, 2vw, 1.3rem)", 
+              lineHeight: 1.6, 
+              color: "rgba(255,255,255,0.85)", 
+              marginBottom: 40, 
+              maxWidth: 500 
+            }}
+          >
             {t("hero.subtitle")}
           </motion.p>
           
-          <motion.div variants={itemVariants} className="hero__cta-row">
+          <motion.div variants={ctaVariants} className="hero__actions" style={{ display: "flex", gap: 16 }}>
             <motion.a 
-              whileHover={{ scale: 1.05, boxShadow: "0 15px 30px rgba(242, 124, 107, 0.4)" }}
-              whileTap={{ scale: 0.95 }}
               href="/assessment" 
               onClick={goAssessment} 
-              className="btn btn-accent"
-              style={{ borderRadius: 16 }}
+              className="btn btn-primary"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              animate={{ 
+                boxShadow: ["0px 0px 0px rgba(242,124,107,0)", "0px 0px 20px rgba(242,124,107,0.6)", "0px 0px 0px rgba(242,124,107,0)"] 
+              }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              style={{ fontSize: 16, padding: "14px 28px", borderRadius: 16 }}
             >
               <PulseIcon />
               {t("hero.cta", "احجز استشارة فيديو أونلاين")}
@@ -122,11 +166,18 @@ export default function Hero() {
         </motion.div>
 
         <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.4, type: "spring" }}
-          className="hero__wrap"
-          style={{ perspective: 1000 }}
+          className="hero__img-container"
+          initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+          style={{ 
+            flex: 1, 
+            display: "flex", 
+            justifyContent: "center", 
+            alignItems: "flex-end", 
+            position: "relative",
+            height: "100%"
+          }}
         >
           <motion.div
             whileHover={{ rotateY: 5, rotateX: 5, scale: 1.02 }}
