@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox, UserRound,
+  ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox, UserRound, BookTemplate, Check,
 } from "lucide-react";
 import { careApi, patientApi } from "../../api/client";
 import PatientSelector from "../shared/PatientSelector";
+import { templateStore } from "../../lib/templateStore";
 
 const statusTone = (s) =>
   ({ draft: "dash-badge--neutral", scheduled: "dash-badge--info", active: "dash-badge--primary", paused: "dash-badge--warning", completed: "dash-badge--success", cancelled: "dash-badge--danger", expired: "dash-badge--neutral" }[s] || "dash-badge--neutral");
@@ -50,6 +51,9 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
   const [versionsBusy, setVersionsBusy] = useState(false);
   const [nutritionVersionId, setNutritionVersionId] = useState("");
   const [exerciseVersionId, setExerciseVersionId] = useState("");
+  const [mode, setMode] = useState("manual"); // "manual" | "template"
+  const [chosenTemplate, setChosenTemplate] = useState(null);
+  const templates = templateStore.list();
 
   useEffect(() => {
     if (!selected?.id) { setVersions(null); setNutritionVersionId(""); setExerciseVersionId(""); return; }
@@ -68,7 +72,7 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
     setError(null);
     try {
       const f = new FormData(e.currentTarget);
-      await onCreate({
+      const program = await onCreate({
         patientId: selected?.id,
         startDate: f.get("startDate"),
         endDate: f.get("endDate"),
@@ -77,6 +81,20 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
         exercisePlanVersionId: exerciseVersionId || null,
         programInstructions: f.get("programInstructions") || null,
       });
+      // If a template was chosen, add all its activities automatically
+      if (chosenTemplate && program?.program?.id && chosenTemplate.activities.length > 0) {
+        await careApi.addDefinitions(
+          String(program.program.id),
+          chosenTemplate.activities.map((a) => ({
+            activityType: a.activityType,
+            measure: a.measure,
+            code: a.code,
+            nameAr: a.nameAr || null,
+            nameEn: a.nameEn || null,
+            plannedTarget: a.plannedTarget || {},
+          }))
+        );
+      }
     } catch (err) {
       setError(err.message || String(err));
     } finally {
@@ -92,6 +110,78 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
         </h3>
         <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={onCancel}><X />{t("dashboard.common.close") || "Close"}</button>
       </div>
+
+      {/* Mode Toggle */}
+      <div style={{ display: "flex", gap: "10px", padding: "16px 16px 0" }}>
+        <button
+          type="button"
+          onClick={() => { setMode("manual"); setChosenTemplate(null); }}
+          style={{
+            padding: "8px 18px", borderRadius: "10px", fontSize: "13px", fontWeight: "800", border: "1.5px solid",
+            borderColor: mode === "manual" ? "var(--dash-primary)" : "var(--dash-border)",
+            background: mode === "manual" ? "var(--dash-primary-soft)" : "transparent",
+            color: mode === "manual" ? "var(--dash-primary)" : "var(--dash-text-muted)",
+            cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          ✏️ إنشاء يدوي
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("template")}
+          style={{
+            padding: "8px 18px", borderRadius: "10px", fontSize: "13px", fontWeight: "800", border: "1.5px solid",
+            borderColor: mode === "template" ? "var(--dash-primary)" : "var(--dash-border)",
+            background: mode === "template" ? "var(--dash-primary-soft)" : "transparent",
+            color: mode === "template" ? "var(--dash-primary)" : "var(--dash-text-muted)",
+            cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          📋 استيراد من قالب {templates.length > 0 && `(${templates.length})`}
+        </button>
+      </div>
+
+      {/* Template Picker */}
+      {mode === "template" && (
+        <div style={{ padding: "16px", borderBottom: "1px solid var(--dash-border)" }}>
+          {templates.length === 0 ? (
+            <p style={{ color: "var(--dash-text-muted)", fontSize: "14px", fontWeight: "600", textAlign: "center", padding: "20px" }}>
+              لا توجد قوالب محفوظة بعد — اذهب لقسم "القوالب" لإنشاء أول قالب لك.
+            </p>
+          ) : (
+            <div style={{ display: "grid", gap: "10px" }}>
+              {templates.map((tmpl) => (
+                <div
+                  key={tmpl.id}
+                  onClick={() => setChosenTemplate(chosenTemplate?.id === tmpl.id ? null : tmpl)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "14px",
+                    padding: "14px 18px", borderRadius: "14px", cursor: "pointer",
+                    border: "1.5px solid " + (chosenTemplate?.id === tmpl.id ? "var(--dash-primary)" : "var(--dash-border)"),
+                    background: chosenTemplate?.id === tmpl.id ? "var(--dash-primary-soft)" : "var(--dash-bg)",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <div style={{ width: 36, height: 36, borderRadius: "10px", background: chosenTemplate?.id === tmpl.id ? "var(--dash-primary)" : "var(--dash-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    {chosenTemplate?.id === tmpl.id ? <Check size={20} style={{ color: "#fff" }} /> : <ClipboardList size={20} style={{ color: "var(--dash-text-soft)" }} />}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: "800", fontSize: "15px", color: chosenTemplate?.id === tmpl.id ? "var(--dash-primary)" : "var(--dash-text)" }}>{tmpl.name}</div>
+                    {tmpl.description && <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", marginTop: "2px" }}>{tmpl.description}</div>}
+                    <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", marginTop: "4px" }}>{tmpl.activities.length} نشاط</div>
+                  </div>
+                </div>
+              ))}
+              {chosenTemplate && (
+                <div style={{ background: "#d1fae5", border: "1px solid #6ee7b7", borderRadius: "12px", padding: "10px 14px", fontSize: "13px", fontWeight: "700", color: "#065f46" }}>
+                  ✅ سيتم إضافة {chosenTemplate.activities.length} نشاط من قالب "{chosenTemplate.name}" تلقائياً بعد إنشاء البرنامج
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       <form className="dash-form" onSubmit={submit}>
         <div className="dash-form--grid">
           {patientId ? (
@@ -138,6 +228,7 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
         {error && <p className="dash-muted" style={{ color: "var(--dash-danger)" }}>{error}</p>}
         <button className="dash-btn dash-btn--primary" disabled={busy || !selected?.id}>
           <Save />{busy ? t("dashboard.common.loading") : t("doctorCare.create")}
+          {chosenTemplate && ` (+ ${chosenTemplate.activities.length} نشاط من القالب)`}
         </button>
       </form>
     </section>

@@ -21,6 +21,7 @@ import StatusBadge from "../shared/StatusBadge";
 import PaymentReview from "./PaymentReview";
 import AdminConfiguration from "./AdminConfiguration";
 import CarePrograms from "./CarePrograms";
+import CareTemplates from "./CareTemplates";
 import DoctorProgress from "./ProgressManager";
 import PatientsList from "./PatientsList";
 import PatientProfile from "./PatientProfile";
@@ -281,6 +282,7 @@ export default function DoctorDashboard({ path }) {
     { path: "/doctor/patients", label: t("dashboard.nav.patients"), icon: Users },
     { path: "/doctor/reviews", label: t("dashboard.nav.reviewQueue"), icon: ListChecks },
     { path: "/doctor/care", label: t("doctorCare.title"), icon: ClipboardList },
+    { path: "/doctor/templates", label: "قوالب الرعاية", icon: ClipboardList },
     { path: "/doctor/progress", label: t("doctorProgress.nav"), icon: Scale },
     { path: "/doctor/payments", label: t("dashboard.nav.payments"), icon: Wallet },
     { path: "/doctor/configuration", label: t("dashboard.nav.configuration"), icon: Settings },
@@ -298,6 +300,7 @@ export default function DoctorDashboard({ path }) {
   else if (path === "/doctor/notifications") page = <NotificationsPanel />;
   else if (path === "/doctor/reviews") page = <Reviews rows={reviews} reload={reload} />;
   else if (path === "/doctor/care") page = <CarePrograms />;
+  else if (path === "/doctor/templates") page = <CareTemplates />;
   else if (path === "/doctor/progress") page = <DoctorProgress />;
   else if (path === "/doctor/appointments") page = <Appointments rows={appointments} reload={reload} />;
   else
