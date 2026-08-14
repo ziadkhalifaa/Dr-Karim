@@ -23,6 +23,8 @@ import ServicesPage from "./pages/ServicesPage";
 import ArticlesPage from "./pages/ArticlesPage";
 import ContactPage from "./pages/ContactPage";
 import ContentPage from "./pages/ContentPage";
+import PackagesPage from "./features/patient/PackagesPage";
+import PaymentPage from "./features/patient/PaymentPage";
 
 export default function App() {
   const path = useRoute();
@@ -35,10 +37,14 @@ export default function App() {
   if (path === "/assessment") {
     return (
       <AppProvider>
-        <AssessmentPage />
+        <AuthProvider>
+          <AssessmentPage />
+        </AuthProvider>
       </AppProvider>
     );
   }
+  if (path === "/packages") return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PackagesPage /></ProtectedRoute></AuthProvider></AppProvider>;
+  if (path.startsWith("/payment")) return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PaymentPage path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
 
   if (path === "/about") return <AppProvider><AboutPage /></AppProvider>;
   if (path === "/services") return <AppProvider><ServicesPage /></AppProvider>;

@@ -1,17 +1,48 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, UserRound, CreditCard, ClipboardList, Scale, Wallet, Inbox } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, UserRound, CreditCard, ClipboardList, Scale, Wallet, Inbox, Phone, Calendar, Mail, FileText, CheckCircle2, ChevronLeft } from "lucide-react";
 import { patientApi } from "../../api/client";
 import { navigate } from "../../lib/router";
-import StatusBadge from "../shared/StatusBadge";
 import CarePrograms from "./CarePrograms";
 import DoctorProgress from "./ProgressManager";
 
-const patientStatusTone = (s) =>
-  ({ active: "dash-badge--primary", pending_payment: "dash-badge--warning", inactive: "dash-badge--neutral", archived: "dash-badge--neutral" }[s] || "dash-badge--neutral");
+const STATUS_STYLES = {
+  active: { bg: "#d1fae5", color: "#065f46", border: "#6ee7b7", dot: "#10b981", label: "نشط" },
+  pending_payment: { bg: "#fef3c7", color: "#92400e", border: "#fcd34d", dot: "#f59e0b", label: "في انتظار الدفع" },
+  inactive: { bg: "#f1f5f9", color: "#475569", border: "#cbd5e1", dot: "#94a3b8", label: "غير نشط" },
+  archived: { bg: "#f1f5f9", color: "#475569", border: "#cbd5e1", dot: "#94a3b8", label: "مؤرشف" },
+};
 
-// Phase 6D patient-context workspace: the doctor opens one patient and every
-// clinical tool (care program, progress) is scoped to that person by patientId.
+function StatusPill({ status }) {
+  const s = STATUS_STYLES[status] || STATUS_STYLES.inactive;
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: "6px",
+      background: s.bg, color: s.color, border: "1px solid " + s.border,
+      padding: "4px 12px", borderRadius: "999px", fontSize: "12px", fontWeight: "800",
+    }}>
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.dot, display: "inline-block" }} />
+      {s.label}
+    </span>
+  );
+}
+
+function StatCard({ icon: Icon, label, value, sub, highlight }) {
+  return (
+    <div style={{ background: "var(--dash-card-bg)", borderRadius: "16px", padding: "20px", border: "1.5px solid var(--dash-border)", display: "flex", gap: "16px", alignItems: "center" }}>
+      <div style={{ width: 48, height: 48, borderRadius: "14px", background: highlight ? "var(--dash-primary-soft)" : "var(--dash-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <Icon size={24} style={{ color: highlight ? "var(--dash-primary)" : "var(--dash-text-muted)" }} />
+      </div>
+      <div>
+        <div style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "4px" }}>{label}</div>
+        <div style={{ fontSize: "16px", fontWeight: "800", color: "var(--dash-text)", lineHeight: "1.2" }}>{value}</div>
+        {sub && <div style={{ fontSize: "12px", color: "var(--dash-text-soft)", marginTop: "4px" }}>{sub}</div>}
+      </div>
+    </div>
+  );
+}
+
 export default function PatientProfile({ patientId }) {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
@@ -32,206 +63,205 @@ export default function PatientProfile({ patientId }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientId]);
 
-  const back = () => navigate("/doctor/patients");
-
   if (error && !data) return (
-    <section className="dash-panel">
-      <div className="dash-page-head">
-        <span className="dash-eyebrow"><UserRound />{t("patientProfile.title")}</span>
-      </div>
-      <p className="dash-form-error">{error}</p>
-    </section>
+    <div className="dash-panel" style={{ padding: "40px 20px", textAlign: "center" }}>
+      <p style={{ color: "#ef4444", fontWeight: "700" }}>{error}</p>
+      <button onClick={() => navigate("/doctor/patients")} className="dash-btn dash-btn--ghost" style={{ marginTop: "16px" }}>
+        العودة للقائمة
+      </button>
+    </div>
   );
-  if (!data) return <p className="dash-muted">{t("dashboard.common.loading")}</p>;
+  
+  if (!data) return (
+    <div style={{ display: "flex", justifyContent: "center", padding: "80px" }}>
+      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid var(--dash-border)", borderTopColor: "var(--dash-primary)" }} />
+    </div>
+  );
 
-  const { patient, subscription, careProgram, plans, upcomingAppointments, progress, review, payments } = data;
+  const { patient, subscription, careProgram, progress, payments } = data;
+
+  const TABS = [
+    { key: "overview", label: "نظرة عامة", icon: UserRound },
+    { key: "care", label: "برامج الرعاية", icon: ClipboardList },
+    { key: "progress", label: "القياسات والتقدم", icon: Scale },
+    { key: "payments", label: "المدفوعات", icon: Wallet },
+  ];
 
   return (
     <>
-      <div className="dash-page-head">
-        <span className="dash-eyebrow">
-          <UserRound />
-          {t("patientProfile.title")}
-        </span>
-        <h2>{patient.fullName}</h2>
-        <div className="dash-row-actions">
-          <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={back}>
-            <ArrowLeft />{t("patientProfile.back")}
+      <div style={{ marginBottom: "28px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
+        <div>
+          <button
+            onClick={() => navigate("/doctor/patients")}
+            style={{ background: "transparent", border: "none", color: "var(--dash-text-muted)", fontSize: "14px", fontWeight: "700", display: "flex", alignItems: "center", gap: "6px", cursor: "pointer", padding: "0", marginBottom: "16px", fontFamily: "inherit" }}
+          >
+            <ArrowLeft size={16} /> العودة لقائمة المرضى
           </button>
-          <span className={`dash-badge ${patientStatusTone(patient.status)}`}>
-            {patient.status === "pending_payment"
-              ? t("doctorPatients.pendingPayment")
-              : t(`dashboard.status.${patient.status}`, patient.status)}
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <div style={{ width: 64, height: 64, borderRadius: "20px", background: "var(--dash-primary-soft)", color: "var(--dash-primary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px", fontWeight: "900", flexShrink: 0 }}>
+              {patient.fullName ? patient.fullName.charAt(0).toUpperCase() : "?"}
+            </div>
+            <div>
+              <h2 style={{ fontSize: "28px", fontWeight: "900", color: "var(--dash-text)", margin: "0 0 6px", lineHeight: "1" }}>{patient.fullName}</h2>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", color: "var(--dash-text-muted)", fontSize: "14px", fontWeight: "600" }}>
+                {patient.phoneDisplay && <span style={{ display: "flex", alignItems: "center", gap: "4px" }}><Phone size={14} /> <span dir="ltr">{patient.phoneDisplay}</span></span>}
+                {patient.email && <span style={{ display: "flex", alignItems: "center", gap: "4px" }}><Mail size={14} /> <span>{patient.email}</span></span>}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <StatusPill status={patient.status} />
         </div>
       </div>
 
-      <div className="dash-tabs" style={{ marginBlockEnd: "16px" }}>
-        <button className={`dash-tab ${activeTab === "overview" ? "dash-tab--active" : ""}`} onClick={() => setActiveTab("overview")}>
-          <UserRound />{t("patientProfile.tabOverview")}
-        </button>
-        <button className={`dash-tab ${activeTab === "care" ? "dash-tab--active" : ""}`} onClick={() => setActiveTab("care")}>
-          <ClipboardList />{t("patientProfile.tabCare")}
-        </button>
-        <button className={`dash-tab ${activeTab === "progress" ? "dash-tab--active" : ""}`} onClick={() => setActiveTab("progress")}>
-          <Scale />{t("patientProfile.tabProgress")}
-        </button>
-        <button className={`dash-tab ${activeTab === "payments" ? "dash-tab--active" : ""}`} onClick={() => setActiveTab("payments")}>
-          <Wallet />{t("patientProfile.tabPayments")}
-        </button>
+      {/* Modern Tabs */}
+      <div style={{ display: "flex", gap: "8px", marginBottom: "28px", borderBottom: "1.5px solid var(--dash-border)", paddingBottom: "16px", overflowX: "auto" }}>
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setActiveTab(t.key)}
+            style={{
+              padding: "10px 20px", borderRadius: "12px", fontSize: "14px", fontWeight: "800",
+              border: "none", background: activeTab === t.key ? "var(--dash-text)" : "transparent",
+              color: activeTab === t.key ? "var(--dash-bg)" : "var(--dash-text-muted)",
+              cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
+              display: "flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap"
+            }}
+          >
+            <t.icon size={18} /> {t.label}
+          </button>
+        ))}
       </div>
 
-      {error && <p className="dash-form-error">{error}</p>}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.15 }}
+        >
+          {activeTab === "overview" && (
+            <div style={{ display: "grid", gap: "24px" }}>
+              {/* Top Stats */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+                <StatCard
+                  icon={Calendar} label="العمر"
+                  value={patient.ageYears != null ? `${patient.ageYears} سنة` : "غير محدد"}
+                  sub={patient.sex ? (patient.sex === "M" ? "ذكر" : "أنثى") : ""}
+                />
+                <StatCard
+                  icon={CreditCard} label="الاشتراك الحالي" highlight={!!subscription}
+                  value={subscription ? (subscription.package?.name || "باقة مخصصة") : "لا يوجد اشتراك"}
+                  sub={subscription?.endsAt ? `ينتهي في ${new Date(subscription.endsAt).toLocaleDateString("ar-EG")}` : ""}
+                />
+                <StatCard
+                  icon={ClipboardList} label="برنامج الرعاية" highlight={careProgram?.status === "active"}
+                  value={careProgram ? careProgram.status : "لا يوجد برنامج"}
+                  sub={careProgram ? "تم تعيين خطة" : "يحتاج إنشاء خطة"}
+                />
+              </div>
 
-      {activeTab === "overview" && (
-        <>
-          <div className="dash-split">
-            <section className="dash-panel">
-              <div className="dash-panel__head">
-                <h3 className="dash-panel__title"><UserRound />{t("patientProfile.identity")}</h3>
-              </div>
-              <div className="dash-panel__body">
-                <dl className="dash-def-list">
-                  <div><dt>{t("patientProfile.name")}</dt><dd>{patient.fullName}</dd></div>
-                  <div><dt>{t("patientProfile.age")}</dt><dd>{patient.ageYears != null ? `${patient.ageYears} ${t("patientProfile.yearUnit")}` : "—"}</dd></div>
-                  <div><dt>{t("patientProfile.sex")}</dt><dd>{patient.sex ? t(`patientProfile.sexOptions.${patient.sex}`) : "—"}</dd></div>
-                  <div><dt>{t("patientProfile.phone")}</dt><dd dir="ltr">{patient.phoneDisplay || "—"}</dd></div>
-                  <div><dt>{t("patientProfile.email")}</dt><dd>{patient.email || "—"}</dd></div>
-                  <div><dt>{t("patientProfile.review")}</dt><dd>{review ? <StatusBadge status={review.status} /> : <span className="dash-muted">{t("patientProfile.noReview")}</span>}</dd></div>
-                </dl>
-              </div>
-            </section>
-
-            <section className="dash-panel">
-              <div className="dash-panel__head">
-                <h3 className="dash-panel__title"><CreditCard />{t("patientProfile.subscription")}</h3>
-              </div>
-              <div className="dash-panel__body">
-                {subscription ? (
-                  <>
-                    <div className="dash-stat__value" style={{ marginBlockEnd: "6px" }}>
-                      {subscription.package?.name || "—"}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "24px" }}>
+                
+                {/* Latest Measurements */}
+                <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", padding: "24px", border: "1.5px solid var(--dash-border)" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+                    <h3 style={{ fontSize: "18px", fontWeight: "800", display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
+                      <Scale size={20} style={{ color: "var(--dash-primary)" }} /> أحدث القياسات
+                    </h3>
+                    <button onClick={() => setActiveTab("progress")} style={{ background: "transparent", border: "none", color: "var(--dash-text-muted)", fontSize: "13px", fontWeight: "700", display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", fontFamily: "inherit" }}>
+                      عرض الكل <ChevronLeft size={14} />
+                    </button>
+                  </div>
+                  {progress?.latest?.length ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                      {progress.latest.map((m, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px", background: "var(--dash-bg)", borderRadius: "12px" }}>
+                          <span style={{ fontWeight: "700", color: "var(--dash-text)" }}>{m.type}</span>
+                          <div style={{ textAlign: "left" }}>
+                            <div style={{ fontWeight: "800", color: "var(--dash-primary)", fontSize: "16px" }}>{m.value} {m.unit}</div>
+                            <div style={{ fontSize: "11px", color: "var(--dash-text-muted)" }}>{m.measuredOn}</div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <p className="dash-muted">
-                      {t("patientProfile.endsAt")}:{" "}
-                      {subscription.endsAt ? new Date(subscription.endsAt).toLocaleDateString() : "∞"}
-                    </p>
-                    {subscription.entitlements.length ? (
-                      <ul className="dash-list">
-                        {subscription.entitlements.map((e, i) => (
-                          <li key={i}>
-                            <strong>{e.code}</strong>
-                            <span className="dash-muted"> · {t("patientProfile.entitlementUsed", { used: e.used, limit: e.limit ?? "∞" })}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="dash-muted">{t("patientProfile.noEntitlements")}</p>
-                    )}
-                  </>
-                ) : (
-                  <p className="dash-muted">{t("patientProfile.noSubscription")}</p>
-                )}
-                {careProgram && (
-                  <p className="dash-hint" style={{ marginTop: "10px" }}>
-                    {t("patientProfile.careProgram")}: <strong>{careProgram.status}</strong>
-                  </p>
-                )}
-              </div>
-            </section>
-          </div>
+                  ) : (
+                    <div style={{ textAlign: "center", padding: "32px 0", color: "var(--dash-text-soft)" }}>
+                      <Scale size={32} style={{ opacity: 0.5, margin: "0 auto 12px" }} />
+                      <p style={{ margin: 0, fontWeight: "600", fontSize: "14px" }}>لا توجد قياسات مسجلة</p>
+                    </div>
+                  )}
+                </div>
 
-          <div className="dash-split">
-            <section className="dash-panel">
-              <div className="dash-panel__head">
-                <h3 className="dash-panel__title"><ClipboardList />{t("patientProfile.plans")}</h3>
+                {/* Subscriptions Entitlements */}
+                <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", padding: "24px", border: "1.5px solid var(--dash-border)" }}>
+                  <h3 style={{ fontSize: "18px", fontWeight: "800", display: "flex", alignItems: "center", gap: "8px", margin: "0 0 20px" }}>
+                    <CheckCircle2 size={20} style={{ color: "var(--dash-info)" }} /> صلاحيات الباقة
+                  </h3>
+                  {subscription?.entitlements?.length ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                      {subscription.entitlements.map((e, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px", background: "var(--dash-bg)", borderRadius: "12px" }}>
+                          <span style={{ fontWeight: "700", color: "var(--dash-text)" }}>{e.code}</span>
+                          <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)", background: "var(--dash-border)", padding: "4px 10px", borderRadius: "999px" }}>
+                            تم استخدام {e.used} / {e.limit ?? "∞"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ textAlign: "center", padding: "32px 0", color: "var(--dash-text-soft)" }}>
+                      <FileText size={32} style={{ opacity: 0.5, margin: "0 auto 12px" }} />
+                      <p style={{ margin: 0, fontWeight: "600", fontSize: "14px" }}>لا توجد صلاحيات لعرضها</p>
+                    </div>
+                  )}
+                </div>
+                
               </div>
-              <div className="dash-panel__body">
-                <ul className="dash-list">
-                  <li><strong>{t("patientProfile.nutrition")}</strong> <span className="dash-muted">{plans?.nutrition ? plans.nutrition.status : t("patientProfile.none")}</span></li>
-                  <li><strong>{t("patientProfile.exercise")}</strong> <span className="dash-muted">{plans?.exercise ? plans.exercise.status : t("patientProfile.none")}</span></li>
-                </ul>
-              </div>
-            </section>
-
-            <section className="dash-panel">
-              <div className="dash-panel__head">
-                <h3 className="dash-panel__title"><Scale />{t("patientProfile.measurements")}</h3>
-              </div>
-              <div className="dash-panel__body">
-                {progress?.latest?.length ? (
-                  <ul className="dash-list">
-                    {progress.latest.map((m, i) => (
-                      <li key={i}>
-                        <strong>{m.type}</strong>{" "}
-                        <span className="dash-muted">{m.value} {m.unit} · {m.measuredOn}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="dash-muted">{t("patientProfile.noMeasurements")}</p>
-                )}
-              </div>
-            </section>
-          </div>
-
-          <section className="dash-panel">
-            <div className="dash-panel__head">
-              <h3 className="dash-panel__title"><Wallet />{t("patientProfile.appointments")}</h3>
             </div>
-            <div className="dash-panel__body">
-              {upcomingAppointments?.length ? (
-                <ul className="dash-list">
-                  {upcomingAppointments.map((a) => (
-                    <li key={a.id}>
-                      <strong>{a.type}</strong>
-                      <span className="dash-muted"> · {a.scheduledStartAt ? new Date(a.scheduledStartAt).toLocaleString() : "—"} · <StatusBadge status={a.status} /></span>
-                    </li>
+          )}
+
+          {activeTab === "care" && <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}><CarePrograms patientId={patientId} /></div>}
+          
+          {activeTab === "progress" && <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}><DoctorProgress patientId={patientId} /></div>}
+          
+          {activeTab === "payments" && (
+            <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}>
+              <h3 style={{ fontSize: "18px", fontWeight: "800", display: "flex", alignItems: "center", gap: "8px", margin: "0 0 20px" }}>
+                <Wallet size={20} /> سجل المدفوعات
+              </h3>
+              {payments?.length ? (
+                <div style={{ display: "grid", gap: "12px" }}>
+                  {payments.map((p) => (
+                    <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px", background: "var(--dash-bg)", borderRadius: "16px", border: "1px solid var(--dash-border)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                        <div style={{ width: 44, height: 44, borderRadius: "12px", background: "var(--dash-card-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>
+                          {p.method === "vodafone_cash" ? "📱" : p.method === "instapay" ? "🏦" : "💳"}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: "16px", fontWeight: "900", color: "var(--dash-text)" }}>{p.amount} {p.currency}</div>
+                          <div style={{ fontSize: "13px", color: "var(--dash-text-muted)", marginTop: "2px" }}>
+                            {p.submittedAt ? new Date(p.submittedAt).toLocaleDateString("ar-EG") : "—"}
+                          </div>
+                        </div>
+                      </div>
+                      <StatusPill status={p.status} />
+                    </div>
                   ))}
-                </ul>
+                </div>
               ) : (
-                <div className="dash-empty"><Inbox /><p>{t("patientProfile.noAppointments")}</p></div>
+                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--dash-text-soft)" }}>
+                  <Inbox size={48} style={{ opacity: 0.5, margin: "0 auto 16px" }} />
+                  <p style={{ margin: 0, fontWeight: "600", fontSize: "15px" }}>لا يوجد سجل مدفوعات</p>
+                </div>
               )}
             </div>
-          </section>
-        </>
-      )}
-
-      {activeTab === "care" && <CarePrograms patientId={patientId} />}
-      {activeTab === "progress" && <DoctorProgress patientId={patientId} />}
-      {activeTab === "payments" && (
-        <section className="dash-panel">
-          <div className="dash-panel__head">
-            <h3 className="dash-panel__title"><Wallet />{t("patientProfile.payments")}</h3>
-          </div>
-          {payments?.length ? (
-            <div className="dash-table-wrap dash-panel__body--flush">
-              <table className="dash-table">
-                <thead>
-                  <tr>
-                    <th>{t("dashboard.payments.amount")}</th>
-                    <th>{t("dashboard.payments.method")}</th>
-                    <th>{t("dashboard.payments.status")}</th>
-                    <th>{t("doctorPatients.created")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {payments.map((p) => (
-                    <tr key={p.id}>
-                      <td className="dash-cell-main">{p.amount} {p.currency}</td>
-                      <td className="dash-cell-muted">{p.method}</td>
-                      <td><StatusBadge status={p.status} /></td>
-                      <td className="dash-cell-muted">{p.submittedAt ? new Date(p.submittedAt).toLocaleDateString() : "—"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="dash-empty"><Inbox /><p>{t("dashboard.patient.noPayments")}</p></div>
           )}
-        </section>
-      )}
+        </motion.div>
+      </AnimatePresence>
     </>
   );
 }

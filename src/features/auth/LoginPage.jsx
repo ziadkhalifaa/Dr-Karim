@@ -27,7 +27,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, var(--surface-brand) 0%, var(--deep) 100%)", padding: "20px" }}>
+    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, var(--deep) 0%, var(--surface-brand) 100%)", padding: "20px" }}>
       <motion.div 
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -39,7 +39,9 @@ export default function LoginPage() {
           boxShadow: "var(--shadow-lg)",
           width: "100%",
           maxWidth: "440px",
-          textAlign: "center"
+          textAlign: "center",
+          border: "1px solid rgba(255,255,255,0.1)",
+          backdropFilter: "blur(20px)"
         }}
       >
         <motion.div 
@@ -61,7 +63,8 @@ export default function LoginPage() {
         <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "20px", textAlign: "start" }}>
           <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
             البريد الإلكتروني أو رقم الهاتف
-            <input 
+            <motion.input 
+              whileFocus={{ scale: 1.01, borderColor: "var(--primary)" }}
               required 
               value={form.identifier} 
               onChange={(e) => setForm({ ...form, identifier: e.target.value })} 
@@ -76,14 +79,13 @@ export default function LoginPage() {
                 fontSize: "16px",
                 transition: "border 0.2s ease, box-shadow 0.2s ease"
               }}
-              onFocus={(e) => { e.target.style.borderColor = "var(--primary)"; e.target.style.boxShadow = "0 0 0 3px rgba(18, 59, 74, 0.1)"; }}
-              onBlur={(e) => { e.target.style.borderColor = "var(--line)"; e.target.style.boxShadow = "none"; }}
             />
           </label>
           
           <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
             كلمة المرور
-            <input 
+            <motion.input 
+              whileFocus={{ scale: 1.01, borderColor: "var(--primary)" }}
               required 
               type="password" 
               value={form.password} 
@@ -99,8 +101,6 @@ export default function LoginPage() {
                 fontSize: "16px",
                 transition: "border 0.2s ease, box-shadow 0.2s ease"
               }}
-              onFocus={(e) => { e.target.style.borderColor = "var(--primary)"; e.target.style.boxShadow = "0 0 0 3px rgba(18, 59, 74, 0.1)"; }}
-              onBlur={(e) => { e.target.style.borderColor = "var(--line)"; e.target.style.boxShadow = "none"; }}
             />
           </label>
 
@@ -109,7 +109,7 @@ export default function LoginPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               role="alert" 
-              style={{ color: "var(--highlight-text)", background: "var(--highlight-bg)", padding: "12px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", margin: 0 }}
+              style={{ color: "#ef4444", background: "#fee2e2", padding: "12px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", margin: 0 }}
             >
               {error || authError.message}
             </motion.p>
@@ -126,13 +126,20 @@ export default function LoginPage() {
           </motion.button>
         </form>
 
+        <p style={{ color: "var(--text-muted)", marginTop: "20px", fontSize: "14px" }}>
+          ليس لديك حساب؟{" "}
+          <button onClick={() => navigate("/register")} style={{ background: "none", border: "none", color: "var(--primary)", fontWeight: "700", cursor: "pointer", fontSize: "14px" }}>
+            إنشاء حساب
+          </button>
+        </p>
+
         <button 
           onClick={() => navigate("/")} 
           style={{ 
             background: "none", 
             border: "none", 
             color: "var(--text-muted)", 
-            marginTop: "24px", 
+            marginTop: "12px", 
             fontSize: "14px", 
             cursor: "pointer",
             display: "inline-flex",

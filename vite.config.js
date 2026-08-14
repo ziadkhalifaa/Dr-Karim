@@ -5,6 +5,16 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/',
+  server: {
+    // Local dev: forward API calls to the backend instead of the Vite dev
+    // server, so the dashboard is live against MySQL, not static.
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,

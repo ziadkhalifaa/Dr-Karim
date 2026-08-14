@@ -7,59 +7,79 @@
    ============================================================ */
 
 :root {
-  --dash-sidebar-bg: linear-gradient(180deg, #0d2b15 0%, #0a1f10 100%);
-  --dash-sidebar-text: #d8eeda;
-  --dash-sidebar-muted: #8fbb9a;
-  --dash-sidebar-active-bg: rgba(109, 204, 99, 0.16);
-  --dash-sidebar-active-text: #ffffff;
+  /* Sidebar — rich dark-navy for a premium brand feel in light mode */
+  --dash-sidebar-bg: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+  --dash-sidebar-text: #e2e8f0;
+  --dash-sidebar-muted: #94a3b8;
+  --dash-sidebar-active-bg: rgba(16, 185, 129, 0.18);
+  --dash-sidebar-active-text: #34d399;
   --dash-sidebar-border: rgba(255, 255, 255, 0.08);
-  --dash-topbar-bg: rgba(255, 255, 255, 0.86);
-  --dash-bg: #f2f7f3;
+
+  --dash-topbar-bg: rgba(255, 255, 255, 0.92);
+  --dash-bg: #f1f5f9;
   --dash-card-bg: #ffffff;
-  --dash-border: rgba(46, 139, 37, 0.14);
-  --dash-text: #15202b;
-  --dash-text-muted: #5c6f66;
-  --dash-text-soft: #8aa098;
-  --dash-primary: #2e8b25;
-  --dash-primary-soft: #e7f4e4;
-  --dash-danger: #d64545;
-  --dash-danger-soft: #fdeaea;
-  --dash-warning: #b07a1e;
-  --dash-warning-soft: #fdf3dd;
-  --dash-info: #1a72d4;
-  --dash-info-soft: #e6f0fc;
-  --dash-gold: #c79a3d;
-  --dash-shadow: 0 1px 2px rgba(15, 44, 22, 0.04), 0 12px 32px rgba(15, 44, 22, 0.07);
-  --dash-shadow-lg: 0 24px 60px rgba(15, 44, 22, 0.14);
+  --dash-border: #e2e8f0;
+
+  --dash-text: #0f172a;
+  --dash-text-muted: #64748b;
+  --dash-text-soft: #94a3b8;
+
+  --dash-primary: #10b981;
+  --dash-primary-soft: #d1fae5;
+
+  --dash-danger: #ef4444;
+  --dash-danger-soft: #fee2e2;
+
+  --dash-warning: #f59e0b;
+  --dash-warning-soft: #fef3c7;
+
+  --dash-info: #3b82f6;
+  --dash-info-soft: #dbeafe;
+
+  --dash-gold: #eab308;
+
+  --dash-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07);
+  --dash-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  --dash-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.1);
+
   --dash-radius: 16px;
   --dash-radius-sm: 10px;
 }
 
 [data-theme="dark"] {
-  --dash-sidebar-bg: linear-gradient(180deg, #0d1f11 0%, #091709 100%);
-  --dash-sidebar-text: #cfe9d3;
-  --dash-sidebar-muted: #7aa887;
-  --dash-sidebar-active-bg: rgba(109, 204, 99, 0.18);
-  --dash-sidebar-active-text: #ffffff;
-  --dash-sidebar-border: rgba(255, 255, 255, 0.07);
-  --dash-topbar-bg: rgba(12, 24, 14, 0.86);
-  --dash-bg: #0b150c;
-  --dash-card-bg: #132019;
-  --dash-border: rgba(109, 204, 99, 0.14);
-  --dash-text: #e4f3e4;
-  --dash-text-muted: #94b5a0;
-  --dash-text-soft: #6f8f7c;
-  --dash-primary: #6dcc63;
-  --dash-primary-soft: rgba(109, 204, 99, 0.14);
-  --dash-danger: #f0716b;
-  --dash-danger-soft: rgba(240, 113, 107, 0.14);
-  --dash-warning: #e0b255;
-  --dash-warning-soft: rgba(224, 178, 85, 0.14);
-  --dash-info: #64a8f0;
-  --dash-info-soft: rgba(100, 168, 240, 0.14);
-  --dash-gold: #e0b255;
-  --dash-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.35);
-  --dash-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --dash-sidebar-bg: #0f172a; /* Slate 900 */
+  --dash-sidebar-text: #cbd5e1; /* Slate 300 */
+  --dash-sidebar-muted: #94a3b8; /* Slate 400 */
+  --dash-sidebar-active-bg: rgba(16, 185, 129, 0.15);
+  --dash-sidebar-active-text: #34d399; /* Emerald 400 */
+  --dash-sidebar-border: #1e293b; /* Slate 800 */
+  
+  --dash-topbar-bg: rgba(15, 23, 42, 0.85);
+  --dash-bg: #020617; /* Slate 950 */
+  --dash-card-bg: #0f172a; /* Slate 900 */
+  --dash-border: #1e293b; /* Slate 800 */
+  
+  --dash-text: #f8fafc; /* Slate 50 */
+  --dash-text-muted: #94a3b8; /* Slate 400 */
+  --dash-text-soft: #64748b; /* Slate 500 */
+  
+  --dash-primary: #10b981; 
+  --dash-primary-soft: rgba(16, 185, 129, 0.15);
+  
+  --dash-danger: #f87171; 
+  --dash-danger-soft: rgba(239, 68, 68, 0.15);
+  
+  --dash-warning: #fbbf24; 
+  --dash-warning-soft: rgba(245, 158, 11, 0.15);
+  
+  --dash-info: #60a5fa; 
+  --dash-info-soft: rgba(59, 130, 246, 0.15);
+  
+  --dash-gold: #fbbf24; 
+  
+  --dash-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --dash-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --dash-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
 }
 
 /* ============ Layout ============ */
@@ -97,6 +117,7 @@
   color: var(--dash-sidebar-text);
   border-inline-end: 1px solid var(--dash-sidebar-border);
   z-index: 40;
+  box-shadow: 4px 0 32px rgba(0,0,0,0.18);
 }
 
 .dash-brand {
@@ -179,8 +200,8 @@
 }
 
 .dash-nav-item:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--dash-sidebar-text);
+  background: var(--dash-sidebar-active-bg);
+  color: var(--dash-sidebar-active-text);
 }
 
 .dash-nav-item.active {
@@ -238,7 +259,7 @@
 .dash-user__name {
   font-weight: 700;
   font-size: 13.5px;
-  color: #fff;
+  color: #e2e8f0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

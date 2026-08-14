@@ -1,4 +1,4 @@
-﻿import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { navigate } from "../../../lib/router";
 
 export default function SuccessScreen({ referenceNumber, overallTier, reviewState }) {
@@ -52,16 +52,10 @@ export default function SuccessScreen({ referenceNumber, overallTier, reviewStat
           <button
             type="button"
             className="aq-btn aq-btn--accent"
-            onClick={createAccount}
+            onClick={() => navigate("/packages")}
+            style={{ padding: "16px 24px", fontSize: "18px", borderRadius: "12px", background: "var(--primary)", color: "#fff", border: "none", fontWeight: "800", cursor: "pointer", width: "100%" }}
           >
-            {t("success.createAccount")}
-          </button>
-          <button
-            type="button"
-            className="aq-btn aq-btn--ghost aq-success__home"
-            onClick={() => navigate("/")}
-          >
-            {t("success.home")}
+            {t("success.choosePackage", "الخطوة التالية: اختيار الباقة والدفع")}
           </button>
         </div>
       </div>

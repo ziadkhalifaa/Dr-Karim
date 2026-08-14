@@ -43,15 +43,14 @@ export default function RegisterPage() {
     }
     setBusy(true);
     try {
-      const referenceNumber = readPrefill("drke-register-assessment") || undefined;
       const session = await register({
         fullName: form.fullName,
         phone: form.phone,
         password: form.password,
         email: form.email || undefined,
-        assessmentReference: referenceNumber,
       });
-      navigate(session.user.role === "patient" ? "/patient" : "/login");
+      // Route patient to assessment immediately after registration
+      navigate(session.user.role === "patient" ? "/assessment" : "/login");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,12 +72,22 @@ export default function RegisterPage() {
   };
 
   return (
-    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, var(--surface-brand) 0%, var(--deep) 100%)", padding: "20px" }}>
+    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, var(--deep) 0%, var(--surface-brand) 100%)", padding: "20px" }}>
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        style={{ background: "var(--card-bg)", padding: "40px", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-lg)", width: "100%", maxWidth: "460px", textAlign: "center" }}
+        style={{ 
+          background: "var(--card-bg)", 
+          padding: "40px", 
+          borderRadius: "var(--radius-xl)", 
+          boxShadow: "var(--shadow-lg)", 
+          width: "100%", 
+          maxWidth: "460px", 
+          textAlign: "center",
+          border: "1px solid rgba(255,255,255,0.1)",
+          backdropFilter: "blur(20px)"
+        }}
       >
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", delay: 0.2 }} style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
           <Logo size={70} />
@@ -90,27 +99,27 @@ export default function RegisterPage() {
         <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "18px", textAlign: "start" }}>
           <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
             {t("register.fullName")}
-            <input required value={form.fullName} onChange={set("fullName")} autoComplete="name" style={fieldStyle} />
+            <motion.input whileFocus={{ scale: 1.01, borderColor: "var(--primary)" }} required value={form.fullName} onChange={set("fullName")} autoComplete="name" style={fieldStyle} />
           </label>
           <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
             {t("register.phone")}
-            <input required value={form.phone} onChange={set("phone")} inputMode="tel" autoComplete="tel" placeholder="01xxxxxxxxx" dir="ltr" style={fieldStyle} />
+            <motion.input whileFocus={{ scale: 1.01, borderColor: "var(--primary)" }} required value={form.phone} onChange={set("phone")} inputMode="tel" autoComplete="tel" placeholder="01xxxxxxxxx" dir="ltr" style={fieldStyle} />
           </label>
           <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
             {t("register.email")}
-            <input type="email" value={form.email} onChange={set("email")} autoComplete="email" style={fieldStyle} />
+            <motion.input whileFocus={{ scale: 1.01, borderColor: "var(--primary)" }} type="email" value={form.email} onChange={set("email")} autoComplete="email" style={fieldStyle} />
           </label>
           <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
             {t("register.password")}
-            <input required type="password" value={form.password} onChange={set("password")} autoComplete="new-password" style={fieldStyle} />
+            <motion.input whileFocus={{ scale: 1.01, borderColor: "var(--primary)" }} required type="password" value={form.password} onChange={set("password")} autoComplete="new-password" style={fieldStyle} />
           </label>
           <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
             {t("register.confirmPassword")}
-            <input required type="password" value={form.confirm} onChange={set("confirm")} autoComplete="new-password" style={fieldStyle} />
+            <motion.input whileFocus={{ scale: 1.01, borderColor: "var(--primary)" }} required type="password" value={form.confirm} onChange={set("confirm")} autoComplete="new-password" style={fieldStyle} />
           </label>
 
           {(error || authError) && (
-            <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} role="alert" style={{ color: "var(--highlight-text)", background: "var(--highlight-bg)", padding: "12px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", margin: 0 }}>
+            <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} role="alert" style={{ color: "#ef4444", background: "#fee2e2", padding: "12px", borderRadius: "8px", fontSize: "14px", fontWeight: "600", margin: 0 }}>
               {error || authError.message}
             </motion.p>
           )}
