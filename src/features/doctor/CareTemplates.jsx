@@ -120,7 +120,7 @@ function ActivityBuilder({ onAdd }) {
           </select>
         </Field>
         <Field label="الاسم بالعربي *">
-          <input value={form.nameAr} onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))} placeholder="مثلاً: شرب الماء" style={inputStyle} />
+          <input value={form.nameAr} onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))} placeholder="مثلاً: بروتين يومي، وجبة الإفطار، أو شرب الماء" style={inputStyle} />
         </Field>
         <Field label="الاسم بالإنجليزي">
           <input value={form.nameEn} onChange={(e) => setForm((f) => ({ ...f, nameEn: e.target.value }))} placeholder="e.g. Drink Water" style={inputStyle} dir="ltr" />
@@ -131,7 +131,7 @@ function ActivityBuilder({ onAdd }) {
               <input type="number" value={form.targetValue} onChange={(e) => setForm((f) => ({ ...f, targetValue: e.target.value }))} placeholder="30" min="0" step="any" style={inputStyle} dir="ltr" />
             </Field>
             <Field label="الوحدة">
-              <input value={form.targetUnit} onChange={(e) => setForm((f) => ({ ...f, targetUnit: e.target.value }))} placeholder="دقيقة · مل · جلسة" style={inputStyle} />
+              <input value={form.targetUnit} onChange={(e) => setForm((f) => ({ ...f, targetUnit: e.target.value }))} placeholder="جرام · سعرة · لتر" style={inputStyle} />
             </Field>
           </>
         )}
