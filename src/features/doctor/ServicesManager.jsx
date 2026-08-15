@@ -10,10 +10,11 @@ function classNames(...classes) {
 export default function ServicesManager() {
   const { t } = useTranslation();
   const [services, setServices] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ title: "", body: "", code: "", status: "active" });
+  const [editForm, setEditForm] = useState({ title: "", body: "", code: "", status: "active", categoryId: "" });
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingId, setUploadingId] = useState(null);
   const [search, setSearch] = useState("");
@@ -21,8 +22,12 @@ export default function ServicesManager() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const res = await servicesApi.doctorList("ar");
+      const [res, cats] = await Promise.all([
+        servicesApi.doctorList("ar"),
+        servicesApi.categories("ar"),
+      ]);
       setServices(res.services || []);
+      setCategories(cats.categories || []);
       setError(null);
     } catch (err) {
       setError(err.message || "Failed to load services");
@@ -42,12 +47,13 @@ export default function ServicesManager() {
       body: svc.body || "",
       code: svc.code || "",
       status: svc.status || "active",
+      categoryId: svc.categoryId || "",
     });
   };
 
   const handleCancel = () => {
     setEditingId(null);
-    setEditForm({ title: "", body: "", code: "", status: "active" });
+    setEditForm({ title: "", body: "", code: "", status: "active", categoryId: "" });
   };
 
   const handleSave = async (e) => {
@@ -60,9 +66,19 @@ export default function ServicesManager() {
     setIsSaving(true);
     try {
       if (editingId === "new") {
-        await servicesApi.create(editForm);
+        await servicesApi.create({
+          title: editForm.title,
+          body: editForm.body,
+          code: editForm.code,
+          serviceCategoryId: editForm.categoryId || null,
+        });
       } else {
-        await servicesApi.update(editingId, editForm);
+        await servicesApi.update(editingId, {
+          title: editForm.title,
+          body: editForm.body,
+          status: editForm.status,
+          serviceCategoryId: editForm.categoryId || null,
+        });
       }
       await loadData();
       handleCancel();
@@ -171,6 +187,20 @@ export default function ServicesManager() {
               </div>
 
               <div className="drke-form-group">
+                <label>القسم</label>
+                <select
+                  className="drke-input"
+                  value={editForm.categoryId}
+                  onChange={(e) => setEditForm({ ...editForm, categoryId: e.target.value })}
+                >
+                  <option value="">بدون قسم</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="drke-form-group">
                 <label>الوصف</label>
                 <textarea
                   className="drke-input"
@@ -211,7 +241,7 @@ export default function ServicesManager() {
             <tr>
               <th style={{ width: "80px" }}>الصورة</th>
               <th>الخدمة</th>
-              <th>الكود</th>
+              <th>القسم</th>
               <th>الحالة</th>
               <th className="dash-table-actions">إجراءات</th>
             </tr>
@@ -242,7 +272,9 @@ export default function ServicesManager() {
                   <div className="dash-cell-main">{svc.title}</div>
                   <div className="dash-cell-sub" style={{ maxWidth: "300px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{svc.body}</div>
                 </td>
-                <td className="dash-cell-muted">{svc.code}</td>
+                <td className="dash-cell-muted">
+                  {categories.find((c) => String(c.id) === String(svc.categoryId))?.title || svc.code}
+                </td>
                 <td>
                   <span className={classNames("dash-badge", svc.status === "active" ? "dash-badge--success" : "dash-badge--neutral")}>
                     {svc.status === "active" ? "مفعل" : "غير مفعل"}

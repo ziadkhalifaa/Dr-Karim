@@ -51,14 +51,15 @@ export const foodApi = {
 };
 export const servicesApi = {
   // Doctor protected
-  doctorList: (lang) => api.get(`/services/doctor/services`, { params: { lang } }),
+  doctorList: (lang) => api.get(`/services/doctor/services?lang=${lang}`),
+  categories: (lang = "ar") => api.get(`/services/doctor/categories?lang=${lang}`),
   create: (body) => api.post("/services/doctor/services", body),
   update: (id, body) => api.patch(`/services/doctor/services/${id}`, body),
   delete: (id) => api.delete(`/services/doctor/services/${id}`),
   uploadCover: (id, file) => {
     const form = new FormData();
     form.append("cover", file);
-    return fetch(`${API_BASE}/services/doctor/services/${id}/cover`, {
+    return fetch(`${API_BASE}/content/doctor/services/${id}/cover`, {
       method: "POST",
       headers: { Authorization: `Bearer ${tokenStore.access}` },
       body: form,
@@ -127,6 +128,8 @@ export const progressApi = {
 export const publicApi = {
   /** List services grouped by category */
   services: (lang = "ar") => api.get(`/public/services?lang=${lang}`),
+  /** Get a single service by code */
+  service: (code, lang = "ar") => api.get(`/public/services/${code}?lang=${lang}`),
   /** List pricing packages */
   packages: () => api.get("/public/packages"),
   /** Clinic info + social media settings */

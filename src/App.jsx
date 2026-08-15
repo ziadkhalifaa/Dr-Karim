@@ -22,6 +22,7 @@ import PatientDashboard from "./features/patient/PatientDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AboutPage from "./pages/AboutPage";
 import ServicesPage from "./pages/ServicesPage";
+import ServiceSinglePage from "./pages/ServiceSinglePage";
 import ArticlesPage from "./pages/ArticlesPage";
 import ArticleSinglePage from "./pages/ArticleSinglePage";
 import ContactPage from "./pages/ContactPage";
@@ -51,6 +52,7 @@ export default function App() {
 
   if (path === "/about") return <AppProvider><AboutPage /></AppProvider>;
   if (path === "/services") return <AppProvider><ServicesPage /></AppProvider>;
+  if (path.startsWith("/services/")) return <AppProvider><ServiceSinglePage code={path.replace("/services/", "")} /></AppProvider>;
   if (path === "/articles") return <AppProvider><ArticlesPage /></AppProvider>;
   if (path.startsWith("/tips/")) return <AppProvider><ArticleSinglePage slug={path.replace("/tips/", "")} /></AppProvider>;
   if (path === "/contact") return <AppProvider><ContactPage /></AppProvider>;

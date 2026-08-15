@@ -6,6 +6,12 @@ import { navigate } from "../lib/router";
 import { publicApi } from "../api/client";
 
 const FALLBACK_ICON = <Sparkles size={40} />;
+const FALLBACK_COVER = "/assets/covers/service-therapeutic-nutrition.svg";
+
+const openService = (e, code) => {
+  e.preventDefault();
+  navigate(`/services/${code}`);
+};
 
 export default function ServicesSection() {
   const { t, i18n } = useTranslation();
@@ -87,10 +93,16 @@ export default function ServicesSection() {
                   transition={{ duration: 0.5, delay: i * 0.08 }}
                   key={i}
                   className="service-card"
+                  style={{ cursor: "pointer" }}
+                  onClick={(e) => openService(e, item.code)}
                 >
                   <div className="service-card__media">
                     {item.coverImageUrl ? (
-                      <img src={item.coverImageUrl} alt={item.title} />
+                      <img
+                        src={item.coverImageUrl}
+                        alt={item.title}
+                        onError={(e) => { e.currentTarget.src = FALLBACK_COVER; }}
+                      />
                     ) : (
                       <span className="service-card__fallback">{FALLBACK_ICON}</span>
                     )}

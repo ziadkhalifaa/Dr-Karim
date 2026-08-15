@@ -5,6 +5,7 @@ import * as servicesController from "../controllers/services.controller.js";
 const router = Router();
 
 // ===== DOCTOR (protected) =====
+router.get("/doctor/categories", authenticateOptional, requireAuth, requireRole("doctor", "admin"), servicesController.listServiceCategories);
 router.get("/doctor/services", authenticateOptional, requireAuth, requireRole("doctor", "admin"), servicesController.listAllServices);
 router.post("/doctor/services", authenticateOptional, requireAuth, requireRole("doctor", "admin"), servicesController.createService);
 router.patch("/doctor/services/:id", authenticateOptional, requireAuth, requireRole("doctor", "admin"), servicesController.updateService);

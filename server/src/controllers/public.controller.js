@@ -100,6 +100,61 @@ export async function listServices(req, res, next) {
   } catch (err) { next(err); }
 }
 
+// ──────────────────────────────────────────
+// GET /api/v1/public/services/:code
+// ──────────────────────────────────────────
+export async function getService(req, res, next) {
+  try {
+    const locale = req.query.lang || "ar";
+    const code = req.params.code;
+
+    const service = await Service.findOne({
+      where: { code, status: "active", deleted_at: null },
+      include: [
+        {
+          model: ServiceTranslation,
+          as: "translations",
+          where: { locale },
+          required: false,
+        },
+      ],
+    });
+
+    if (!service) throw new AppError(404, "NOT_FOUND", "Service not found");
+
+    let category = null;
+    if (service.service_category_id) {
+      const cat = await ServiceCategory.findByPk(service.service_category_id, {
+        include: [
+          {
+            model: ServiceCategoryTranslation,
+            as: "translations",
+            where: { locale },
+            required: false,
+          },
+        ],
+      });
+      if (cat) {
+        category = {
+          id: String(cat.id),
+          code: cat.code,
+          title: cat.translations?.[0]?.name || cat.code,
+          description: cat.translations?.[0]?.description || "",
+        };
+      }
+    }
+
+    return ok(res, 200, {
+      id: String(service.id),
+      code: service.code,
+      title: service.translations?.[0]?.name || service.code,
+      body: service.translations?.[0]?.description || "",
+      coverImageUrl: service.cover_image_url || null,
+      category,
+    });
+  } catch (err) { next(err); }
+}
+
 import { Package, PackageEntitlement } from "../models/16_monetization.js";
 
 // ──────────────────────────

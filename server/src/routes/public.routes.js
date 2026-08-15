@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authenticateOptional, requireAuth, requireRole } from "../middleware/auth.js";
 import {
   listServices,
+  getService,
   getPublicSettings,
   submitContact,
   listContacts,
@@ -13,6 +14,7 @@ const router = Router();
 
 // ===== PUBLIC (no auth needed) =====
 router.get("/services", listServices);
+router.get("/services/:code", getService);
 router.get("/packages", listPackages);
 router.get("/settings", getPublicSettings);
 router.post("/contact", submitContact);

@@ -20,7 +20,11 @@ function ArticleCard({ article }) {
     >
       <div className="article-card__media">
         {article.coverImageUrl ? (
-          <img src={article.coverImageUrl} alt={article.title} />
+          <img
+            src={article.coverImageUrl}
+            alt={article.title}
+            onError={(e) => { e.currentTarget.src = "/assets/covers/article-healthy-habits.svg"; }}
+          />
         ) : (
           <span className="article-card__fallback"><BookOpen size={44} /></span>
         )}

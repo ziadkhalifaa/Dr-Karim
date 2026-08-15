@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import { sequelize } from "../config/database.js";
-import { Service, ServiceTranslation } from "../models/07_content_services_settings.js";
+import { Service, ServiceTranslation, ServiceCategory, ServiceCategoryTranslation } from "../models/07_content_services_settings.js";
 import { ok } from "../middleware/api-response.js";
 import { AppError } from "../utils/errors.js";
 
@@ -11,6 +11,29 @@ function getTenantId(req) {
 function requireDoctor(auth) {
   if (!auth) throw new AppError(401, "AUTH_REQUIRED", "Authentication required");
   if (!["doctor", "admin"].includes(auth.membership?.role)) throw new AppError(403, "FORBIDDEN", "Doctors only");
+}
+
+export async function listServiceCategories(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const locale = req.query.lang || "ar";
+
+    const categories = await ServiceCategory.findAll({
+      where: { tenant_id: tenantId, deleted_at: null },
+      include: [{ model: ServiceCategoryTranslation, as: "translations", where: { locale }, required: false }],
+      order: [["sort_order", "ASC"]],
+    });
+
+    const data = categories.map((cat) => ({
+      id: String(cat.id),
+      code: cat.code,
+      title: cat.translations?.[0]?.name || cat.code,
+      active: cat.active,
+    }));
+
+    return ok(res, 200, { categories: data });
+  } catch (err) { next(err); }
 }
 
 export async function listAllServices(req, res, next) {
@@ -31,6 +54,7 @@ export async function listAllServices(req, res, next) {
       title: svc.translations?.[0]?.name || svc.code,
       body: svc.translations?.[0]?.description || "",
       coverImageUrl: svc.cover_image_url || null,
+      categoryId: svc.service_category_id ? String(svc.service_category_id) : null,
       status: svc.status,
     }));
 
@@ -42,7 +66,7 @@ export async function createService(req, res, next) {
   try {
     requireDoctor(req.auth);
     const tenantId = getTenantId(req);
-    const { title, body, code } = req.body || {};
+    const { title, body, code, serviceCategoryId } = req.body || {};
     if (!title?.trim()) throw new AppError(422, "VALIDATION_ERROR", "Title is required");
 
     const safeCode = code || `svc-${Date.now()}`;
@@ -51,6 +75,7 @@ export async function createService(req, res, next) {
       const service = await Service.create({
         tenant_id: tenantId,
         code: safeCode,
+        service_category_id: serviceCategoryId ? Number(serviceCategoryId) : null,
         status: "active",
       }, { transaction: t });
 
@@ -72,13 +97,17 @@ export async function updateService(req, res, next) {
     requireDoctor(req.auth);
     const tenantId = getTenantId(req);
     const { id } = req.params;
-    const { title, body, status } = req.body || {};
+    const { title, body, status, serviceCategoryId } = req.body || {};
 
     const service = await Service.findOne({ where: { id, tenant_id: tenantId, deleted_at: null } });
     if (!service) throw new AppError(404, "NOT_FOUND", "Service not found");
 
     if (status !== undefined) {
       await service.update({ status });
+    }
+
+    if (serviceCategoryId !== undefined) {
+      await service.update({ service_category_id: serviceCategoryId ? Number(serviceCategoryId) : null });
     }
 
     if (title !== undefined || body !== undefined) {

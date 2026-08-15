@@ -158,6 +158,12 @@ export const en = {
     cta: "Start your nutrition assessment",
     more: "Discover more",
     empty: "No services are currently available.",
+    single: {
+      back: "Back to services",
+      error: "Something went wrong while loading this service.",
+      notFound: "Service not found",
+      notFoundBody: "Sorry, we couldn't find this service.",
+    },
   },
   about: {
     kicker: "Get to know us",

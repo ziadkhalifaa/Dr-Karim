@@ -62,7 +62,11 @@ export default function MedicalTipsSection() {
               >
                 <div className="article-card__media">
                   {art.coverImageUrl ? (
-                    <img src={art.coverImageUrl} alt={art.title} />
+                    <img
+                      src={art.coverImageUrl}
+                      alt={art.title}
+                      onError={(e) => { e.currentTarget.src = "/assets/covers/article-healthy-habits.svg"; }}
+                    />
                   ) : (
                     <span className="article-card__fallback">
                       <BookOpen size={44} />

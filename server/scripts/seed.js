@@ -459,16 +459,16 @@ async function buildServices(tenant) {
   const arGroups = ar.services.groups;
   const CATEGORIES = [
     { code: "core", enTitle: enGroups[0].title, arTitle: arGroups[0].title, services: [
-      { code: "therapeutic-nutrition", enTitle: enGroups[0].items[0].title, enBody: enGroups[0].items[0].body, arTitle: arGroups[0].items[0].title, arBody: arGroups[0].items[0].body, cover_image_url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2053&auto=format&fit=crop" },
+      { code: "therapeutic-nutrition", enTitle: enGroups[0].items[0].title, enBody: enGroups[0].items[0].body, arTitle: arGroups[0].items[0].title, arBody: arGroups[0].items[0].body, cover_image_url: "/assets/covers/service-therapeutic-nutrition.svg" },
     ]},
     { code: "weight-management", enTitle: enGroups[1].title, arTitle: arGroups[1].title, services: [
-      { code: "obesity-treatment", enTitle: enGroups[1].items[0].title, enBody: enGroups[1].items[0].body, arTitle: arGroups[1].items[0].title, arBody: arGroups[1].items[0].body, cover_image_url: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop" },
-      { code: "underweight-treatment", enTitle: enGroups[1].items[1].title, enBody: enGroups[1].items[1].body, arTitle: arGroups[1].items[1].title, arBody: arGroups[1].items[1].body, cover_image_url: "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?q=80&w=1974&auto=format&fit=crop" },
+      { code: "obesity-treatment", enTitle: enGroups[1].items[0].title, enBody: enGroups[1].items[0].body, arTitle: arGroups[1].items[0].title, arBody: arGroups[1].items[0].body, cover_image_url: "/assets/covers/service-obesity-treatment.svg" },
+      { code: "underweight-treatment", enTitle: enGroups[1].items[1].title, enBody: enGroups[1].items[1].body, arTitle: arGroups[1].items[1].title, arBody: arGroups[1].items[1].body, cover_image_url: "/assets/covers/service-underweight-treatment.svg" },
     ]},
     { code: "health-conditions", enTitle: enGroups[2].title, arTitle: arGroups[2].title, services: [
-      { code: "insulin-resistance", enTitle: enGroups[2].items[0].title, enBody: enGroups[2].items[0].body, arTitle: arGroups[2].items[0].title, arBody: arGroups[2].items[0].body, cover_image_url: "https://images.unsplash.com/photo-1498837167339-54df3c2557ff?q=80&w=2070&auto=format&fit=crop" },
-      { code: "thyroid-disorders", enTitle: enGroups[2].items[1].title, enBody: enGroups[2].items[1].body, arTitle: arGroups[2].items[1].title, arBody: arGroups[2].items[1].body, cover_image_url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070&auto=format&fit=crop" },
-      { code: "diabetes-children", enTitle: enGroups[2].items[2].title, enBody: enGroups[2].items[2].body, arTitle: arGroups[2].items[2].title, arBody: arGroups[2].items[2].body, cover_image_url: "https://images.unsplash.com/photo-1543362906-acfc16c67564?q=80&w=1965&auto=format&fit=crop" },
+      { code: "insulin-resistance", enTitle: enGroups[2].items[0].title, enBody: enGroups[2].items[0].body, arTitle: arGroups[2].items[0].title, arBody: arGroups[2].items[0].body, cover_image_url: "/assets/covers/service-insulin-resistance.svg" },
+      { code: "thyroid-disorders", enTitle: enGroups[2].items[1].title, enBody: enGroups[2].items[1].body, arTitle: arGroups[2].items[1].title, arBody: arGroups[2].items[1].body, cover_image_url: "/assets/covers/service-thyroid-disorders.svg" },
+      { code: "diabetes-children", enTitle: enGroups[2].items[2].title, enBody: enGroups[2].items[2].body, arTitle: arGroups[2].items[2].title, arBody: arGroups[2].items[2].body, cover_image_url: "/assets/covers/service-diabetes-children.svg" },
     ]},
   ];
 
@@ -634,7 +634,7 @@ async function seedArticles(tenant) {
     {
       slug: "healthy-habits",
       minutes: 5,
-      cover_image_url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2053&auto=format&fit=crop",
+      cover_image_url: "/assets/covers/article-healthy-habits.svg",
       ar: {
         title: "5 عادات يومية لحياة صحية",
         body: "<p>شرب الماء الكافي، النوم المبكر، وممارسة الرياضة بانتظام هي مفاتيح الصحة الجيدة.</p><p>ابدأ يومك بكوب ماء دافئ، وخصص 30 دقيقة فقط للمشي، وتجنب السهر قدر الإمكان — ستلاحظ الفرق خلال أسبوع واحد فقط.</p>",
@@ -647,7 +647,7 @@ async function seedArticles(tenant) {
     {
       slug: "keto-diet",
       minutes: 6,
-      cover_image_url: "https://images.unsplash.com/photo-1498837167339-54df3c2557ff?q=80&w=2070&auto=format&fit=crop",
+      cover_image_url: "/assets/covers/article-keto-diet.svg",
       ar: {
         title: "كل ما تريد معرفته عن نظام الكيتو",
         body: "<p>نظام الكيتو يعتمد على تقليل الكربوهيدرات وزيادة الدهون الصحية لتدريب الجسم على حرق الدهون.</p><p>احرص على اختيار مصادر دهون صحية مثل الأفوكادو والمكسرات وزيت الزيتون، وراقب مستويات البروتين بعناية لتجنب خروج الجسم من الحالة الكيتونية.</p>",
@@ -660,7 +660,7 @@ async function seedArticles(tenant) {
     {
       slug: "intermittent-fasting",
       minutes: 7,
-      cover_image_url: "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?q=80&w=1974&auto=format&fit=crop",
+      cover_image_url: "/assets/covers/article-intermittent-fasting.svg",
       ar: {
         title: "الصيام المتقطع: دليلك الشامل",
         body: "<p>يعتبر الصيام المتقطع من أفضل الطرق لتنظيم الإنسولين وحرق الدهون بدون حرمان.</p><p>ابدأ بنافذة صيام 12:12 ثم انتقل تدريجيًا إلى 16:8، واشرب سوائل خالية من السعرات خلال الصيام مع مراعاة جودة الوجبات عند الإفطار.</p>",
@@ -673,7 +673,7 @@ async function seedArticles(tenant) {
     {
       slug: "hydration-myths",
       minutes: 4,
-      cover_image_url: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?q=80&w=1952&auto=format&fit=crop",
+      cover_image_url: "/assets/covers/article-hydration-myths.svg",
       ar: {
         title: "8 أساطير شائعة عن شرب الماء",
         body: "<p>هل تحتاج حقًا إلى 8 أكواب يوميًا؟ الحقيقة أن حاجتك للماء تعتمد على وزنك ونشاطك والمناخ من حولك.</p><p>راقب لون البول كدليل عملي على الترطيب، وزد من السوائل أثناء التمرين وفي الطقس الحار.</p>",
@@ -686,7 +686,7 @@ async function seedArticles(tenant) {
     {
       slug: "protein-guide",
       minutes: 6,
-      cover_image_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1952&auto=format&fit=crop",
+      cover_image_url: "/assets/covers/article-protein-guide.svg",
       ar: {
         title: "البروتين: الكمية المناسبة لجسمك",
         body: "<p>البروتين ليس فقط للاعبي كمال الأجسام، بل ضروري لبناء العضلات وصيانتها والمساعدة في الشبع.</p><p>القاعدة العامة هي 1.2 إلى 2 جرام لكل كيلوجرام من وزن الجسم حسب مستوى نشاطك، مع توزيع المصادر بين اللحوم والأسماك والبقوليات.</p>",
@@ -699,7 +699,7 @@ async function seedArticles(tenant) {
     {
       slug: "sleep-and-weight",
       minutes: 5,
-      cover_image_url: "https://images.unsplash.com/photo-1505577058444-a3dab90d4253?q=80&w=1974&auto=format&fit=crop",
+      cover_image_url: "/assets/covers/article-sleep-and-weight.svg",
       ar: {
         title: "علاقة النوم الجيد بالتحكم في الوزن",
         body: "<p>قلة النوم ترفع هرمون الجريلين الذي يزيد الشهية وتخفض اللبتين المسؤول عن الشبع.</p><p>نام من 7 إلى 9 ساعات بانتظام، وأطفئ الشاشات قبل النوم بساعة، وستجد التحكم في شهيتك أسهل بكثير.</p>",
@@ -779,3 +779,4 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
       process.exit(1);
     });
 }
+

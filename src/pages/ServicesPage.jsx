@@ -5,6 +5,14 @@ import { Sparkles } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { publicApi } from "../api/client";
+import { navigate } from "../lib/router";
+
+const FALLBACK_COVER = "/assets/covers/service-therapeutic-nutrition.svg";
+
+const openService = (e, code) => {
+  e.preventDefault();
+  navigate(`/services/${code}`);
+};
 
 export default function ServicesPage() {
   const { t, i18n } = useTranslation();
@@ -98,6 +106,8 @@ export default function ServicesPage() {
                       <motion.article
                         key={item.id || i}
                         className="service-card"
+                        style={{ cursor: "pointer" }}
+                        onClick={(e) => openService(e, item.code)}
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-40px" }}
@@ -105,7 +115,11 @@ export default function ServicesPage() {
                       >
                         <div className="service-card__media">
                           {item.coverImageUrl ? (
-                            <img src={item.coverImageUrl} alt={item.title} />
+                            <img
+                              src={item.coverImageUrl}
+                              alt={item.title}
+                              onError={(e) => { e.currentTarget.src = FALLBACK_COVER; }}
+                            />
                           ) : (
                             <span className="service-card__fallback"><Sparkles size={40} /></span>
                           )}

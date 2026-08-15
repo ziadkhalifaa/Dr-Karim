@@ -117,6 +117,7 @@ export default function ArticleSinglePage({ slug }) {
                   <img
                     src={article.coverImageUrl}
                     alt={article.title}
+                    onError={(e) => { e.currentTarget.src = "/assets/covers/article-healthy-habits.svg"; }}
                     style={{ width: "100%", maxHeight: 480, objectFit: "cover", borderRadius: "var(--radius-lg)", marginBottom: 36 }}
                   />
                 )}
