@@ -1,10 +1,29 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Star, ShieldCheck, HeartPulse, BadgeCheck } from "lucide-react";
-import { motion } from "framer-motion";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { navigate } from "../lib/router";
 
+const SLIDES = [
+  "/assets/dr_karim_hero.png",
+  "/assets/slider_1.png",
+  "/assets/slider_2.png",
+  "/assets/slider_3.png",
+  "/assets/drkarim.png",
+];
+
 export default function Hero() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), 4500);
+    return () => clearInterval(id);
+  }, []);
+
+  const prev = () => setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length);
+  const next = () => setIndex((i) => (i + 1) % SLIDES.length);
 
   return (
     <section className="hero">
@@ -74,47 +93,48 @@ export default function Hero() {
           <div className="hero__photo-wrap">
             <div className="hero__ring" aria-hidden="true" />
             <div className="hero__ring-2" aria-hidden="true" />
-            <div className="hero__photo">
-              <img src="/assets/dr_karim_hero.png" alt={t("brand.name")} />
-            </div>
 
-            <div className="hero__float hero__float--1">
-              <span
-                className="hero__float-ico"
-                style={{ background: "linear-gradient(135deg, var(--primary), var(--primary-deep))" }}
-              >
-                <ShieldCheck size={20} />
-              </span>
-              <span>
-                <b>{t("hero.chip1")}</b>
-                <span>{t("brand.title")}</span>
-              </span>
-            </div>
+            <div className="hero__photo hero-slider">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={index}
+                  src={SLIDES[index]}
+                  alt={t("brand.name")}
+                  initial={{ opacity: 0, scale: 1.06 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.7, ease: "easeOut" }}
+                />
+              </AnimatePresence>
 
-            <div className="hero__float hero__float--2">
-              <span
-                className="hero__float-ico"
-                style={{ background: "linear-gradient(135deg, var(--secondary), var(--secondary-deep))" }}
+              <button
+                type="button"
+                className="hero-slider__btn hero-slider__btn--prev"
+                onClick={prev}
+                aria-label="Previous"
               >
-                <HeartPulse size={20} />
-              </span>
-              <span>
-                <b>{t("hero.chip2")}</b>
-                <span>{t("hero.chip3")}</span>
-              </span>
-            </div>
+                {isAr ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
+              </button>
+              <button
+                type="button"
+                className="hero-slider__btn hero-slider__btn--next"
+                onClick={next}
+                aria-label="Next"
+              >
+                {isAr ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
+              </button>
 
-            <div className="hero__float hero__float--3">
-              <span
-                className="hero__float-ico"
-                style={{ background: "linear-gradient(135deg, var(--primary-deep), #065f46)" }}
-              >
-                <BadgeCheck size={20} />
-              </span>
-              <span>
-                <b>{t("brand.coach")}</b>
-                <span>{t("brand.city")}</span>
-              </span>
+              <div className="hero-slider__dots">
+                {SLIDES.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`hero-slider__dot ${i === index ? "is-active" : ""}`}
+                    onClick={() => setIndex(i)}
+                    aria-label={`Slide ${i + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </motion.div>

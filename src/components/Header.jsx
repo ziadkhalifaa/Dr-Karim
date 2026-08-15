@@ -69,10 +69,6 @@ export default function Header() {
           onClick={(e) => navTo(e, "/")}
         >
           <img src="/assets/logo.png" alt={t("brand.name")} />
-          <span className="site-header__brand-text">
-            <span className="site-header__brand-name">{t("brand.name")}</span>
-            <span className="site-header__brand-title">{t("brand.title")}</span>
-          </span>
         </a>
 
         <nav className="site-header__nav" aria-label="Main">
