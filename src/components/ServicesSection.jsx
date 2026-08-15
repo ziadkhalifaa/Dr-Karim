@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Sparkles, ArrowLeft } from "lucide-react";
+import { Sparkles, ArrowLeft, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { navigate } from "../lib/router";
 import { publicApi } from "../api/client";
 
-// Generic fallback image just in case
-const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80";
+const FALLBACK_ICON = <Sparkles size={40} />;
 
 export default function ServicesSection() {
   const { t, i18n } = useTranslation();
@@ -24,116 +23,105 @@ export default function ServicesSection() {
       .finally(() => setLoading(false));
   }, [i18n.language]);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 60, damping: 15 } }
-  };
+  const Arrow = i18n.language === "ar" ? ArrowLeft : ArrowRight;
 
   return (
-    <section className="section bg-bg relative py-20" id="services">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-primary-glow to-transparent rounded-full opacity-40 translate-x-1/3 -translate-y-1/3" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-gold-glow to-transparent rounded-full opacity-30 -translate-x-1/3 translate-y-1/3" />
-      </div>
-
-      <div className="container relative z-10">
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <span className="inline-flex items-center gap-2 bg-highlight-bg text-highlight-text px-4 py-1.5 rounded-full text-sm font-bold mb-4 shadow-sm">
-            <Sparkles className="w-4 h-4" />
-            مجالات التخصص
-          </span>
-          <h2 className="text-4xl md:text-5xl font-black text-text mb-6">
-            {t("services.title")} <strong className="text-gradient">المتكاملة</strong>
+    <section className="section" id="services">
+      <div className="container">
+        <div className="section-head">
+          <span className="sec-kicker">{t("services.kicker")}</span>
+          <h2 className="sec-title">
+            {t("services.title")} <span className="grad">{t("services.title2")}</span>
           </h2>
-          <p className="text-text-muted text-lg max-w-2xl mx-auto leading-relaxed">
-            حلول غذائية شاملة ومخصصة لمساعدتك في الوصول إلى هدفك بأفضل طريقة صحية ومستدامة.
-          </p>
-        </motion.div>
+          <p className="sec-lead">{t("services.lead")}</p>
+        </div>
 
         {loading && (
-          <div className="flex justify-center py-10">
-            <div className="w-10 h-10 border-4 border-line border-t-primary rounded-full animate-spin" />
+          <div style={{ display: "flex", justifyContent: "center", padding: "40px 0" }}>
+            <div className="spinner" />
           </div>
         )}
 
         {groups.map((group, gi) => (
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
             key={gi}
-            className="mb-16"
+            style={{ marginBottom: gi < groups.length - 1 ? 56 : 0 }}
           >
-            <h3 className="text-2xl md:text-3xl font-black text-primary-deep mb-8 flex items-center gap-4">
+            <h3
+              style={{
+                fontSize: 20,
+                fontWeight: 900,
+                color: "var(--secondary-deep)",
+                marginBottom: 22,
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+              }}
+            >
+              <span
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
+                  background: "var(--secondary-tint)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Sparkles size={16} />
+              </span>
               {group.title}
-              <div className="h-px bg-gradient-to-l from-primary-soft to-transparent flex-1 opacity-50" />
             </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {group.items.map((item, i) => {
-                const imgSrc = item.coverImageUrl || FALLBACK_IMAGE;
-                
-                return (
-                  <motion.article 
-                    variants={cardVariants}
-                    whileHover={{ y: -10 }}
-                    key={i} 
-                    className="glass-card rounded-[2rem] overflow-hidden flex flex-col group cursor-pointer h-full"
-                  >
-                    <div className="w-full h-56 relative overflow-hidden">
-                      <img 
-                        src={imgSrc} 
-                        alt={item.title} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-deep/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
-                    
-                    <div className="p-8 flex-1 flex flex-col relative bg-card-bg">
-                      <h4 className="text-2xl font-black text-text mb-4 transition-colors group-hover:text-primary">
-                        {item.title}
-                      </h4>
-                      <p className="text-text-muted leading-relaxed flex-1 font-medium mb-6">
-                        {item.body}
-                      </p>
-                      <div className="inline-flex items-center gap-2 text-primary font-bold text-sm">
-                        اكتشف المزيد
-                        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-2" />
-                      </div>
-                    </div>
-                  </motion.article>
-                );
-              })}
+
+            <div className="services__grid">
+              {group.items.map((item, i) => (
+                <motion.article
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.5, delay: i * 0.08 }}
+                  key={i}
+                  className="service-card"
+                >
+                  <div className="service-card__media">
+                    {item.coverImageUrl ? (
+                      <img src={item.coverImageUrl} alt={item.title} />
+                    ) : (
+                      <span className="service-card__fallback">{FALLBACK_ICON}</span>
+                    )}
+                  </div>
+                  <div className="service-card__body">
+                    <span className="service-card__cat">{group.title}</span>
+                    <h4 className="service-card__title">{item.title}</h4>
+                    <p className="service-card__desc">{item.body}</p>
+                    <span className="service-card__foot">
+                      {t("services.more")}
+                      <Arrow size={16} />
+                    </span>
+                  </div>
+                </motion.article>
+              ))}
             </div>
           </motion.div>
         ))}
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-16 text-center"
+          style={{ textAlign: "center", marginTop: 56 }}
         >
           <a
             href="/assessment"
-            onClick={e => { e.preventDefault(); navigate('/assessment'); }}
-            className="btn btn-primary"
-            style={{ borderRadius: "100px", padding: "18px 40px", fontSize: "18px" }}
+            onClick={(e) => { e.preventDefault(); navigate("/assessment"); }}
+            className="btn btn-primary btn-lg"
           >
-            <Sparkles className="w-5 h-5 mr-2" />
+            <Sparkles size={20} />
             {t("services.cta")}
           </a>
         </motion.div>

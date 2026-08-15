@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { Sparkles } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { publicApi } from "../api/client";
@@ -18,13 +19,11 @@ export default function ServicesPage() {
         if (groups.length > 0) {
           setCategories(groups);
         } else {
-          // Fallback to translation file if DB has no services yet
           const fallback = t("services.groups", { returnObjects: true });
           setCategories(Array.isArray(fallback) ? fallback : []);
         }
       })
       .catch(() => {
-        // Graceful fallback to static translations
         const fallback = t("services.groups", { returnObjects: true });
         setCategories(Array.isArray(fallback) ? fallback : []);
       })
@@ -34,70 +33,96 @@ export default function ServicesPage() {
   return (
     <>
       <Header />
-      <main style={{ minHeight: "80vh", padding: "120px 20px 60px", background: "var(--bg)" }}>
-        <div className="container">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            style={{ textAlign: "center", marginBottom: "80px" }}
-          >
-            <span style={{ display: "inline-block", background: "var(--highlight-bg)", color: "var(--primary-deep)", padding: "8px 16px", borderRadius: "100px", fontSize: "15px", fontWeight: "800", marginBottom: "16px" }}>
-              مجالات التخصص
-            </span>
-            <h1 className="sec-title" style={{ fontSize: "clamp(36px, 5vw, 54px)", color: "var(--text)" }}>
-              خدماتنا <strong style={{ color: "var(--primary)" }}>الطبية</strong>
-            </h1>
-            <p style={{ color: "var(--text-muted)", fontSize: "18px", maxWidth: "700px", margin: "20px auto 0", lineHeight: 1.8, fontWeight: 500 }}>
-              نقدم مجموعة متكاملة من الخدمات لضمان وصولك لهدفك الصحي بأمان، مصممة خصيصاً لتناسب احتياجاتك وحالتك الصحية.
-            </p>
-          </motion.div>
+      <main>
+        <section className="page-hero">
+          <div className="page-hero__mesh" aria-hidden="true" />
+          <div className="container">
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <span className="page-hero__kicker">{t("services.kicker")}</span>
+              <h1 className="page-hero__title">
+                {t("services.title")} <span className="gold">{t("services.title2")}</span>
+              </h1>
+              <p className="page-hero__lead">{t("services.lead")}</p>
+            </motion.div>
+          </div>
+        </section>
 
-          {loading ? (
-            <div style={{ display: "flex", justifyContent: "center", padding: "80px" }}>
-              <div style={{ width: "48px", height: "48px", borderRadius: "50%", border: "4px solid var(--line)", borderTopColor: "var(--primary)", animation: "spin 0.8s linear infinite" }} />
-            </div>
-          ) : categories.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "100px", color: "var(--text-muted)", fontSize: "18px", fontWeight: "700" }}>
-              لا توجد خدمات منشورة حالياً.
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "60px" }}>
-              {categories.map((group, gi) => (
-                <motion.div 
+        <section className="section">
+          <div className="container">
+            {loading ? (
+              <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
+                <div className="spinner" />
+              </div>
+            ) : categories.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "80px 0", color: "var(--text-muted)", fontWeight: 700 }}>
+                {t("services.empty")}
+              </div>
+            ) : (
+              categories.map((group, gi) => (
+                <motion.div
                   key={group.id || gi}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: gi * 0.1 }}
+                  transition={{ delay: gi * 0.08 }}
+                  style={{ marginBottom: gi < categories.length - 1 ? 56 : 0 }}
                 >
-                  <h2 style={{ fontSize: "32px", color: "var(--primary-deep)", marginBottom: "32px", fontWeight: "900", borderBottom: "2px solid var(--line)", paddingBottom: "16px" }}>{group.title}</h2>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "30px" }}>
+                  <h3
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 900,
+                      color: "var(--secondary-deep)",
+                      marginBottom: 22,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 14,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: 10,
+                        background: "var(--secondary-tint)",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Sparkles size={16} />
+                    </span>
+                    {group.title}
+                  </h3>
+                  <div className="services__grid">
                     {(group.items || []).map((item, i) => (
-                      <motion.div 
+                      <motion.article
                         key={item.id || i}
-                        whileHover={{ y: -8, boxShadow: "0 24px 48px rgba(0,0,0,0.08)", borderColor: "rgba(5, 150, 105, 0.3)" }}
-                        style={{ 
-                          background: "var(--card-bg)", 
-                          borderRadius: "24px", 
-                          padding: "36px 30px", 
-                          border: "1px solid var(--line)",
-                          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                          display: "flex", flexDirection: "column", gap: "16px",
-                          position: "relative", overflow: "hidden"
-                        }}
+                        className="service-card"
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-40px" }}
+                        transition={{ delay: i * 0.06, duration: 0.5 }}
                       >
-                        <div style={{ position: "absolute", top: 0, insetInline: 0, height: "4px", background: "linear-gradient(90deg, var(--primary), var(--primary-soft))" }} />
-                        <h3 style={{ fontSize: "24px", color: "var(--text)", fontWeight: "900", letterSpacing: "-0.01em" }}>{item.title}</h3>
-                        <p style={{ fontSize: "16px", color: "var(--text-muted)", lineHeight: "1.9", fontWeight: 500 }}>{item.body}</p>
-                      </motion.div>
+                        <div className="service-card__media">
+                          {item.coverImageUrl ? (
+                            <img src={item.coverImageUrl} alt={item.title} />
+                          ) : (
+                            <span className="service-card__fallback"><Sparkles size={40} /></span>
+                          )}
+                        </div>
+                        <div className="service-card__body">
+                          <span className="service-card__cat">{group.title}</span>
+                          <h4 className="service-card__title">{item.title}</h4>
+                          <p className="service-card__desc">{item.body}</p>
+                        </div>
+                      </motion.article>
                     ))}
                   </div>
                 </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
+              ))
+            )}
+          </div>
+        </section>
       </main>
       <Footer />
     </>

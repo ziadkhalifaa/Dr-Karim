@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { mapsDirectionsUrl, waUrl } from "../config";
+import { mapsDirectionsUrl, waUrl, CLINIC } from "../config";
 import { usePublicSettings } from "../hooks/usePublicSettings";
 import {
   FacebookIcon,
@@ -9,52 +8,48 @@ import {
   PhoneIcon,
   MailIcon,
   PinIcon,
-  SendIcon,
   WhatsAppIcon,
 } from "./Icons";
 import { motion } from "framer-motion";
+import { navigate } from "../lib/router";
 
-const LINKS = ["home", "about", "services", "articles", "contact"];
+const LINKS = [
+  { key: "home", href: "/" },
+  { key: "about", href: "/about" },
+  { key: "services", href: "/services" },
+  { key: "articles", href: "/articles" },
+  { key: "contact", href: "/contact" },
+];
+
+const LEGAL = [
+  { key: "privacy", href: "/privacy" },
+  { key: "terms", href: "/terms" },
+  { key: "faq", href: "/faq" },
+];
 
 function SocialButtons({ social }) {
+  const items = [
+    { key: "facebook", href: social?.facebook, Icon: FacebookIcon, label: "Facebook" },
+    { key: "youtube", href: social?.youtube, Icon: YoutubeIcon, label: "YouTube" },
+    { key: "tiktok", href: social?.tiktok, Icon: TikTokIcon, label: "TikTok" },
+  ].filter((i) => i.href);
+
   return (
-    <div className="social-row" style={{ display: "flex", gap: "12px" }}>
-      <motion.a
-        whileHover={{ scale: 1.1, backgroundColor: "var(--primary)" }}
-        whileTap={{ scale: 0.95 }}
-        className="social-btn"
-        href={social?.facebook || "#"}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Facebook"
-        style={{ width: "44px", height: "44px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.1)", color: "#fff", transition: "background 0.3s ease" }}
-      >
-        <FacebookIcon />
-      </motion.a>
-      <motion.a
-        whileHover={{ scale: 1.1, backgroundColor: "var(--primary)" }}
-        whileTap={{ scale: 0.95 }}
-        className="social-btn"
-        href={social?.youtube || "#"}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="YouTube"
-        style={{ width: "44px", height: "44px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.1)", color: "#fff", transition: "background 0.3s ease" }}
-      >
-        <YoutubeIcon />
-      </motion.a>
-      <motion.a
-        whileHover={{ scale: 1.1, backgroundColor: "var(--primary)" }}
-        whileTap={{ scale: 0.95 }}
-        className="social-btn"
-        href={social?.tiktok || "#"}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="TikTok"
-        style={{ width: "44px", height: "44px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.1)", color: "#fff", transition: "background 0.3s ease" }}
-      >
-        <TikTokIcon />
-      </motion.a>
+    <div className="footer-social">
+      {items.map(({ href, Icon, label }) => (
+        <motion.a
+          key={label}
+          whileHover={{ y: -4 }}
+          whileTap={{ scale: 0.95 }}
+          className="footer-social__btn"
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={label}
+        >
+          <Icon />
+        </motion.a>
+      ))}
     </div>
   );
 }
@@ -62,109 +57,88 @@ function SocialButtons({ social }) {
 export default function Footer() {
   const { t } = useTranslation();
   const { settings } = usePublicSettings();
-  const [email, setEmail] = useState("");
-  const [done, setDone] = useState(false);
 
-  const submit = (e) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setDone(true);
-  };
+  const clinic = settings?.clinic || {};
 
   return (
-    <footer className="site-footer" id="contact" style={{ background: "var(--surface-brand)", color: "var(--on-brand)", padding: "80px 0 30px", borderTopLeftRadius: "var(--radius-xl)", borderTopRightRadius: "var(--radius-xl)" }}>
+    <footer className="site-footer" id="contact">
       <div className="container">
-        <div className="footer-top" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "60px", marginBottom: "60px" }}>
-          
-          <motion.div 
+        <div className="footer-top">
+          <motion.div
+            className="footer-brand"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="footer-cta"
+            transition={{ duration: 0.6 }}
           >
-            <h2 style={{ fontSize: "32px", fontWeight: "800", lineHeight: "1.4", marginBottom: "20px" }}>
-              {t("footer.cta1")} <span className="bg-chip" style={{ background: "rgba(255,255,255,0.15)", color: "var(--gold)", padding: "4px 12px", borderRadius: "12px", display: "inline-block" }}>{t("footer.ctaHighlight")}</span>
-              <br />
-              {t("footer.cta2")}
-            </h2>
-            <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "16px", lineHeight: "1.8", maxWidth: "400px" }}>
-              ابدأ رحلتك نحو حياة صحية الآن. تواصل معنا لمعرفة كيف يمكننا مساعدتك في تحقيق أهدافك.
-            </p>
+            <div className="footer-brand__logo">
+              <img src="/assets/logo.png" alt={t("brand.name")} />
+              <div>
+                <b>{t("brand.name")}</b>
+                <span>{t("brand.title")}</span>
+              </div>
+            </div>
+            <p className="footer-brand__text">{t("footer.about")}</p>
+            <SocialButtons social={settings?.social} />
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
-            transition={{ delay: 0.1 }}
-            className="footer-col"
+            transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <h3 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "24px", color: "var(--gold)" }}>{t("footer.linksTitle")}</h3>
-            <ul className="footer-links" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {LINKS.map((key) => (
-                <li key={key}>
-                  <motion.a 
-                    whileHover={{ x: -10, color: "var(--gold)" }}
-                    href={`#${key === "home" ? "home" : key}`}
-                    style={{ color: "rgba(255,255,255,0.85)", fontSize: "16px", fontWeight: "600", transition: "color 0.2s" }}
-                  >
-                    {t(`nav.${key}`)}
-                  </motion.a>
-                </li>
+            <h3 className="footer-col__title">{t("footer.linksTitle")}</h3>
+            <div className="footer-links">
+              {LINKS.map(({ key, href }) => (
+                <a
+                  key={key}
+                  href={href}
+                  onClick={(e) => { e.preventDefault(); navigate(href); }}
+                >
+                  {t(`nav.${key}`)}
+                </a>
               ))}
-            </ul>
+            </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
-            transition={{ delay: 0.2 }}
-            className="footer-col"
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h3 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "24px", color: "var(--gold)" }}>{t("footer.keepTitle")}</h3>
-            
-            <div className="contact-block" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-              <div className="contact-line" style={{ display: "flex", alignItems: "center", gap: "16px", color: "rgba(255,255,255,0.85)" }}>
-                <span style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--secondary)" }}>
-                  <PhoneIcon />
-                </span>
-                <span style={{ fontSize: "15px", fontWeight: "600" }}>{settings?.clinic?.phone || "01064227806"}</span>
+            <h3 className="footer-col__title">{t("footer.contactTitle")}</h3>
+            <div className="footer-contact">
+              <div className="footer-contact__item">
+                <PhoneIcon />
+                <span>{clinic?.phone || CLINIC.phones[0]}</span>
               </div>
-              <div className="contact-line" style={{ display: "flex", alignItems: "center", gap: "16px", color: "rgba(255,255,255,0.85)" }}>
-                <span style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--secondary)" }}>
-                  <MailIcon />
-                </span>
-                <span style={{ fontSize: "15px", fontWeight: "600" }}>{settings?.clinic?.email || "dr.kareem.eliethy@gmail.com"}</span>
+              <div className="footer-contact__item">
+                <MailIcon />
+                <span>{clinic?.email || CLINIC.email}</span>
               </div>
-              <div className="contact-line" style={{ display: "flex", alignItems: "center", gap: "16px", color: "rgba(255,255,255,0.85)" }}>
-                <span style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--secondary)" }}>
-                  <PinIcon />
-                </span>
-                <span style={{ fontSize: "15px", fontWeight: "600", lineHeight: "1.6" }}>{t("footer.address")}</span>
+              <div className="footer-contact__item">
+                <PinIcon />
+                <span>{t("footer.address")}</span>
               </div>
-              
-              <div className="contact-actions" style={{ display: "flex", gap: "12px", marginTop: "10px" }}>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 6 }}>
                 <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href={settings?.maps || "#"}
+                  whileHover={{ y: -2 }}
+                  href={mapsDirectionsUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="btn btn-outline"
-                  style={{ flex: 1, padding: "12px", fontSize: "14px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.2)" }}
+                  className="footer-contact__btn"
                 >
                   <PinIcon />
                   {t("footer.directions")}
                 </motion.a>
                 <motion.a
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  href={settings?.social?.whatsapp || "#"}
+                  whileHover={{ y: -2 }}
+                  href={waUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="btn btn-accent"
-                  style={{ flex: 1, padding: "12px", fontSize: "14px", borderRadius: "12px" }}
+                  className="footer-contact__btn footer-contact__btn--gold"
                 >
                   <WhatsAppIcon />
                   {t("footer.whatsapp")}
@@ -174,18 +148,21 @@ export default function Footer() {
           </motion.div>
         </div>
 
-        <motion.hr 
-          initial={{ opacity: 0, scaleX: 0 }}
-          whileInView={{ opacity: 1, scaleX: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="footer-divider" 
-          style={{ border: "none", height: "1px", background: "rgba(255,255,255,0.1)", margin: "40px 0" }} 
-        />
+        <hr className="footer-divider" />
 
-        <div className="footer-bottom" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "20px" }}>
-          <div className="footer-copy" style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px", fontWeight: "600" }}>{t("footer.copyright")}</div>
-          <SocialButtons social={settings?.social} />
+        <div className="footer-bottom">
+          <p className="footer-copy">{t("footer.copyright")}</p>
+          <div className="footer-legal">
+            {LEGAL.map(({ key, href }) => (
+              <a
+                key={key}
+                href={href}
+                onClick={(e) => { e.preventDefault(); navigate(href); }}
+              >
+                {t(`footer.${key}`)}
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

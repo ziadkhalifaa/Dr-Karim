@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, UserRound, CreditCard, ClipboardList, Scale, Wallet, Inbox, Phone, Calendar, Mail, FileText, CheckCircle2, ChevronLeft, TrendingDown, Activity, ShieldAlert, Ban, HeartPulse } from "lucide-react";
+import { ArrowLeft, UserRound, CreditCard, ClipboardList, Scale, Wallet, Inbox, Phone, Calendar, Mail, TrendingDown, Activity, ShieldAlert, Ban, HeartPulse } from "lucide-react";
 import { patientApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 import CarePrograms from "./CarePrograms";
@@ -30,7 +29,6 @@ function StatusPill({ status }) {
 }
 
 export default function PatientProfile({ patientId }) {
-  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
@@ -48,6 +46,43 @@ export default function PatientProfile({ patientId }) {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientId]);
+
+  // Derive charts and summaries from progress history
+  const chartData = useMemo(() => {
+    const progress = data?.progress;
+    if (!progress?.history?.length) return [];
+    // group by date
+    const grouped = {};
+    progress.history.forEach(m => {
+      if (!grouped[m.measuredOn]) grouped[m.measuredOn] = { date: m.measuredOn };
+      grouped[m.measuredOn][m.type] = m.value;
+    });
+    return Object.values(grouped).sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [data]);
+
+  const weightStats = useMemo(() => {
+    const progress = data?.progress;
+    if (!progress?.history) return null;
+    const weights = progress.history.filter(m => m.type === "weight").sort((a, b) => new Date(a.measuredOn) - new Date(b.measuredOn));
+    if (weights.length === 0) return null;
+    const first = weights[0];
+    const last = weights[weights.length - 1];
+    const diff = last.value - first.value;
+    const isLoss = diff < 0;
+    
+    // approximate weeks
+    const daysDiff = (new Date(last.measuredOn) - new Date(first.measuredOn)) / (1000 * 60 * 60 * 24);
+    const weeks = Math.round(daysDiff / 7);
+
+    return {
+      firstWeight: first.value,
+      firstDate: first.measuredOn,
+      currentWeight: last.value,
+      diff: Math.abs(diff),
+      isLoss,
+      durationText: weeks > 0 ? `خلال ${weeks} ${weeks === 1 ? "أسبوع" : weeks <= 10 ? "أسابيع" : "أسبوع"}` : "حديثاً"
+    };
+  }, [data]);
 
   if (error && !data) return (
     <div className="dash-panel" style={{ padding: "40px 20px", textAlign: "center" }}>
@@ -73,41 +108,6 @@ export default function PatientProfile({ patientId }) {
     { key: "progress", label: "القياسات والمتابعة", icon: Scale },
     { key: "payments", label: "المدفوعات", icon: Wallet },
   ];
-
-  // Derive charts and summaries from progress history
-  const chartData = useMemo(() => {
-    if (!progress?.history?.length) return [];
-    // group by date
-    const grouped = {};
-    progress.history.forEach(m => {
-      if (!grouped[m.measuredOn]) grouped[m.measuredOn] = { date: m.measuredOn };
-      grouped[m.measuredOn][m.type] = m.value;
-    });
-    return Object.values(grouped).sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [progress]);
-
-  const weightStats = useMemo(() => {
-    if (!progress?.history) return null;
-    const weights = progress.history.filter(m => m.type === "weight").sort((a, b) => new Date(a.measuredOn) - new Date(b.measuredOn));
-    if (weights.length === 0) return null;
-    const first = weights[0];
-    const last = weights[weights.length - 1];
-    const diff = last.value - first.value;
-    const isLoss = diff < 0;
-    
-    // approximate weeks
-    const daysDiff = (new Date(last.measuredOn) - new Date(first.measuredOn)) / (1000 * 60 * 60 * 24);
-    const weeks = Math.round(daysDiff / 7);
-
-    return {
-      firstWeight: first.value,
-      firstDate: first.measuredOn,
-      currentWeight: last.value,
-      diff: Math.abs(diff),
-      isLoss,
-      durationText: weeks > 0 ? `خلال ${weeks} ${weeks === 1 ? "أسبوع" : weeks <= 10 ? "أسابيع" : "أسبوع"}` : "حديثاً"
-    };
-  }, [progress]);
 
   return (
     <>

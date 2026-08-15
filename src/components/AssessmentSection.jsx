@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import { CheckCircle2, Clock, Lock } from "lucide-react";
 
 export default function AssessmentSection() {
   const { t } = useTranslation();
@@ -16,37 +17,53 @@ export default function AssessmentSection() {
     submit.timer = window.setTimeout(() => setToast(false), 3200);
   };
 
-  return (
-    <section className="section assessment" id="assessment" style={{ overflow: "hidden" }}>
-      <div className="container">
-        <motion.div 
-          className="assessment__head"
-          initial={{ opacity: 0, y: -30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, type: "spring" }}
-        >
-          <h2 className="sec-title" style={{ marginTop: 0 }}>
-            {t("assessment.title")} <strong>{t("assessment.title2")}</strong>
-          </h2>
-          <p className="assessment__subtitle">{t("assessment.subtitle")}</p>
-        </motion.div>
+  const features = [
+    { key: "features.1", icon: CheckCircle2 },
+    { key: "features.2", icon: Clock },
+    { key: "features.3", icon: Lock },
+  ];
 
-        <div className="assessment__layout">
-          <motion.form 
-            className="assessment__card" 
+  return (
+    <section className="section section--alt" id="assessment">
+      <div className="container">
+        <div className="assess">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7 }}
+          >
+            <span className="assess__kicker">{t("assessment.tag")}</span>
+            <h2 className="assess__title">
+              {t("assessment.title")} <span className="gold">{t("assessment.title2")}</span>
+            </h2>
+            <p className="assess__lead">{t("assessment.subtitle")}</p>
+
+            <div className="assess__features">
+              {features.map(({ key, icon: Icon }) => (
+                <div className="assess__feature" key={key}>
+                  <span className="assess__feature-ico">
+                    <Icon size={17} />
+                  </span>
+                  {t(`assessment.${key}`)}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.form
+            className="assess__card"
             onSubmit={submit}
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7, delay: 0.1 }}
           >
-            <div className="assessment__step">
-              <span className="assessment__step-no">01</span>
-              <label className="assessment__step-label" htmlFor="assessment-weight">
+            <div className="assess__field">
+              <label className="assess__label" htmlFor="assessment-weight">
                 {t("assessment.weightLabel")}
               </label>
-              <div className="assessment__weight">
+              <div style={{ display: "flex", gap: 10 }}>
                 <input
                   id="assessment-weight"
                   type="number"
@@ -57,97 +74,56 @@ export default function AssessmentSection() {
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
                   placeholder="75"
+                  className="assess__input"
+                  style={{ flex: 1 }}
                 />
-                <span className="assessment__unit">{t("assessment.weightUnit")}</span>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    padding: "0 18px",
+                    borderRadius: 14,
+                    background: "rgba(217, 119, 6, 0.18)",
+                    color: "var(--secondary-soft)",
+                    fontWeight: 800,
+                    fontSize: 15,
+                  }}
+                >
+                  {t("assessment.weightUnit")}
+                </span>
               </div>
             </div>
 
-            <hr className="assessment__divider" />
-
-            <div
-              className="assessment__step"
-              role="radiogroup"
-              aria-labelledby="assessment-goal-label"
-            >
-              <span className="assessment__step-no">02</span>
-              <p id="assessment-goal-label" className="assessment__step-label">
+            <div className="assess__field" role="radiogroup" aria-labelledby="assessment-goal-label">
+              <p className="assess__label" id="assessment-goal-label">
                 {t("assessment.goalLabel")}
               </p>
-              <div className="assessment__goals">
+              <div className="assess__goals">
                 {goals && goals.map((g) => (
-                  <label
+                  <button
+                    type="button"
                     key={g}
-                    className={`goal-opt ${goal === g ? "is-active" : ""}`}
+                    className={`assess__goal ${goal === g ? "is-active" : ""}`}
+                    onClick={() => setGoal(g)}
                   >
-                    <input
-                      type="radio"
-                      name="assessment-goal"
-                      checked={goal === g}
-                      onChange={() => setGoal(g)}
-                    />
-                    <span className="goal-opt__radio" aria-hidden="true" />
-                    <span>{g}</span>
-                  </label>
+                    <span className="assess__goal-radio" aria-hidden="true" />
+                    {g}
+                  </button>
                 ))}
               </div>
             </div>
 
-            <motion.button 
-              type="submit" 
-              className="btn btn-accent assessment__submit"
-              whileHover={{ scale: 1.02, boxShadow: "0 10px 20px rgba(18,59,74,0.3)" }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <button type="submit" className="btn btn-accent btn-block" style={{ padding: "17px 30px" }}>
               {t("assessment.cta")}
-              <svg
-                className="assessment__arrow"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M4 12h16M14 6l6 6-6 6" />
-              </svg>
-            </motion.button>
-          </motion.form>
+            </button>
 
-          <motion.div 
-            className="assessment__media"
-            initial={{ opacity: 0, scale: 0.8, x: -50 }}
-            whileInView={{ opacity: 1, scale: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.8, type: "spring", bounce: 0.5 }}
-          >
-            <motion.img 
-              src="/assets/running_man.gif" 
-              alt="Running" 
-              className="assessment__art" 
-              style={{ width: "100%", height: "auto", objectFit: "contain", filter: "drop-shadow(0 20px 30px rgba(0,0,0,0.15))" }}
-              animate={{ y: [0, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-            />
-          </motion.div>
+            <p style={{ fontSize: 12.5, fontWeight: 700, color: "rgba(255,255,255,0.5)", textAlign: "center" }}>
+              {t("assessment.meta")}
+            </p>
+          </motion.form>
         </div>
 
-        <motion.p 
-          className="assessment__meta"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5, duration: 1 }}
-        >
-          {t("assessment.meta")}
-        </motion.p>
-
-        {toast && (
-          <div className="assessment-toast" role="status">
-            {t("assessment.comingSoon")}
-          </div>
-        )}
+        {toast && <div className="assess__toast" role="status">{t("assessment.comingSoon")}</div>}
       </div>
     </section>
   );

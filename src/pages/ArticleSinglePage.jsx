@@ -1,28 +1,33 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Clock, User, Calendar, ArrowRight } from "lucide-react";
+import { Clock, User, Calendar, ArrowLeft, ArrowRight } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { articleApi } from "../api/client";
+import { navigate } from "../lib/router";
+import { useTranslation } from "react-i18next";
 
 export default function ArticleSinglePage({ slug }) {
+  const { t, i18n } = useTranslation();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isAr = i18n.language === "ar";
+  const BackArrow = isAr ? ArrowRight : ArrowLeft;
 
   useEffect(() => {
     articleApi.get(slug)
-      .then(res => setArticle(res.data))
-      .catch(err => setError(err.message || "حدث خطأ"))
+      .then((res) => setArticle(res.data))
+      .catch((err) => setError(err.message || t("tips.error")))
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [slug, t]);
 
   if (loading) {
     return (
       <>
         <Header />
-        <main style={{ minHeight: "80vh", padding: "120px 20px", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Clock size={40} style={{ animation: "spin 2s linear infinite", color: "var(--text-soft)" }} />
+        <main style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div className="spinner" />
         </main>
         <Footer />
       </>
@@ -33,11 +38,16 @@ export default function ArticleSinglePage({ slug }) {
     return (
       <>
         <Header />
-        <main style={{ minHeight: "80vh", padding: "120px 20px", background: "var(--bg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "20px" }}>
-          <h2 style={{ fontSize: "32px", color: "var(--text)", fontWeight: "900" }}>المقالة غير موجودة</h2>
-          <p style={{ color: "var(--text-muted)", fontSize: "16px" }}>عذراً، المقالة التي تبحث عنها غير موجودة أو تم حذفها.</p>
-          <a href="/articles" style={{ display: "flex", alignItems: "center", gap: "8px", background: "var(--primary)", color: "#fff", padding: "12px 24px", borderRadius: "12px", textDecoration: "none", fontWeight: "700" }}>
-            <ArrowRight size={18} /> العودة للنصائح
+        <main style={{ minHeight: "80vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, padding: "0 20px", textAlign: "center" }}>
+          <h2 className="sec-title" style={{ fontSize: 34 }}>{t("tips.notFound")}</h2>
+          <p style={{ color: "var(--text-muted)" }}>{t("tips.notFoundBody")}</p>
+          <a
+            href="/articles"
+            onClick={(e) => { e.preventDefault(); navigate("/articles"); }}
+            className="btn btn-primary"
+          >
+            <BackArrow size={18} />
+            {t("tips.back")}
           </a>
         </main>
         <Footer />
@@ -48,50 +58,80 @@ export default function ArticleSinglePage({ slug }) {
   return (
     <>
       <Header />
-      <main style={{ minHeight: "80vh", padding: "120px 20px 80px", background: "var(--bg)" }}>
-        <article className="container" style={{ maxWidth: "800px", margin: "0 auto" }}>
-          <a href="/articles" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "var(--text-muted)", textDecoration: "none", fontSize: "14px", fontWeight: "700", marginBottom: "30px", transition: "color 0.2s" }} onMouseOver={e => e.currentTarget.style.color = "var(--primary)"} onMouseOut={e => e.currentTarget.style.color = "var(--text-muted)"}>
-            <ArrowRight size={16} /> العودة للنصائح
-          </a>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <h1 style={{ fontSize: "clamp(32px, 5vw, 48px)", fontWeight: "900", color: "var(--text)", lineHeight: 1.3, marginBottom: "24px" }}>
-              {article.title}
-            </h1>
-
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", alignItems: "center", color: "var(--text-muted)", fontSize: "14px", fontWeight: "600", marginBottom: "40px", paddingBottom: "20px", borderBottom: "1px solid var(--line)" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><User size={16} /> {article.authorName}</span>
-              <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Calendar size={16} /> {new Date(article.publishedAt).toLocaleDateString("ar-EG", { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-              {article.readTimeMinutes && <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Clock size={16} /> {article.readTimeMinutes} دقائق قراءة</span>}
+      <main style={{ paddingBlock: "64px 96px" }}>
+        <section className="page-hero" style={{ padding: "80px 0 56px" }}>
+          <div className="page-hero__mesh" aria-hidden="true" />
+          <div className="container">
+            <span className="page-hero__kicker">{t("tips.kicker")}</span>
+            <h1 className="page-hero__title">{article.title}</h1>
+            <div
+              className="page-hero__crumbs"
+              style={{ color: "rgba(255,255,255,0.7)" }}
+            >
+              <a href="/articles" onClick={(e) => { e.preventDefault(); navigate("/articles"); }}>
+                {t("tips.back")}
+              </a>
+              <span>/</span>
+              <span>{article.title}</span>
             </div>
+          </div>
+        </section>
 
-            {article.coverImageUrl && (
-              <img src={article.coverImageUrl} alt={article.title} style={{ width: "100%", maxHeight: "500px", objectFit: "cover", borderRadius: "24px", marginBottom: "40px", boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }} />
-            )}
+        <section className="section section--tight" style={{ paddingBlock: "64px 0" }}>
+          <div className="container">
+            <div className="content-sheet" style={{ maxWidth: 860, marginInline: "auto" }}>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 18,
+                    alignItems: "center",
+                    color: "var(--text-muted)",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    marginBottom: 28,
+                    paddingBottom: 22,
+                    borderBottom: "1px solid var(--line)",
+                  }}
+                >
+                  {article.authorName && (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <User size={15} /> {article.authorName}
+                    </span>
+                  )}
+                  {article.publishedAt && (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <Calendar size={15} />
+                      {new Date(article.publishedAt).toLocaleDateString(isAr ? "ar-EG" : "en-GB", { year: "numeric", month: "long", day: "numeric" })}
+                    </span>
+                  )}
+                  {article.readTimeMinutes && (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <Clock size={15} /> {article.readTimeMinutes} {t("tips.minutes")}
+                    </span>
+                  )}
+                </div>
 
-            <div 
-              className="article-content tiptap-editor"
-              style={{ fontSize: "18px", lineHeight: 1.8, color: "var(--text)", fontFamily: "inherit" }}
-              dangerouslySetInnerHTML={{ __html: article.body }}
-            />
-          </motion.div>
-        </article>
+                {article.coverImageUrl && (
+                  <img
+                    src={article.coverImageUrl}
+                    alt={article.title}
+                    style={{ width: "100%", maxHeight: 480, objectFit: "cover", borderRadius: "var(--radius-lg)", marginBottom: 36 }}
+                  />
+                )}
+
+                <div
+                  className="content-sheet__body"
+                  style={{ fontSize: 17.5 }}
+                  dangerouslySetInnerHTML={{ __html: article.body }}
+                />
+              </motion.div>
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
-      
-      {/* Article Content Styles */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        .article-content h1 { font-size: 32px; font-weight: 900; margin: 40px 0 20px; color: var(--text); }
-        .article-content h2 { font-size: 26px; font-weight: 800; margin: 36px 0 16px; color: var(--text); }
-        .article-content h3 { font-size: 22px; font-weight: 700; margin: 30px 0 12px; color: var(--text); }
-        .article-content p { margin: 0 0 20px; }
-        .article-content img { max-width: 100%; border-radius: 16px; margin: 24px 0; }
-        .article-content a { color: var(--primary); text-decoration: underline; }
-        .article-content blockquote { border-right: 4px solid var(--primary); padding-right: 20px; margin: 30px 0; font-size: 20px; font-style: italic; color: var(--text-muted); }
-        .article-content ul, .article-content ol { padding-right: 24px; margin: 0 0 20px; }
-        .article-content li { margin-bottom: 10px; }
-        .article-content mark { background: #fef08a; padding: 0 4px; border-radius: 4px; }
-      `}} />
     </>
   );
 }
