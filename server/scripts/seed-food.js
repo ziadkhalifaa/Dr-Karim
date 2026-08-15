@@ -14,7 +14,7 @@ async function seed() {
     await FoodItem.sync({ alter: true });
     
     console.log("Reading food_seed.json...");
-    const data = JSON.parse(fs.readFileSync(path.resolve("../../scratch/food_seed.json"), "utf8"));
+    const data = JSON.parse(fs.readFileSync(path.resolve("./scripts/food_seed.json"), "utf8"));
     
     console.log(`Found ${data.length} items to seed.`);
     
