@@ -196,6 +196,8 @@ export async function uploadCover(req, res, next) {
 
     return ok(res, 200, { coverImageUrl: coverUrl });
   } catch (err) { next(err); }
+}
+
 export async function uploadServiceCover(req, res, next) {
   try {
     requireDoctor(req.auth);
