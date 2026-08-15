@@ -631,16 +631,92 @@ async function seedPackages(tenant) {
 async function seedArticles(tenant) {
   const { Content, ContentTranslation } = models;
   const articles = [
-    { slug: "healthy-habits", title: "5 عادات يومية لحياة صحية", body: "<p>شرب الماء الكافي، النوم المبكر، وممارسة الرياضة بانتظام هي مفاتيح الصحة الجيدة.</p>", cover_image_url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2053&auto=format&fit=crop" },
-    { slug: "keto-diet", title: "كل ما تريد معرفته عن نظام الكيتو", body: "<p>نظام الكيتو يعتمد على تقليل الكربوهيدرات وزيادة الدهون الصحية لتدريب الجسم على حرق الدهون.</p>", cover_image_url: "https://images.unsplash.com/photo-1498837167339-54df3c2557ff?q=80&w=2070&auto=format&fit=crop" },
-    { slug: "intermittent-fasting", title: "الصيام المتقطع: دليلك الشامل", body: "<p>يعتبر الصيام المتقطع من أفضل الطرق لتنظيم الإنسولين وحرق الدهون بدون حرمان.</p>", cover_image_url: "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?q=80&w=1974&auto=format&fit=crop" },
+    {
+      slug: "healthy-habits",
+      minutes: 5,
+      cover_image_url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2053&auto=format&fit=crop",
+      ar: {
+        title: "5 عادات يومية لحياة صحية",
+        body: "<p>شرب الماء الكافي، النوم المبكر، وممارسة الرياضة بانتظام هي مفاتيح الصحة الجيدة.</p><p>ابدأ يومك بكوب ماء دافئ، وخصص 30 دقيقة فقط للمشي، وتجنب السهر قدر الإمكان — ستلاحظ الفرق خلال أسبوع واحد فقط.</p>",
+      },
+      en: {
+        title: "5 Daily Habits for a Healthier Life",
+        body: "<p>Drinking enough water, sleeping early, and exercising regularly are the keys to good health.</p><p>Start your day with a glass of warm water, set aside just 30 minutes for walking, and avoid late nights — you will notice the difference within one week.</p>",
+      },
+    },
+    {
+      slug: "keto-diet",
+      minutes: 6,
+      cover_image_url: "https://images.unsplash.com/photo-1498837167339-54df3c2557ff?q=80&w=2070&auto=format&fit=crop",
+      ar: {
+        title: "كل ما تريد معرفته عن نظام الكيتو",
+        body: "<p>نظام الكيتو يعتمد على تقليل الكربوهيدرات وزيادة الدهون الصحية لتدريب الجسم على حرق الدهون.</p><p>احرص على اختيار مصادر دهون صحية مثل الأفوكادو والمكسرات وزيت الزيتون، وراقب مستويات البروتين بعناية لتجنب خروج الجسم من الحالة الكيتونية.</p>",
+      },
+      en: {
+        title: "Everything You Need to Know About Keto",
+        body: "<p>The keto diet relies on reducing carbohydrates and increasing healthy fats to train your body to burn fat.</p><p>Choose healthy fat sources such as avocado, nuts, and olive oil, and monitor protein levels carefully to avoid leaving ketosis.</p>",
+      },
+    },
+    {
+      slug: "intermittent-fasting",
+      minutes: 7,
+      cover_image_url: "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?q=80&w=1974&auto=format&fit=crop",
+      ar: {
+        title: "الصيام المتقطع: دليلك الشامل",
+        body: "<p>يعتبر الصيام المتقطع من أفضل الطرق لتنظيم الإنسولين وحرق الدهون بدون حرمان.</p><p>ابدأ بنافذة صيام 12:12 ثم انتقل تدريجيًا إلى 16:8، واشرب سوائل خالية من السعرات خلال الصيام مع مراعاة جودة الوجبات عند الإفطار.</p>",
+      },
+      en: {
+        title: "Intermittent Fasting: Your Complete Guide",
+        body: "<p>Intermittent fasting is one of the best ways to regulate insulin and burn fat without deprivation.</p><p>Start with a 12:12 fasting window, then gradually move to 16:8, drink calorie-free liquids during fasting, and keep your meals high quality at break.</p>",
+      },
+    },
+    {
+      slug: "hydration-myths",
+      minutes: 4,
+      cover_image_url: "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?q=80&w=1952&auto=format&fit=crop",
+      ar: {
+        title: "8 أساطير شائعة عن شرب الماء",
+        body: "<p>هل تحتاج حقًا إلى 8 أكواب يوميًا؟ الحقيقة أن حاجتك للماء تعتمد على وزنك ونشاطك والمناخ من حولك.</p><p>راقب لون البول كدليل عملي على الترطيب، وزد من السوائل أثناء التمرين وفي الطقس الحار.</p>",
+      },
+      en: {
+        title: "8 Common Water Drinking Myths",
+        body: "<p>Do you really need 8 glasses a day? The truth is your water needs depend on your weight, activity, and climate.</p><p>Use urine color as a practical hydration guide, and increase fluids during exercise and hot weather.</p>",
+      },
+    },
+    {
+      slug: "protein-guide",
+      minutes: 6,
+      cover_image_url: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1952&auto=format&fit=crop",
+      ar: {
+        title: "البروتين: الكمية المناسبة لجسمك",
+        body: "<p>البروتين ليس فقط للاعبي كمال الأجسام، بل ضروري لبناء العضلات وصيانتها والمساعدة في الشبع.</p><p>القاعدة العامة هي 1.2 إلى 2 جرام لكل كيلوجرام من وزن الجسم حسب مستوى نشاطك، مع توزيع المصادر بين اللحوم والأسماك والبقوليات.</p>",
+      },
+      en: {
+        title: "Protein: The Right Amount for Your Body",
+        body: "<p>Protein is not just for bodybuilders — it is essential for building and maintaining muscle and promoting satiety.</p><p>A general rule is 1.2 to 2 grams per kilogram of body weight depending on your activity level, spreading sources across meat, fish, and legumes.</p>",
+      },
+    },
+    {
+      slug: "sleep-and-weight",
+      minutes: 5,
+      cover_image_url: "https://images.unsplash.com/photo-1505577058444-a3dab90d4253?q=80&w=1974&auto=format&fit=crop",
+      ar: {
+        title: "علاقة النوم الجيد بالتحكم في الوزن",
+        body: "<p>قلة النوم ترفع هرمون الجريلين الذي يزيد الشهية وتخفض اللبتين المسؤول عن الشبع.</p><p>نام من 7 إلى 9 ساعات بانتظام، وأطفئ الشاشات قبل النوم بساعة، وستجد التحكم في شهيتك أسهل بكثير.</p>",
+      },
+      en: {
+        title: "How Good Sleep Affects Weight Control",
+        body: "<p>Lack of sleep raises ghrelin, the hunger hormone, and lowers leptin, which promotes satiety.</p><p>Sleep 7–9 hours regularly, turn off screens an hour before bed, and you will find controlling your appetite much easier.</p>",
+      },
+    },
   ];
 
   let aCreated = 0;
   for (const a of articles) {
-    const { row: content, created } = await upsert(Content, { slug: a.slug }, { tenant_id: tenant.id, status: "published", cover_image_url: a.cover_image_url, author_name: "د. كريم الليثي", published_at: new Date() });
+    const { row: content, created } = await upsert(Content, { slug: a.slug }, { tenant_id: tenant.id, status: "published", cover_image_url: a.cover_image_url, author_name: "د. كريم الليثي", read_time_minutes: a.minutes || 4, published_at: new Date() });
     if (created) aCreated += 1;
-    await upsert(ContentTranslation, { content_id: content.id, locale: "ar" }, { title: a.title, body: a.body });
+    await upsert(ContentTranslation, { content_id: content.id, locale: "ar" }, { title: a.ar.title, body: a.ar.body });
+    await upsert(ContentTranslation, { content_id: content.id, locale: "en" }, { title: a.en.title, body: a.en.body });
   }
   return aCreated;
 }

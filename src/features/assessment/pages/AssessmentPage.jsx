@@ -64,6 +64,36 @@ export default function AssessmentPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.status]);
 
+  // Prefill weight + goal carried from the homepage AssessmentSection
+  // (drke-home-weight / drke-home-goal) into the full flow, once per session.
+  const prefilled = useRef(false);
+  useEffect(() => {
+    if (prefilled.current) return;
+    prefilled.current = true;
+    try {
+      const homeWeight = sessionStorage.getItem("drke-home-weight");
+      const homeGoal = sessionStorage.getItem("drke-home-goal");
+      if (homeWeight) {
+        const w = Number(homeWeight);
+        if (Number.isFinite(w) && w > 0) actions.setAnswer("Q02_02", String(w));
+      }
+      if (homeGoal) {
+        const map = {
+          "خسارة الوزن": "weight_loss",
+          "Lose weight": "weight_loss",
+          "زيادة الوزن": "weight_gain",
+          "Gain weight": "weight_gain",
+          "الحفاظ على الوزن": "maintain_weight",
+          "Maintain weight": "maintain_weight",
+        };
+        const value = map[homeGoal];
+        if (value) actions.setAnswer("Q03_01", value);
+      }
+      sessionStorage.removeItem("drke-home-weight");
+      sessionStorage.removeItem("drke-home-goal");
+    } catch { /* ignore storage errors */ }
+  }, [actions]);
+
   // Bug fix: prefill contact.patientName from Q01_03 once when entering the
   // Contact step, only if it is still empty. One-shot (ref) — user edits are
   // never overwritten and there is no continuous force-sync afterwards.

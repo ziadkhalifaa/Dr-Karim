@@ -9,10 +9,10 @@ import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import CharacterCount from "@tiptap/extension-character-count";
 import {
-  Plus, ArrowLeft, Save, Trash2, Eye, Send, Image as ImageIcon,
+  Plus, ArrowLeft, Save, Trash2, Send, Image as ImageIcon,
   Bold, Italic, UnderlineIcon, List, ListOrdered, Quote, Link as LinkIcon,
   AlignLeft, AlignCenter, AlignRight, Heading1, Heading2, Heading3,
-  FileText, Clock, RefreshCw, X, Check, Highlighter,
+  FileText, RefreshCw, X, Highlighter,
 } from "lucide-react";
 import { articleApi } from "../../api/client";
 

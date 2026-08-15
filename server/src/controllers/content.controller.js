@@ -1,19 +1,13 @@
-import { Op } from "sequelize";
 import { sequelize } from "../config/database.js";
-import { Content, ContentTranslation, ContentCategory, ContentCategoryTranslation } from "../models/07_content_services_settings.js";
+import { Content, ContentTranslation } from "../models/07_content_services_settings.js";
 import { ok } from "../middleware/api-response.js";
 import { AppError } from "../utils/errors.js";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function slugify(text) {
   return text
     .toLowerCase()
     .replace(/[\u0600-\u06FF\s]+/g, (match) => match.trim().replace(/\s+/g, "-"))
-    .replace(/[^a-z0-9\u0600-\u06FF\-]/g, "")
+    .replace(/[^a-z0-9\u0600-\u06FF-]/g, "")
     .replace(/-+/g, "-")
     .substring(0, 100) + "-" + Date.now();
 }

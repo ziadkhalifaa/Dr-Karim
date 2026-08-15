@@ -17,7 +17,7 @@ export default function ArticleSinglePage({ slug }) {
 
   useEffect(() => {
     articleApi.get(slug)
-      .then((res) => setArticle(res.data))
+      .then((res) => setArticle(res))
       .catch((err) => setError(err.message || t("tips.error")))
       .finally(() => setLoading(false));
   }, [slug, t]);

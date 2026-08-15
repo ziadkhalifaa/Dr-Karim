@@ -2,19 +2,21 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { CheckCircle2, Clock, Lock } from "lucide-react";
+import { navigate } from "../lib/router";
 
 export default function AssessmentSection() {
   const { t } = useTranslation();
   const goals = t("assessment.goals", { returnObjects: true });
   const [weight, setWeight] = useState("");
   const [goal, setGoal] = useState(goals ? goals[0] : "");
-  const [toast, setToast] = useState(false);
 
   const submit = (e) => {
     e.preventDefault();
-    setToast(true);
-    window.clearTimeout(submit.timer);
-    submit.timer = window.setTimeout(() => setToast(false), 3200);
+    try {
+      sessionStorage.setItem("drke-home-weight", weight.trim());
+      sessionStorage.setItem("drke-home-goal", goal);
+    } catch { /* ignore storage errors */ }
+    navigate("/assessment");
   };
 
   const features = [
@@ -122,8 +124,6 @@ export default function AssessmentSection() {
             </p>
           </motion.form>
         </div>
-
-        {toast && <div className="assess__toast" role="status">{t("assessment.comingSoon")}</div>}
       </div>
     </section>
   );

@@ -38,7 +38,6 @@ export default function Hero() {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <span className="hero__kicker">
-            <span className="dot" />
             {t("brand.coach")}
           </span>
 
