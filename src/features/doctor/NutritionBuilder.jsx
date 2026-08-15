@@ -217,28 +217,28 @@ export default function NutritionBuilder({ planId, patientId }) {
             <span>السعرات الحرارية</span>
             <span>{Math.round(dayTotals.cal)} / {targets.calories}</span>
           </div>
-          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: \`\${Math.min((dayTotals.cal / targets.calories) * 100, 100)}%\`, background: "#f59e0b" }} /></div>
+          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.cal / targets.calories) * 100, 100) + "%", background: "#f59e0b" }} /></div>
         </div>
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)" }}>
             <span>البروتين</span>
             <span>{Math.round(dayTotals.p)}g / {targets.protein}g</span>
           </div>
-          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: \`\${Math.min((dayTotals.p / targets.protein) * 100, 100)}%\`, background: "#ef4444" }} /></div>
+          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.p / targets.protein) * 100, 100) + "%", background: "#ef4444" }} /></div>
         </div>
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)" }}>
             <span>الكربوهيدرات</span>
             <span>{Math.round(dayTotals.c)}g / {targets.carbs}g</span>
           </div>
-          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: \`\${Math.min((dayTotals.c / targets.carbs) * 100, 100)}%\`, background: "#eab308" }} /></div>
+          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.c / targets.carbs) * 100, 100) + "%", background: "#eab308" }} /></div>
         </div>
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)" }}>
             <span>الدهون</span>
             <span>{Math.round(dayTotals.f)}g / {targets.fats}g</span>
           </div>
-          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: \`\${Math.min((dayTotals.f / targets.fats) * 100, 100)}%\`, background: "#3b82f6" }} /></div>
+          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.f / targets.fats) * 100, 100) + "%", background: "#3b82f6" }} /></div>
         </div>
       </div>
 
