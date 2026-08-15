@@ -617,7 +617,7 @@ async function seedPackages(tenant) {
   let pCreated = 0;
   let sIdx = 1;
   for (const p of packages) {
-    const { row: pkg, created } = await upsert(Package, { slug: p.slug }, { tenant_id: tenant.id, name: p.name, description: p.description, price: p.price, active: true, sort_order: sIdx++ });
+    const { row: pkg, created } = await upsert(Package, { slug: p.slug }, { tenant_id: tenant.id, name: p.name, description: p.description, price: p.price, active: true, sort_order: sIdx++, duration_value: 1, duration_unit: "month" });
     if (created) pCreated += 1;
     
     // Upsert entitlements
