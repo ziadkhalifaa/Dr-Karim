@@ -196,6 +196,25 @@ export async function uploadCover(req, res, next) {
 
     return ok(res, 200, { coverImageUrl: coverUrl });
   } catch (err) { next(err); }
+export async function uploadServiceCover(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const { id } = req.params;
+
+    const { Service } = await import("../models/07_content_services_settings.js");
+    const service = await Service.findOne({ where: { id, tenant_id: tenantId, deleted_at: null } });
+    if (!service) throw new AppError(404, "NOT_FOUND", "Service not found");
+
+    if (!req.file) throw new AppError(422, "NO_FILE", "No file uploaded");
+
+    // Build public URL  
+    const baseUrl = process.env.APP_URL || "";
+    const coverUrl = `${baseUrl}/uploads/covers/${req.file.filename}`;
+    await service.update({ cover_image_url: coverUrl });
+
+    return ok(res, 200, { coverImageUrl: coverUrl });
+  } catch (err) { next(err); }
 }
 
 // ===== LEGACY ROUTES (kept for compatibility) =====

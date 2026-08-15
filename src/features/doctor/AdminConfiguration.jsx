@@ -63,48 +63,6 @@ export default function AdminConfiguration() {
 
       {message && <p className="dash-form-msg">{message}</p>}
 
-      <section className="dash-panel">
-        <div className="dash-panel__head">
-          <h3 className="dash-panel__title">
-            <Package />
-            {t("dashboard.config.packages")}
-          </h3>
-        </div>
-        <div className="dash-panel__body">
-          {packages.map((pkg) => (
-            <form
-              className="dash-form dash-form--grid dash-form--bordered"
-              key={pkg.id}
-              onSubmit={(e) => savePackage(pkg, e)}
-            >
-              <div className="dash-field">
-                <span className="dash-label">{pkg.name}</span>
-                {pkg.description && <small className="dash-muted">{pkg.description}</small>}
-              </div>
-              <label className="dash-field">
-                <span>{t("dashboard.config.price")}</span>
-                <input
-                  className="dash-input"
-                  name="price"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  defaultValue={pkg.price}
-                  required
-                />
-              </label>
-              <label className="dash-check">
-                <input name="active" type="checkbox" defaultChecked={Boolean(pkg.active)} />
-                {t("dashboard.config.active")}
-              </label>
-              <button type="submit" className="dash-btn dash-btn--primary">
-                <Save />
-                {t("dashboard.config.save")}
-              </button>
-            </form>
-          ))}
-        </div>
-      </section>
 
       <section className="dash-panel">
         <div className="dash-panel__head">

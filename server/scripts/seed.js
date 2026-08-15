@@ -459,16 +459,16 @@ async function buildServices(tenant) {
   const arGroups = ar.services.groups;
   const CATEGORIES = [
     { code: "core", enTitle: enGroups[0].title, arTitle: arGroups[0].title, services: [
-      { code: "therapeutic-nutrition", enTitle: enGroups[0].items[0].title, enBody: enGroups[0].items[0].body, arTitle: arGroups[0].items[0].title, arBody: arGroups[0].items[0].body },
+      { code: "therapeutic-nutrition", enTitle: enGroups[0].items[0].title, enBody: enGroups[0].items[0].body, arTitle: arGroups[0].items[0].title, arBody: arGroups[0].items[0].body, cover_image_url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2053&auto=format&fit=crop" },
     ]},
     { code: "weight-management", enTitle: enGroups[1].title, arTitle: arGroups[1].title, services: [
-      { code: "obesity-treatment", enTitle: enGroups[1].items[0].title, enBody: enGroups[1].items[0].body, arTitle: arGroups[1].items[0].title, arBody: arGroups[1].items[0].body },
-      { code: "underweight-treatment", enTitle: enGroups[1].items[1].title, enBody: enGroups[1].items[1].body, arTitle: arGroups[1].items[1].title, arBody: arGroups[1].items[1].body },
+      { code: "obesity-treatment", enTitle: enGroups[1].items[0].title, enBody: enGroups[1].items[0].body, arTitle: arGroups[1].items[0].title, arBody: arGroups[1].items[0].body, cover_image_url: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop" },
+      { code: "underweight-treatment", enTitle: enGroups[1].items[1].title, enBody: enGroups[1].items[1].body, arTitle: arGroups[1].items[1].title, arBody: arGroups[1].items[1].body, cover_image_url: "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?q=80&w=1974&auto=format&fit=crop" },
     ]},
     { code: "health-conditions", enTitle: enGroups[2].title, arTitle: arGroups[2].title, services: [
-      { code: "insulin-resistance", enTitle: enGroups[2].items[0].title, enBody: enGroups[2].items[0].body, arTitle: arGroups[2].items[0].title, arBody: arGroups[2].items[0].body },
-      { code: "thyroid-disorders", enTitle: enGroups[2].items[1].title, enBody: enGroups[2].items[1].body, arTitle: arGroups[2].items[1].title, arBody: arGroups[2].items[1].body },
-      { code: "diabetes-children", enTitle: enGroups[2].items[2].title, enBody: enGroups[2].items[2].body, arTitle: arGroups[2].items[2].title, arBody: arGroups[2].items[2].body },
+      { code: "insulin-resistance", enTitle: enGroups[2].items[0].title, enBody: enGroups[2].items[0].body, arTitle: arGroups[2].items[0].title, arBody: arGroups[2].items[0].body, cover_image_url: "https://images.unsplash.com/photo-1498837167339-54df3c2557ff?q=80&w=2070&auto=format&fit=crop" },
+      { code: "thyroid-disorders", enTitle: enGroups[2].items[1].title, enBody: enGroups[2].items[1].body, arTitle: arGroups[2].items[1].title, arBody: arGroups[2].items[1].body, cover_image_url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070&auto=format&fit=crop" },
+      { code: "diabetes-children", enTitle: enGroups[2].items[2].title, enBody: enGroups[2].items[2].body, arTitle: arGroups[2].items[2].title, arBody: arGroups[2].items[2].body, cover_image_url: "https://images.unsplash.com/photo-1543362906-acfc16c67564?q=80&w=1965&auto=format&fit=crop" },
     ]},
   ];
 
@@ -488,7 +488,7 @@ async function buildServices(tenant) {
       const { row: svc } = await upsert(
         Service,
         { code: s.code },
-        { tenant_id: tenant.id, service_category_id: cat.id, status: "active", sort_order: sIdx++, deleted_at: null }
+        { tenant_id: tenant.id, service_category_id: cat.id, status: "active", sort_order: sIdx++, cover_image_url: s.cover_image_url, deleted_at: null }
       );
       created.services += 1;
       await seedServiceTranslations(ServiceTranslation, "service_id", svc.id, s, created);
@@ -606,6 +606,45 @@ async function seedThinCatalogs() {
   return { foodCreated, exerciseCreated };
 }
 
+async function seedPackages(tenant) {
+  const { Package, PackageEntitlement } = models;
+  const packages = [
+    { slug: "silver", name: "الباقة الفضية", description: "باقة البداية للوصول للوزن المثالي", price: 1500, features: ["خطة غذائية شهرية", "متابعة أسبوعية عبر الواتساب"] },
+    { slug: "gold", name: "الباقة الذهبية", description: "خطة متكاملة تشمل التغذية والتدريب", price: 2500, features: ["خطة غذائية شهرية", "خطة تدريبية مخصصة", "متابعة مباشرة عن طريق الفيديو مرة في الاسبوع", "تواصل يومي واتساب"] },
+    { slug: "platinum", name: "الباقة الماسية", description: "المتابعة الشاملة للحالات الخاصة والرياضيين", price: 4000, features: ["خطة غذائية وتدريبية متقدمة", "متابعة مباشرة عن طريق الفيديو مرتين في الاسبوع", "تعديل غير محدود على الخطة", "أولوية الحجز والتواصل"] },
+  ];
+
+  let pCreated = 0;
+  let sIdx = 1;
+  for (const p of packages) {
+    const { row: pkg, created } = await upsert(Package, { slug: p.slug }, { tenant_id: tenant.id, name: p.name, description: p.description, price: p.price, active: true, sort_order: sIdx++ });
+    if (created) pCreated += 1;
+    
+    // Upsert entitlements
+    for (const f of p.features) {
+      await upsert(PackageEntitlement, { package_id: pkg.id, code: f }, { tenant_id: tenant.id, allowed: true });
+    }
+  }
+  return pCreated;
+}
+
+async function seedArticles(tenant) {
+  const { Content, ContentTranslation } = models;
+  const articles = [
+    { slug: "healthy-habits", title: "5 عادات يومية لحياة صحية", body: "<p>شرب الماء الكافي، النوم المبكر، وممارسة الرياضة بانتظام هي مفاتيح الصحة الجيدة.</p>", cover_image_url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2053&auto=format&fit=crop" },
+    { slug: "keto-diet", title: "كل ما تريد معرفته عن نظام الكيتو", body: "<p>نظام الكيتو يعتمد على تقليل الكربوهيدرات وزيادة الدهون الصحية لتدريب الجسم على حرق الدهون.</p>", cover_image_url: "https://images.unsplash.com/photo-1498837167339-54df3c2557ff?q=80&w=2070&auto=format&fit=crop" },
+    { slug: "intermittent-fasting", title: "الصيام المتقطع: دليلك الشامل", body: "<p>يعتبر الصيام المتقطع من أفضل الطرق لتنظيم الإنسولين وحرق الدهون بدون حرمان.</p>", cover_image_url: "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?q=80&w=1974&auto=format&fit=crop" },
+  ];
+
+  let aCreated = 0;
+  for (const a of articles) {
+    const { row: content, created } = await upsert(Content, { slug: a.slug }, { tenant_id: tenant.id, status: "published", cover_image_url: a.cover_image_url, author_name: "د. كريم الليثي", published_at: new Date() });
+    if (created) aCreated += 1;
+    await upsert(ContentTranslation, { content_id: content.id, locale: "ar" }, { title: a.title, body: a.body });
+  }
+  return aCreated;
+}
+
 // ---------------------------------------------------------------------------
 // main
 // ---------------------------------------------------------------------------
@@ -626,6 +665,12 @@ export async function runSeed() {
 
     const services = await buildServices(tenant);
     console.log("services:", JSON.stringify(services));
+
+    const pCreated = await seedPackages(tenant);
+    console.log(`packages seeded: ${pCreated} new.`);
+
+    const aCreated = await seedArticles(tenant);
+    console.log(`articles seeded: ${aCreated} new.`);
 
     await seedClinicInfo(tenant);
     console.log("clinic info seeded (working_hour empty — no approved hours).");

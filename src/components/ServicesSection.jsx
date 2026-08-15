@@ -1,21 +1,11 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { PulseIcon } from "./Icons";
+import { Sparkles, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { navigate } from "../lib/router";
 import { publicApi } from "../api/client";
 
-// Placeholder images carefully selected from Unsplash for each topic
-const SERVICE_IMAGES = {
-  "التغذية العلاجية": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=600&q=80",
-  "علاج السمنة": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=600&q=80",
-  "علاج النحافة": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=600&q=80",
-  "مقاومة الإنسولين": "https://images.unsplash.com/photo-1505576399279-565b52d4ac71?auto=format&fit=crop&w=600&q=80",
-  "اضطرابات الغدة الدرقية": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80",
-  "السكري لدى الأطفال": "https://images.unsplash.com/photo-1514066558159-fc8c737ef259?auto=format&fit=crop&w=600&q=80"
-};
-
-// Generic fallback image
+// Generic fallback image just in case
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80";
 
 export default function ServicesSection() {
@@ -28,28 +18,15 @@ export default function ServicesSection() {
     publicApi.services(lang)
       .then((data) => {
         const _groups = data?.groups || [];
-        if (_groups.length > 0) {
-          setGroups(_groups);
-        } else {
-          // Fallback to translation file if DB has no services yet
-          const fallback = t("services.groups", { returnObjects: true });
-          setGroups(Array.isArray(fallback) ? fallback : []);
-        }
+        if (_groups.length > 0) setGroups(_groups);
       })
-      .catch(() => {
-        // Graceful fallback to static translations
-        const fallback = t("services.groups", { returnObjects: true });
-        setGroups(Array.isArray(fallback) ? fallback : []);
-      })
+      .catch((e) => console.error("Error fetching services:", e))
       .finally(() => setLoading(false));
-  }, [i18n.language, t]);
+  }, [i18n.language]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
   };
 
   const cardVariants = {
@@ -57,36 +34,37 @@ export default function ServicesSection() {
     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 60, damping: 15 } }
   };
 
-  const goAssessment = (e) => {
-    e.preventDefault();
-    navigate("/assessment");
-  };
-
   return (
-    <section className="section" id="services" style={{ paddingBlock: "100px", background: "var(--bg)" }}>
-      <div className="container">
+    <section className="section bg-bg relative py-20" id="services">
+      {/* Decorative Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-primary-glow to-transparent rounded-full opacity-40 translate-x-1/3 -translate-y-1/3" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-tr from-gold-glow to-transparent rounded-full opacity-30 -translate-x-1/3 translate-y-1/3" />
+      </div>
+
+      <div className="container relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="services__head"
-          style={{ textAlign: "center", marginBottom: "80px" }}
+          className="text-center mb-16"
         >
-          <span style={{ display: "inline-block", background: "var(--highlight-bg)", color: "var(--primary-deep)", padding: "8px 16px", borderRadius: "100px", fontSize: "15px", fontWeight: "800", marginBottom: "16px" }}>
+          <span className="inline-flex items-center gap-2 bg-highlight-bg text-highlight-text px-4 py-1.5 rounded-full text-sm font-bold mb-4 shadow-sm">
+            <Sparkles className="w-4 h-4" />
             مجالات التخصص
           </span>
-          <h2 className="sec-title" style={{ fontSize: "clamp(32px, 5vw, 48px)", color: "var(--text)" }}>
-            {t("services.title")} <strong style={{ color: "var(--primary)" }}>{t("services.title2")}</strong>
+          <h2 className="text-4xl md:text-5xl font-black text-text mb-6">
+            {t("services.title")} <strong className="text-gradient">المتكاملة</strong>
           </h2>
-          <p style={{ color: "var(--text-muted)", fontSize: "18px", maxWidth: "600px", margin: "20px auto 0", lineHeight: 1.8, fontWeight: 500 }}>
+          <p className="text-text-muted text-lg max-w-2xl mx-auto leading-relaxed">
             حلول غذائية شاملة ومخصصة لمساعدتك في الوصول إلى هدفك بأفضل طريقة صحية ومستدامة.
           </p>
         </motion.div>
 
         {loading && (
-          <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}>
-            <div style={{ width: "40px", height: "40px", borderRadius: "50%", border: "3px solid var(--line)", borderTopColor: "var(--primary)", animation: "spin 0.8s linear infinite" }} />
+          <div className="flex justify-center py-10">
+            <div className="w-10 h-10 border-4 border-line border-t-primary rounded-full animate-spin" />
           </div>
         )}
 
@@ -97,57 +75,44 @@ export default function ServicesSection() {
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
             key={gi}
-            style={{ marginBottom: "60px" }}
+            className="mb-16"
           >
-            <h3 style={{ fontSize: "28px", color: "var(--primary-deep)", marginBottom: "24px", fontWeight: "800", borderBottom: "2px solid var(--line)", paddingBottom: "12px" }}>
+            <h3 className="text-2xl md:text-3xl font-black text-primary-deep mb-8 flex items-center gap-4">
               {group.title}
+              <div className="h-px bg-gradient-to-l from-primary-soft to-transparent flex-1 opacity-50" />
             </h3>
             
-            <div style={{ 
-              display: "grid", 
-              gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", 
-              gap: "30px" 
-            }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {group.items.map((item, i) => {
-                const imgSrc = SERVICE_IMAGES[item.title] || FALLBACK_IMAGE;
+                const imgSrc = item.coverImageUrl || FALLBACK_IMAGE;
                 
                 return (
                   <motion.article 
                     variants={cardVariants}
-                    whileHover={{ 
-                      y: -10, 
-                      boxShadow: "0 20px 40px rgba(0, 0, 0, 0.12)",
-                    }}
+                    whileHover={{ y: -10 }}
                     key={i} 
-                    style={{ 
-                      background: "var(--card-bg)",
-                      borderRadius: "var(--radius-xl)",
-                      overflow: "hidden",
-                      border: "1px solid var(--line)",
-                      display: "flex",
-                      flexDirection: "column",
-                      transition: "all 0.3s ease"
-                    }}
+                    className="glass-card rounded-[2rem] overflow-hidden flex flex-col group cursor-pointer h-full"
                   >
-                    {/* Image Area */}
-                    <div style={{ width: "100%", height: "200px", position: "relative", overflow: "hidden" }}>
-                      <motion.img 
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ duration: 0.6 }}
+                    <div className="w-full h-56 relative overflow-hidden">
+                      <img 
                         src={imgSrc} 
                         alt={item.title} 
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-deep/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                     
-                    {/* Content Area */}
-                    <div style={{ padding: "30px 24px", flex: 1, display: "flex", flexDirection: "column", background: "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 15%)" }}>
-                      <h4 style={{ fontSize: "22px", fontWeight: "900", color: "var(--text)", marginBottom: "12px" }}>
+                    <div className="p-8 flex-1 flex flex-col relative bg-card-bg">
+                      <h4 className="text-2xl font-black text-text mb-4 transition-colors group-hover:text-primary">
                         {item.title}
                       </h4>
-                      <p style={{ fontSize: "16px", lineHeight: "1.7", color: "var(--text-muted)", flex: 1, fontWeight: 500 }}>
+                      <p className="text-text-muted leading-relaxed flex-1 font-medium mb-6">
                         {item.body}
                       </p>
+                      <div className="inline-flex items-center gap-2 text-primary font-bold text-sm">
+                        اكتشف المزيد
+                        <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-2" />
+                      </div>
                     </div>
                   </motion.article>
                 );
@@ -160,19 +125,17 @@ export default function ServicesSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          style={{ marginTop: "60px", textAlign: "center" }}
+          className="mt-16 text-center"
         >
-          <motion.a 
-            whileHover={{ scale: 1.05, boxShadow: "0 15px 30px rgba(242, 124, 107, 0.4)" }}
-            whileTap={{ scale: 0.95 }}
-            href="/assessment" 
-            onClick={goAssessment}
-            className="btn btn-accent"
-            style={{ borderRadius: "16px", padding: "18px 40px", fontSize: "18px" }}
+          <a
+            href="/assessment"
+            onClick={e => { e.preventDefault(); navigate('/assessment'); }}
+            className="btn btn-primary"
+            style={{ borderRadius: "100px", padding: "18px 40px", fontSize: "18px" }}
           >
-            <PulseIcon />
+            <Sparkles className="w-5 h-5 mr-2" />
             {t("services.cta")}
-          </motion.a>
+          </a>
         </motion.div>
       </div>
     </section>

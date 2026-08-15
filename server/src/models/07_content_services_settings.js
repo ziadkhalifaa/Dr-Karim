@@ -52,6 +52,7 @@ export const Service = sequelize.define(
     tenant_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
     service_category_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
     code: { type: DataTypes.STRING(40), allowNull: false, unique: true },
+    cover_image_url: { type: DataTypes.STRING(500), allowNull: true },
     status: { type: DataTypes.ENUM("active", "inactive", "archived"), allowNull: false, defaultValue: "active" },
     sort_order: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
     deleted_at: { type: DataTypes.DATE, allowNull: true },

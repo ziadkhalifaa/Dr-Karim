@@ -40,6 +40,7 @@ router.post("/doctor/articles", authenticateOptional, requireAuth, requireRole("
 router.patch("/doctor/articles/:id", authenticateOptional, requireAuth, requireRole("doctor", "admin"), contentController.updateArticle);
 router.delete("/doctor/articles/:id", authenticateOptional, requireAuth, requireRole("doctor", "admin"), contentController.deleteArticle);
 router.post("/doctor/articles/:id/cover", authenticateOptional, requireAuth, requireRole("doctor", "admin"), upload.single("cover"), contentController.uploadCover);
+router.post("/doctor/services/:id/cover", authenticateOptional, requireAuth, requireRole("doctor", "admin"), upload.single("cover"), contentController.uploadServiceCover);
 
 // ===== LEGACY (compatibility) =====
 router.get("/", contentController.getAllContent);

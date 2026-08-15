@@ -16,6 +16,7 @@ import { careRouter } from "./care.routes.js";
 import { progressRouter } from "./progress.routes.js";
 import { patientRouter } from "./patient.routes.js";
 import { foodRouter } from "./food.routes.js";
+import packageRouter from "./package.routes.js";
 import { authenticateOptional, requireTenantAccess } from "../middleware/auth.js";
 import { tenantResolver } from "../middleware/tenant.js";
 
@@ -23,6 +24,7 @@ export function routes(app) {
   const api = express.Router();
   api.use("/content", contentRouter);
   api.use("/public", publicRouter);
+  api.use("/monetization/packages", packageRouter);
 
   api.use("/health", healthRouter());
   api.use("/auth", authRouter());

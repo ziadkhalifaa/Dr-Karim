@@ -1,52 +1,58 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
   color-scheme: light;
   
-  /* Premium Palette */
-  --deep: #061e14; /* Darker, richer emerald */
-  --primary: #059669; /* Emerald 600 - very elegant */
-  --primary-deep: #047857; /* Emerald 700 */
-  --primary-soft: #34d399; /* Emerald 400 */
-  --primary-glow: rgba(5, 150, 105, 0.15);
+  /* Premium Palette - Elegant Emerald & Gold */
+  --deep: #021a11; /* Very dark rich emerald */
+  --primary: #059669; /* Elegant Emerald */
+  --primary-deep: #047857;
+  --primary-soft: #34d399;
+  --primary-glow: rgba(5, 150, 105, 0.25);
   
-  --surface-brand: #061e14;
+  --surface-brand: #021a11;
   --on-brand: #ffffff;
   
-  --secondary: #10b981;
-  --secondary-deep: #059669;
+  --secondary: #d97706; /* Rich Gold/Amber */
+  --secondary-deep: #b45309;
   --on-secondary: #ffffff;
   
-  --highlight-bg: #ecfdf5; 
-  --highlight-text: #065f46; 
+  --highlight-bg: rgba(5, 150, 105, 0.1); 
+  --highlight-text: #059669; 
   
   --tint: #f0fdf4; 
   --tint-2: #f8fafc; 
   
-  --gold: #d97706; /* Richer amber/gold */
-  --cream: #fafaf9; /* Warm white */
+  --gold: #d97706;
+  --gold-glow: rgba(217, 119, 6, 0.3);
   
   --text: #0f172a; 
-  --text-muted: #475569; /* Slightly darker for better contrast */
+  --text-muted: #475569; 
   
   --bg: #f8fafc; 
   --bg-soft: #f1f5f9; 
-  --card-bg: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.85); /* Glassmorphism base */
   
-  --line: #e2e8f0; 
+  --line: rgba(226, 232, 240, 0.8); 
+  
+  /* Glassmorphism variables */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  --glass-blur: blur(12px);
   
   /* Modern shadows & Radii */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 12px 24px -4px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.12), 0 12px 24px -8px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.05), 0 2px 5px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 15px 30px -5px rgba(0, 0, 0, 0.08), 0 10px 15px -5px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 15px 25px -10px rgba(0, 0, 0, 0.08);
   
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-xl: 32px;
   
-  /* Using Cairo for primary, Outfit for numbers/English */
+  /* Fonts */
   --font-body: 'Cairo', 'Outfit', system-ui, -apple-system, sans-serif;
   --font-latin: 'Outfit', system-ui, sans-serif;
 }
@@ -54,17 +60,18 @@
 [data-theme="dark"] {
   color-scheme: dark;
   
-  --deep: #020617; /* Slate 950 */
+  --deep: #020617; 
   --primary: #10b981; 
   --primary-deep: #34d399; 
   --primary-soft: #059669; 
+  --primary-glow: rgba(16, 185, 129, 0.25);
   
-  --surface-brand: #0f291e;
+  --surface-brand: #04140e;
   --on-brand: #f8fafc;
   
-  --secondary: #10b981;
-  --secondary-deep: #34d399;
-  --on-secondary: #ffffff;
+  --secondary: #f59e0b;
+  --secondary-deep: #fbbf24;
+  --on-secondary: #020617;
   
   --highlight-bg: rgba(16, 185, 129, 0.15);
   --highlight-text: #6ee7b7;
@@ -73,21 +80,25 @@
   --tint-2: #0f172a; 
   
   --gold: #f59e0b;
-  --cream: #020617;
+  --gold-glow: rgba(245, 158, 11, 0.3);
   
   --text: #f8fafc;
-  --text-muted: #94a3b8;
+  --text-muted: #cbd5e1;
   
   --bg: #020617;
   --bg-soft: #0f172a;
-  --card-bg: #1e293b;
+  --card-bg: rgba(30, 41, 59, 0.7);
   
-  --line: #334155;
+  --line: rgba(51, 65, 85, 0.6);
   
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(15, 23, 42, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  
+  --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  --shadow: 0 5px 15px rgba(0,0,0,0.4);
+  --shadow-md: 0 15px 30px rgba(0,0,0,0.5);
+  --shadow-lg: 0 25px 50px rgba(0,0,0,0.6);
 }
 
 * {

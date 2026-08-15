@@ -92,10 +92,46 @@ export async function listServices(req, res, next) {
         code: svc.code,
         title: svc.translations?.[0]?.name || svc.code,
         body: svc.translations?.[0]?.description || "",
+        coverImageUrl: svc.cover_image_url || null,
       })),
     }));
 
     return ok(res, 200, { groups: data });
+  } catch (err) { next(err); }
+}
+
+import { Package, PackageEntitlement } from "../models/16_monetization.js";
+
+// ──────────────────────────
+// GET /api/v1/public/packages
+// ──────────────────────────
+export async function listPackages(req, res, next) {
+  try {
+    const packages = await Package.findAll({
+      where: { active: true, tenant_id: 1 },
+      order: [["sort_order", "ASC"]],
+    });
+
+    const entitlements = await PackageEntitlement.findAll({
+      where: { package_id: packages.map(p => p.id) },
+    });
+
+    const data = packages.map(pkg => {
+      const features = entitlements.filter(e => e.package_id === pkg.id && e.allowed);
+      return {
+        id: String(pkg.id),
+        name: pkg.name,
+        slug: pkg.slug,
+        description: pkg.description,
+        durationValue: pkg.duration_value,
+        durationUnit: pkg.duration_unit,
+        price: Number(pkg.price),
+        currency: pkg.currency,
+        features: features.map(f => f.code), // Code will be translated on frontend or stored as ar
+      };
+    });
+
+    return ok(res, 200, { packages: data });
   } catch (err) { next(err); }
 }
 

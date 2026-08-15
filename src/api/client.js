@@ -29,7 +29,7 @@ async function request(path, options = {}, retried = false) {
   return parse(response);
 }
 
-export const api = { get: (path, options) => request(path, { ...options, method: "GET" }), post: (path, body, options) => request(path, { ...options, method: "POST", body }), patch: (path, body, options) => request(path, { ...options, method: "PATCH", body }), put: (path, body, options) => request(path, { ...options, method: "PUT", body }) };
+export const api = { get: (path, options) => request(path, { ...options, method: "GET" }), post: (path, body, options) => request(path, { ...options, method: "POST", body }), patch: (path, body, options) => request(path, { ...options, method: "PATCH", body }), put: (path, body, options) => request(path, { ...options, method: "PUT", body }), delete: (path, options) => request(path, { ...options, method: "DELETE" }) };
 export const authApi = {
   register: (body) => api.post("/auth/register", body),
   login: (body) => api.post("/auth/login", body),
@@ -57,7 +57,7 @@ export const articleApi = {
   doctorList: (query = "") => api.get(`/content/doctor/articles${query}`),
   create: (body) => api.post("/content/doctor/articles", body),
   update: (id, body) => api.patch(`/content/doctor/articles/${id}`, body),
-  delete: (id) => api.post(`/content/doctor/articles/${id}`, {}, { method: "DELETE" }),
+  delete: (id) => api.delete(`/content/doctor/articles/${id}`),
   uploadCover: (id, file) => {
     const form = new FormData();
     form.append("cover", file);
@@ -111,6 +111,8 @@ export const progressApi = {
 export const publicApi = {
   /** List services grouped by category */
   services: (lang = "ar") => api.get(`/public/services?lang=${lang}`),
+  /** List pricing packages */
+  packages: () => api.get("/public/packages"),
   /** Clinic info + social media settings */
   settings: () => api.get("/public/settings"),
   /** Submit a contact form message */
@@ -118,5 +120,13 @@ export const publicApi = {
   // Doctor only
   contacts: (query = "") => api.get(`/public/doctor/contacts${query}`),
   markRead: (id) => api.patch(`/public/doctor/contacts/${id}/read`, {}),
+};
+
+/** Doctor Packages CRUD API */
+export const packageAdminApi = {
+  list: () => api.get("/monetization/packages"),
+  create: (body) => api.post("/monetization/packages", body),
+  update: (id, body) => api.patch(`/monetization/packages/${id}`, body),
+  delete: (id) => api.delete(`/monetization/packages/${id}`),
 };
 
