@@ -15,6 +15,7 @@ import {
   Scale,
   Users,
   FileText,
+  MessageCircle,
 } from "lucide-react";
 import DashboardShell from "../shared/DashboardShell";
 import NotificationsPanel from "../shared/NotificationsPanel";
@@ -28,6 +29,7 @@ import PatientsList from "./PatientsList";
 import PatientProfile from "./PatientProfile";
 import NutritionBuilder from "./NutritionBuilder";
 import ArticleManager from "./ArticleManager";
+import ContactMessages from "./ContactMessages";
 import { reviewApi, appointmentApi, notificationApi } from "../../api/client";
 import { useAuth } from "../../context/AuthProvider";
 
@@ -288,6 +290,7 @@ export default function DoctorDashboard({ path }) {
     { path: "/doctor/templates", label: "قوالب الرعاية", icon: ClipboardList },
     { path: "/doctor/progress", label: t("doctorProgress.nav"), icon: Scale },
     { path: "/doctor/articles", label: "نصائح طبية", icon: FileText },
+    { path: "/doctor/messages", label: "رسائل التواصل", icon: MessageCircle },
     { path: "/doctor/payments", label: t("dashboard.nav.payments"), icon: Wallet },
     { path: "/doctor/configuration", label: t("dashboard.nav.configuration"), icon: Settings },
     { path: "/doctor/appointments", label: t("dashboard.nav.appointments"), icon: CalendarDays },
@@ -309,6 +312,7 @@ export default function DoctorDashboard({ path }) {
   else if (path === "/doctor/templates") page = <CareTemplates />;
   else if (path === "/doctor/progress") page = <DoctorProgress />;
   else if (path === "/doctor/articles") page = <ArticleManager />;
+  else if (path === "/doctor/messages") page = <ContactMessages />;
   else if (path === "/doctor/appointments") page = <Appointments rows={appointments} reload={reload} />;
   else
     page = (

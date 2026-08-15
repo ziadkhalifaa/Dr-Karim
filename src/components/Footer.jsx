@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { CLINIC, mapsDirectionsUrl, waUrl } from "../config";
+import { mapsDirectionsUrl, waUrl } from "../config";
+import { usePublicSettings } from "../hooks/usePublicSettings";
 import {
   FacebookIcon,
   YoutubeIcon,
@@ -15,14 +16,14 @@ import { motion } from "framer-motion";
 
 const LINKS = ["home", "about", "services", "articles", "contact"];
 
-function SocialButtons() {
+function SocialButtons({ social }) {
   return (
     <div className="social-row" style={{ display: "flex", gap: "12px" }}>
       <motion.a
         whileHover={{ scale: 1.1, backgroundColor: "var(--primary)" }}
         whileTap={{ scale: 0.95 }}
         className="social-btn"
-        href={CLINIC.social.facebook}
+        href={social?.facebook || "#"}
         target="_blank"
         rel="noreferrer"
         aria-label="Facebook"
@@ -34,7 +35,7 @@ function SocialButtons() {
         whileHover={{ scale: 1.1, backgroundColor: "var(--primary)" }}
         whileTap={{ scale: 0.95 }}
         className="social-btn"
-        href={CLINIC.social.youtube}
+        href={social?.youtube || "#"}
         target="_blank"
         rel="noreferrer"
         aria-label="YouTube"
@@ -46,7 +47,7 @@ function SocialButtons() {
         whileHover={{ scale: 1.1, backgroundColor: "var(--primary)" }}
         whileTap={{ scale: 0.95 }}
         className="social-btn"
-        href={CLINIC.social.tiktok}
+        href={social?.tiktok || "#"}
         target="_blank"
         rel="noreferrer"
         aria-label="TikTok"
@@ -60,6 +61,7 @@ function SocialButtons() {
 
 export default function Footer() {
   const { t } = useTranslation();
+  const { settings } = usePublicSettings();
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
 
@@ -127,13 +129,13 @@ export default function Footer() {
                 <span style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--secondary)" }}>
                   <PhoneIcon />
                 </span>
-                <span style={{ fontSize: "15px", fontWeight: "600" }}>{CLINIC.phones.join("  •  ")}</span>
+                <span style={{ fontSize: "15px", fontWeight: "600" }}>{settings?.clinic?.phone || "01064227806"}</span>
               </div>
               <div className="contact-line" style={{ display: "flex", alignItems: "center", gap: "16px", color: "rgba(255,255,255,0.85)" }}>
                 <span style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--secondary)" }}>
                   <MailIcon />
                 </span>
-                <span style={{ fontSize: "15px", fontWeight: "600" }}>{CLINIC.email}</span>
+                <span style={{ fontSize: "15px", fontWeight: "600" }}>{settings?.clinic?.email || "dr.kareem.eliethy@gmail.com"}</span>
               </div>
               <div className="contact-line" style={{ display: "flex", alignItems: "center", gap: "16px", color: "rgba(255,255,255,0.85)" }}>
                 <span style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--secondary)" }}>
@@ -146,7 +148,7 @@ export default function Footer() {
                 <motion.a
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  href={mapsDirectionsUrl}
+                  href={settings?.maps || "#"}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-outline"
@@ -158,7 +160,7 @@ export default function Footer() {
                 <motion.a
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  href={waUrl}
+                  href={settings?.social?.whatsapp || "#"}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-accent"
@@ -183,7 +185,7 @@ export default function Footer() {
 
         <div className="footer-bottom" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "20px" }}>
           <div className="footer-copy" style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px", fontWeight: "600" }}>{t("footer.copyright")}</div>
-          <SocialButtons />
+          <SocialButtons social={settings?.social} />
         </div>
       </div>
     </footer>

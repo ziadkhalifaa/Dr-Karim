@@ -83,6 +83,46 @@ export default function NutritionBuilder({ planId, patientId }) {
   const [targets, setTargets] = useState({
     calories: 2000, protein: 150, carbs: 200, fats: 66,
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await nutritionApi.patient(patientId);
+        if (res && res.versions && res.versions.length > 0) {
+          const active = res.versions.find(v => v.status === "active") || res.versions[0];
+          if (active.targets_json) {
+            setTargets(active.targets_json);
+          }
+          if (active.meals) {
+            const loadedMeals = [];
+            active.meals.forEach(m => {
+              loadedMeals.push({
+                dayId: m.day_number || 1,
+                code: m.code,
+                items: (m.items || []).map(it => {
+                  const foodData = it.food_item || it.FoodItem || {};
+                  return {
+                    foodItemId: it.food_item_id,
+                    foodItem: { id: it.food_item_id, nameAr: foodData.name_ar || "صنف محفوظ", unit: it.unit, macros: foodData.macros_json },
+                    quantity: it.quantity,
+                    unit: it.unit,
+                    sortOrder: it.sort_order
+                  };
+                })
+              });
+            });
+            setMeals(loadedMeals);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load existing nutrition plan", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [patientId]);
 
   const currentDayMeals = useMemo(() => {
     return MEAL_TYPES.map(mt => {
@@ -187,6 +227,14 @@ export default function NutritionBuilder({ planId, patientId }) {
     }
   };
 
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", padding: "80px" }}>
+        <RefreshCw size={32} className="spin" style={{ color: "var(--dash-primary)" }} />
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px" }}>
       <style dangerouslySetInnerHTML={{__html: `
@@ -211,34 +259,54 @@ export default function NutritionBuilder({ planId, patientId }) {
       </div>
 
       {/* Target Macros */}
-      <div style={{ background: "#fff", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px", marginBottom: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px" }}>
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)" }}>
-            <span>السعرات الحرارية</span>
-            <span>{Math.round(dayTotals.cal)} / {targets.calories}</span>
+      <div style={{ background: "#fff", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px", marginBottom: "24px" }}>
+        <h3 style={{ margin: "0 0 16px", fontSize: "16px", fontWeight: "800", color: "var(--dash-text)" }}>
+          الهدف الغذائي اليومي (اختياري)
+        </h3>
+        <p style={{ margin: "0 0 20px", fontSize: "14px", color: "var(--dash-text-muted)" }}>
+          يمكنك تحديد السعرات والماكروز فقط دون الحاجة لإدخال وجبات محددة، أو استخدامها كمرجع أثناء بناء الوجبات.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px" }}>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)", marginBottom: "8px" }}>
+              <span>السعرات الحرارية</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span style={{ color: "var(--dash-text-muted)" }}>{Math.round(dayTotals.cal)} /</span>
+                <input type="number" value={targets.calories} onChange={(e) => setTargets({ ...targets, calories: Number(e.target.value) })} style={{ width: "60px", padding: "4px 8px", borderRadius: "8px", border: "1px solid var(--dash-border)", outline: "none", fontSize: "14px", fontWeight: "800", background: "var(--dash-bg)" }} />
+              </div>
+            </div>
+            <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.cal / (targets.calories || 1)) * 100, 100) + "%", background: "#f59e0b" }} /></div>
           </div>
-          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.cal / targets.calories) * 100, 100) + "%", background: "#f59e0b" }} /></div>
-        </div>
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)" }}>
-            <span>البروتين</span>
-            <span>{Math.round(dayTotals.p)}g / {targets.protein}g</span>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)", marginBottom: "8px" }}>
+              <span>البروتين (g)</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span style={{ color: "var(--dash-text-muted)" }}>{Math.round(dayTotals.p)} /</span>
+                <input type="number" value={targets.protein} onChange={(e) => setTargets({ ...targets, protein: Number(e.target.value) })} style={{ width: "60px", padding: "4px 8px", borderRadius: "8px", border: "1px solid var(--dash-border)", outline: "none", fontSize: "14px", fontWeight: "800", background: "var(--dash-bg)" }} />
+              </div>
+            </div>
+            <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.p / (targets.protein || 1)) * 100, 100) + "%", background: "#ef4444" }} /></div>
           </div>
-          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.p / targets.protein) * 100, 100) + "%", background: "#ef4444" }} /></div>
-        </div>
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)" }}>
-            <span>الكربوهيدرات</span>
-            <span>{Math.round(dayTotals.c)}g / {targets.carbs}g</span>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)", marginBottom: "8px" }}>
+              <span>الكربوهيدرات (g)</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span style={{ color: "var(--dash-text-muted)" }}>{Math.round(dayTotals.c)} /</span>
+                <input type="number" value={targets.carbs} onChange={(e) => setTargets({ ...targets, carbs: Number(e.target.value) })} style={{ width: "60px", padding: "4px 8px", borderRadius: "8px", border: "1px solid var(--dash-border)", outline: "none", fontSize: "14px", fontWeight: "800", background: "var(--dash-bg)" }} />
+              </div>
+            </div>
+            <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.c / (targets.carbs || 1)) * 100, 100) + "%", background: "#eab308" }} /></div>
           </div>
-          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.c / targets.carbs) * 100, 100) + "%", background: "#eab308" }} /></div>
-        </div>
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)" }}>
-            <span>الدهون</span>
-            <span>{Math.round(dayTotals.f)}g / {targets.fats}g</span>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)", marginBottom: "8px" }}>
+              <span>الدهون (g)</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span style={{ color: "var(--dash-text-muted)" }}>{Math.round(dayTotals.f)} /</span>
+                <input type="number" value={targets.fats} onChange={(e) => setTargets({ ...targets, fats: Number(e.target.value) })} style={{ width: "60px", padding: "4px 8px", borderRadius: "8px", border: "1px solid var(--dash-border)", outline: "none", fontSize: "14px", fontWeight: "800", background: "var(--dash-bg)" }} />
+              </div>
+            </div>
+            <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.f / (targets.fats || 1)) * 100, 100) + "%", background: "#3b82f6" }} /></div>
           </div>
-          <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.f / targets.fats) * 100, 100) + "%", background: "#3b82f6" }} /></div>
         </div>
       </div>
 

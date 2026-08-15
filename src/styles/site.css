@@ -1450,5 +1450,6 @@ html[dir="rtl"] .assessment__arrow {
     width: 52px !important;
     height: 52px !important;
   }
-}. a r t i c l e - i m g - h o v e r : h o v e r   {   t r a n s f o r m :   s c a l e ( 1 . 0 5 ) ;   }  
- 
+}
+
+.article-img-hover:hover { transform: scale(1.05); }

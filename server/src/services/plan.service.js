@@ -105,7 +105,7 @@ async function versionDetails(domain, version, tenantId) {
   const details = { ...version };
   if (domain === "nutrition") {
     const templates = await MealTemplate.findAll({ where: { plan_version_id: version.id, tenant_id: tenantId }, order: [["day_number", "ASC"], ["sort_order", "ASC"], ["id", "ASC"]], raw: true });
-    const items = templates.length ? await MealItem.findAll({ where: { meal_template_id: templates.map((template) => template.id), tenant_id: tenantId }, order: [["sort_order", "ASC"], ["id", "ASC"]], raw: true }) : [];
+    const items = templates.length ? (await MealItem.findAll({ where: { meal_template_id: templates.map((template) => template.id), tenant_id: tenantId }, include: [{ model: models.FoodItem }], order: [["sort_order", "ASC"], ["id", "ASC"]] })).map(i => i.toJSON()) : [];
     const substitutions = items.length ? await FoodSubstitution.findAll({ where: { meal_item_id: items.map((item) => item.id), tenant_id: tenantId }, raw: true }) : [];
     details.meals = templates.map((template) => ({ ...template, items: items.filter((item) => String(item.meal_template_id) === String(template.id)).map((item) => ({ ...item, substitutions: substitutions.filter((substitution) => String(substitution.meal_item_id) === String(item.id)) })) }));
   } else {

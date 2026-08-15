@@ -1,6 +1,7 @@
 import express from "express";
 import { healthRouter } from "./health.routes.js";
 import contentRouter from "./content.routes.js";
+import publicRouter from "./public.routes.js";
 import { assessmentRouter } from "./assessment.routes.js";
 import { placeholderRouter } from "./placeholder.routes.js";
 import { authRouter } from "./auth.routes.js";
@@ -21,6 +22,7 @@ import { tenantResolver } from "../middleware/tenant.js";
 export function routes(app) {
   const api = express.Router();
   api.use("/content", contentRouter);
+  api.use("/public", publicRouter);
 
   api.use("/health", healthRouter());
   api.use("/auth", authRouter());
@@ -43,7 +45,8 @@ export function routes(app) {
   api.use(progressRouter());
   api.use("/patients", patientRouter());
   api.use("/food", foodRouter());
-  api.use("/services", placeholderRouter("services"));
+  // /services is now served dynamically via /public/services
+  // api.use("/services", placeholderRouter("services"));
   api.use("/appointments", placeholderRouter("appointments"));
   app.use("/api/v1", api);
 }

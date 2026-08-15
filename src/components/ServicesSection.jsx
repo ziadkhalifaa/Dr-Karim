@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { PulseIcon } from "./Icons";
 import { motion } from "framer-motion";
 import { navigate } from "../lib/router";
+import { publicApi } from "../api/client";
 
 // Placeholder images carefully selected from Unsplash for each topic
 const SERVICE_IMAGES = {
@@ -17,8 +19,30 @@ const SERVICE_IMAGES = {
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80";
 
 export default function ServicesSection() {
-  const { t } = useTranslation();
-  const groups = t("services.groups", { returnObjects: true });
+  const { t, i18n } = useTranslation();
+  const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const lang = i18n.language?.startsWith("en") ? "en" : "ar";
+    publicApi.services(lang)
+      .then((data) => {
+        const _groups = data?.groups || [];
+        if (_groups.length > 0) {
+          setGroups(_groups);
+        } else {
+          // Fallback to translation file if DB has no services yet
+          const fallback = t("services.groups", { returnObjects: true });
+          setGroups(Array.isArray(fallback) ? fallback : []);
+        }
+      })
+      .catch(() => {
+        // Graceful fallback to static translations
+        const fallback = t("services.groups", { returnObjects: true });
+        setGroups(Array.isArray(fallback) ? fallback : []);
+      })
+      .finally(() => setLoading(false));
+  }, [i18n.language, t]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -59,6 +83,12 @@ export default function ServicesSection() {
             حلول غذائية شاملة ومخصصة لمساعدتك في الوصول إلى هدفك بأفضل طريقة صحية ومستدامة.
           </p>
         </motion.div>
+
+        {loading && (
+          <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}>
+            <div style={{ width: "40px", height: "40px", borderRadius: "50%", border: "3px solid var(--line)", borderTopColor: "var(--primary)", animation: "spin 0.8s linear infinite" }} />
+          </div>
+        )}
 
         {groups.map((group, gi) => (
           <motion.div 

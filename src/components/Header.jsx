@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useApp } from "../context/appContext";
-import { waUrl } from "../config";
+import { usePublicSettings } from "../hooks/usePublicSettings";
 import { navigate } from "../lib/router";
 import Logo from "./Logo";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +25,7 @@ const NAV = [
 
 export default function Header() {
   const { t } = useTranslation();
+  const { settings } = usePublicSettings();
   const { theme, toggleTheme, lang, changeLang } = useApp();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -247,7 +248,7 @@ export default function Header() {
               </a>
             </div>
             <div className="header-actions" style={{ marginTop: "12px", justifyContent: "space-between" }}>
-              <a href={waUrl} target="_blank" rel="noreferrer" className="btn btn-outline" style={{ border: "1px solid var(--line)", color: "var(--text)", padding: "10px 16px" }}>
+              <a href={settings?.social?.whatsapp || "#"} target="_blank" rel="noreferrer" className="btn btn-outline" style={{ border: "1px solid var(--line)", color: "var(--text)", padding: "10px 16px" }}>
                 <WhatsAppIcon />
                 <span>{t("nav.book")}</span>
               </a>

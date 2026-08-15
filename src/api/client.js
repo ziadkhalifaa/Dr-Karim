@@ -106,3 +106,17 @@ export const progressApi = {
   activateGoal: (id) => api.post(`/progress/goals/${id}/activate`, {}),
   closeGoal: (id, body) => api.post(`/progress/goals/${id}/close`, body),
 };
+
+/** Public website API — no auth needed */
+export const publicApi = {
+  /** List services grouped by category */
+  services: (lang = "ar") => api.get(`/public/services?lang=${lang}`),
+  /** Clinic info + social media settings */
+  settings: () => api.get("/public/settings"),
+  /** Submit a contact form message */
+  contact: (body) => api.post("/public/contact", body),
+  // Doctor only
+  contacts: (query = "") => api.get(`/public/doctor/contacts${query}`),
+  markRead: (id) => api.patch(`/public/doctor/contacts/${id}/read`, {}),
+};
+

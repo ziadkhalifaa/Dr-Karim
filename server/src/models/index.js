@@ -164,11 +164,11 @@ for (const { model, fk, ref, as } of CLINICAL_ROWS) {
 PatientAllergy.belongsTo(SeverityCode, { foreignKey: "severity_code", targetKey: "code", as: "severity" });
 
 // ---- Services / content / clinic ----
-ServiceCategory.hasMany(ServiceCategoryTranslation, { foreignKey: "service_category_id" });
+ServiceCategory.hasMany(ServiceCategoryTranslation, { foreignKey: "service_category_id", as: "translations" });
 ServiceCategoryTranslation.belongsTo(ServiceCategory, { foreignKey: "service_category_id" });
-ServiceCategory.hasMany(Service, { foreignKey: "service_category_id" });
-Service.belongsTo(ServiceCategory, { foreignKey: "service_category_id" });
-Service.hasMany(ServiceTranslation, { foreignKey: "service_id" });
+ServiceCategory.hasMany(Service, { foreignKey: "service_category_id", as: "services" });
+Service.belongsTo(ServiceCategory, { foreignKey: "service_category_id", as: "category" });
+Service.hasMany(ServiceTranslation, { foreignKey: "service_id", as: "translations" });
 ServiceTranslation.belongsTo(Service, { foreignKey: "service_id" });
 
 ContentCategory.hasMany(ContentCategoryTranslation, { foreignKey: "content_category_id", as: "translations" });
