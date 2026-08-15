@@ -49,6 +49,22 @@ export const patientApi = {
 export const foodApi = {
   list: (query = "") => api.get(`/food${query}`),
 };
+export const servicesApi = {
+  // Doctor protected
+  doctorList: (lang) => api.get(`/services/doctor/services`, { params: { lang } }),
+  create: (body) => api.post("/services/doctor/services", body),
+  update: (id, body) => api.patch(`/services/doctor/services/${id}`, body),
+  delete: (id) => api.delete(`/services/doctor/services/${id}`),
+  uploadCover: (id, file) => {
+    const form = new FormData();
+    form.append("cover", file);
+    return fetch(`${API_BASE}/services/doctor/services/${id}/cover`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${tokenStore.access}` },
+      body: form,
+    }).then(parse);
+  },
+};
 export const articleApi = {
   // public
   list: (query = "") => api.get(`/content/articles${query}`),

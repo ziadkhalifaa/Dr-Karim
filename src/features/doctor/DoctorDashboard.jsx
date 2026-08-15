@@ -29,6 +29,7 @@ import PatientsList from "./PatientsList";
 import PatientProfile from "./PatientProfile";
 import NutritionBuilder from "./NutritionBuilder";
 import ArticleManager from "./ArticleManager";
+import ServicesManager from "./ServicesManager";
 import ContactMessages from "./ContactMessages";
 import PackagesManager from "./PackagesManager";
 import { reviewApi, appointmentApi, notificationApi } from "../../api/client";
@@ -291,6 +292,7 @@ export default function DoctorDashboard({ path }) {
     { path: "/doctor/templates", label: "قوالب الرعاية", icon: ClipboardList },
     { path: "/doctor/progress", label: t("doctorProgress.nav"), icon: Scale },
     { path: "/doctor/articles", label: "نصائح طبية", icon: FileText },
+    { path: "/doctor/services", label: "إدارة الخدمات", icon: ClipboardList },
     { path: "/doctor/packages", label: "إدارة الباقات", icon: Wallet },
     { path: "/doctor/messages", label: "رسائل التواصل", icon: MessageCircle },
     { path: "/doctor/payments", label: t("dashboard.nav.payments"), icon: Wallet },
@@ -314,6 +316,7 @@ export default function DoctorDashboard({ path }) {
   else if (path === "/doctor/templates") page = <CareTemplates />;
   else if (path === "/doctor/progress") page = <DoctorProgress />;
   else if (path === "/doctor/articles") page = <ArticleManager />;
+  else if (path === "/doctor/services") page = <ServicesManager />;
   else if (path === "/doctor/packages") page = <PackagesManager />;
   else if (path === "/doctor/messages") page = <ContactMessages />;
   else if (path === "/doctor/appointments") page = <Appointments rows={appointments} reload={reload} />;
