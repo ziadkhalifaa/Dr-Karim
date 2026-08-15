@@ -13,6 +13,9 @@
 // deploy/restart via src/db-bootstrap.js): missing rows are created and
 // existing derived rows are refreshed toward the frontend single source,
 // but NO row is ever deleted — legacy/removed questions stay intact.
+// User-editable catalog rows (services, articles) use upsertFillDefaults:
+// admin changes (uploaded covers, titles, status) are preserved and only
+// missing/empty fields are backfilled.
 
 
 
@@ -57,6 +60,25 @@ async function upsert(Model, where, values) {
   const existing = await Model.findOne({ where });
   if (existing) {
     await existing.update(values);
+    return { row: existing, created: false };
+  }
+  const row = await Model.create({ ...where, ...values });
+  return { row, created: true };
+}
+
+// Like upsert, but only fills a value when the existing row's field is
+// missing/empty. Used for user-editable catalog rows (services, articles) so
+// that admin changes (uploaded covers, titles, status) survive redeploys —
+// the seed still backfills defaults for brand-new or blank fields.
+async function upsertFillDefaults(Model, where, values) {
+  const existing = await Model.findOne({ where });
+  if (existing) {
+    const patch = {};
+    for (const [key, value] of Object.entries(values)) {
+      const current = existing[key];
+      if (current === null || current === undefined || current === "") patch[key] = value;
+    }
+    if (Object.keys(patch).length > 0) await existing.update(patch);
     return { row: existing, created: false };
   }
   const row = await Model.create({ ...where, ...values });
@@ -485,7 +507,7 @@ async function buildServices(tenant) {
 
     let sIdx = 0;
     for (const s of c.services) {
-      const { row: svc } = await upsert(
+      const { row: svc } = await upsertFillDefaults(
         Service,
         { code: s.code },
         { tenant_id: tenant.id, service_category_id: cat.id, status: "active", sort_order: sIdx++, cover_image_url: s.cover_image_url, deleted_at: null }
@@ -713,10 +735,10 @@ async function seedArticles(tenant) {
 
   let aCreated = 0;
   for (const a of articles) {
-    const { row: content, created } = await upsert(Content, { slug: a.slug }, { tenant_id: tenant.id, status: "published", cover_image_url: a.cover_image_url, author_name: "د. كريم الليثي", read_time_minutes: a.minutes || 4, published_at: new Date() });
+    const { row: content, created } = await upsertFillDefaults(Content, { slug: a.slug }, { tenant_id: tenant.id, status: "published", cover_image_url: a.cover_image_url, author_name: "د. كريم الليثي", read_time_minutes: a.minutes || 4, published_at: new Date() });
     if (created) aCreated += 1;
-    await upsert(ContentTranslation, { content_id: content.id, locale: "ar" }, { title: a.ar.title, body: a.ar.body });
-    await upsert(ContentTranslation, { content_id: content.id, locale: "en" }, { title: a.en.title, body: a.en.body });
+    await upsertFillDefaults(ContentTranslation, { content_id: content.id, locale: "ar" }, { title: a.ar.title, body: a.ar.body });
+    await upsertFillDefaults(ContentTranslation, { content_id: content.id, locale: "en" }, { title: a.en.title, body: a.en.body });
   }
   return aCreated;
 }
