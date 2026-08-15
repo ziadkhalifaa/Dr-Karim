@@ -68,10 +68,10 @@ export const ENUM = {
   // ---- Phase 6C: Progress & Measurements (§2, §3, §7, §10) ----
   // Approved measurement types preserved from patient_measurement (§2). Weight
   // is kg; dimensions (waist/neck/hip) are cm (§25 unit consistency).
-  PROGRESS_MEASUREMENT_TYPE: ["weight", "waist", "neck", "hip"],
+  PROGRESS_MEASUREMENT_TYPE: ["weight", "waist", "neck", "hip", "body_fat_percentage", "muscle_mass_kg"],
   PROGRESS_SOURCE: ["patient", "doctor", "checkin", "assessment", "system", "appointment"],
   PROGRESS_MEASUREMENT_KIND: ["initial", "correction"], // append-only correction chains
-  PROGRESS_UNIT_BY_TYPE: { weight: "kg", waist: "cm", neck: "cm", hip: "cm" },
+  PROGRESS_UNIT_BY_TYPE: { weight: "kg", waist: "cm", neck: "cm", hip: "cm", body_fat_percentage: "%", muscle_mass_kg: "kg" },
   PROGRESS_GOAL_TYPE: ["weight"], // no invented goal categories (§7)
   PROGRESS_GOAL_STATUS: ["draft", "active", "closed", "superseded", "cancelled"], // §7/§9
   PROGRESS_GOAL_VERSION_STATUS: ["draft", "active", "superseded"], // §8
@@ -94,6 +94,8 @@ export const PROGRESS_BOUNDS = {
   waist: [20, 300], // cm
   neck: [20, 300], // cm
   hip: [20, 300], // cm
+  body_fat_percentage: [1, 80], // %
+  muscle_mass_kg: [10, 200], // kg
 };
 
 export const IDS = {

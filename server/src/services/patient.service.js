@@ -104,16 +104,28 @@ async function progressSummary(patientId, tenantId) {
   const ctx = await PatientProgress.findOne({ where: { patient_id: patientId, tenant_id: tenantId }, raw: true });
   const measurements = await ProgressMeasurement.findAll({
     where: { patient_id: patientId, tenant_id: tenantId },
-    order: [["recorded_at", "DESC"]], raw: true,
+    order: [["measured_on", "ASC"], ["recorded_at", "ASC"]], raw: true,
   });
+  
   const latestByType = new Map();
-  for (const m of measurements) if (!latestByType.has(m.measurement_type)) latestByType.set(m.measurement_type, m);
+  // Since order is ASC now, the last one we see in the loop is the latest.
+  for (const m of measurements) {
+    latestByType.set(m.measurement_type, m);
+  }
+  
   const items = [...latestByType.values()].map((m) => ({ type: m.measurement_type, value: Number(m.value), unit: m.unit, measuredOn: m.measured_on }));
   return {
     cadence: ctx?.cadence || null,
     nextDueDate: ctx?.next_due_date || null,
     latest: items,
     measuredTypes: [...latestByType.keys()],
+    history: measurements.map(m => ({
+      id: String(m.id),
+      type: m.measurement_type,
+      value: Number(m.value),
+      unit: m.unit,
+      measuredOn: m.measured_on
+    }))
   };
 }
 

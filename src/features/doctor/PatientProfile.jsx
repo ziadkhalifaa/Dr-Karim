@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, UserRound, CreditCard, ClipboardList, Scale, Wallet, Inbox, Phone, Calendar, Mail, FileText, CheckCircle2, ChevronLeft } from "lucide-react";
+import { ArrowLeft, UserRound, CreditCard, ClipboardList, Scale, Wallet, Inbox, Phone, Calendar, Mail, FileText, CheckCircle2, ChevronLeft, TrendingDown, Activity, ShieldAlert, Ban, HeartPulse } from "lucide-react";
 import { patientApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 import CarePrograms from "./CarePrograms";
 import DoctorProgress from "./ProgressManager";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
 
 const STATUS_STYLES = {
   active: { bg: "#d1fae5", color: "#065f46", border: "#6ee7b7", dot: "#10b981", label: "نشط" },
@@ -25,21 +26,6 @@ function StatusPill({ status }) {
       <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.dot, display: "inline-block" }} />
       {s.label}
     </span>
-  );
-}
-
-function StatCard({ icon: Icon, label, value, sub, highlight }) {
-  return (
-    <div style={{ background: "var(--dash-card-bg)", borderRadius: "16px", padding: "20px", border: "1.5px solid var(--dash-border)", display: "flex", gap: "16px", alignItems: "center" }}>
-      <div style={{ width: 48, height: 48, borderRadius: "14px", background: highlight ? "var(--dash-primary-soft)" : "var(--dash-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        <Icon size={24} style={{ color: highlight ? "var(--dash-primary)" : "var(--dash-text-muted)" }} />
-      </div>
-      <div>
-        <div style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "4px" }}>{label}</div>
-        <div style={{ fontSize: "16px", fontWeight: "800", color: "var(--dash-text)", lineHeight: "1.2" }}>{value}</div>
-        {sub && <div style={{ fontSize: "12px", color: "var(--dash-text-soft)", marginTop: "4px" }}>{sub}</div>}
-      </div>
-    </div>
   );
 }
 
@@ -79,14 +65,49 @@ export default function PatientProfile({ patientId }) {
     </div>
   );
 
-  const { patient, subscription, careProgram, progress, payments } = data;
+  const { patient, profile, subscription, careProgram, progress, payments, upcomingAppointments } = data;
 
   const TABS = [
-    { key: "overview", label: "نظرة عامة", icon: UserRound },
-    { key: "care", label: "برامج الرعاية", icon: ClipboardList },
-    { key: "progress", label: "القياسات والتقدم", icon: Scale },
+    { key: "overview", label: "لوحة تحكم المريض", icon: UserRound },
+    { key: "care", label: "برامج التغذية والرعاية", icon: ClipboardList },
+    { key: "progress", label: "القياسات والمتابعة", icon: Scale },
     { key: "payments", label: "المدفوعات", icon: Wallet },
   ];
+
+  // Derive charts and summaries from progress history
+  const chartData = useMemo(() => {
+    if (!progress?.history?.length) return [];
+    // group by date
+    const grouped = {};
+    progress.history.forEach(m => {
+      if (!grouped[m.measuredOn]) grouped[m.measuredOn] = { date: m.measuredOn };
+      grouped[m.measuredOn][m.type] = m.value;
+    });
+    return Object.values(grouped).sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [progress]);
+
+  const weightStats = useMemo(() => {
+    if (!progress?.history) return null;
+    const weights = progress.history.filter(m => m.type === "weight").sort((a, b) => new Date(a.measuredOn) - new Date(b.measuredOn));
+    if (weights.length === 0) return null;
+    const first = weights[0];
+    const last = weights[weights.length - 1];
+    const diff = last.value - first.value;
+    const isLoss = diff < 0;
+    
+    // approximate weeks
+    const daysDiff = (new Date(last.measuredOn) - new Date(first.measuredOn)) / (1000 * 60 * 60 * 24);
+    const weeks = Math.round(daysDiff / 7);
+
+    return {
+      firstWeight: first.value,
+      firstDate: first.measuredOn,
+      currentWeight: last.value,
+      diff: Math.abs(diff),
+      isLoss,
+      durationText: weeks > 0 ? `خلال ${weeks} ${weeks === 1 ? "أسبوع" : weeks <= 10 ? "أسابيع" : "أسبوع"}` : "حديثاً"
+    };
+  }, [progress]);
 
   return (
     <>
@@ -111,7 +132,13 @@ export default function PatientProfile({ patientId }) {
             </div>
           </div>
         </div>
-        <div>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          {upcomingAppointments?.length > 0 && (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "var(--dash-info-soft)", color: "var(--dash-info)", padding: "6px 14px", borderRadius: "999px", fontSize: "13px", fontWeight: "800" }}>
+              <Calendar size={14} />
+              موعد قادم: {new Date(upcomingAppointments[0].scheduledStartAt).toLocaleDateString("ar-EG")}
+            </span>
+          )}
           <StatusPill status={patient.status} />
         </div>
       </div>
@@ -124,8 +151,8 @@ export default function PatientProfile({ patientId }) {
             onClick={() => setActiveTab(t.key)}
             style={{
               padding: "10px 20px", borderRadius: "12px", fontSize: "14px", fontWeight: "800",
-              border: "none", background: activeTab === t.key ? "var(--dash-text)" : "transparent",
-              color: activeTab === t.key ? "var(--dash-bg)" : "var(--dash-text-muted)",
+              border: "none", background: activeTab === t.key ? "var(--dash-primary)" : "transparent",
+              color: activeTab === t.key ? "#fff" : "var(--dash-text-muted)",
               cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
               display: "flex", alignItems: "center", gap: "8px", whiteSpace: "nowrap"
             }}
@@ -144,89 +171,208 @@ export default function PatientProfile({ patientId }) {
           transition={{ duration: 0.15 }}
         >
           {activeTab === "overview" && (
-            <div style={{ display: "grid", gap: "24px" }}>
-              {/* Top Stats */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
-                <StatCard
-                  icon={Calendar} label="العمر"
-                  value={patient.ageYears != null ? `${patient.ageYears} سنة` : "غير محدد"}
-                  sub={patient.sex ? (patient.sex === "M" ? "ذكر" : "أنثى") : ""}
-                />
-                <StatCard
-                  icon={CreditCard} label="الاشتراك الحالي" highlight={!!subscription}
-                  value={subscription ? (subscription.package?.name || "باقة مخصصة") : "لا يوجد اشتراك"}
-                  sub={subscription?.endsAt ? `ينتهي في ${new Date(subscription.endsAt).toLocaleDateString("ar-EG")}` : ""}
-                />
-                <StatCard
-                  icon={ClipboardList} label="برنامج الرعاية" highlight={careProgram?.status === "active"}
-                  value={careProgram ? careProgram.status : "لا يوجد برنامج"}
-                  sub={careProgram ? "تم تعيين خطة" : "يحتاج إنشاء خطة"}
-                />
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              
+              {/* Row 1: Personal Info & Subscriptions (Top Cards) */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
+                
+                {/* Personal Info Card */}
+                <div style={{ background: "#fff", borderRadius: "20px", padding: "24px", border: "1.5px solid var(--dash-border)", boxShadow: "0 4px 12px rgba(0,0,0,0.02)" }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", margin: "0 0 16px", display: "flex", alignItems: "center", gap: "8px", color: "var(--dash-text)" }}>
+                    <UserRound size={18} style={{ color: "var(--dash-primary)" }} /> المعلومات الشخصية
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                    <div>
+                      <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", fontWeight: "600", marginBottom: "4px" }}>الاسم</div>
+                      <div style={{ fontSize: "14px", fontWeight: "800", color: "var(--dash-text)" }}>{patient.fullName}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", fontWeight: "600", marginBottom: "4px" }}>العمر والجنس</div>
+                      <div style={{ fontSize: "14px", fontWeight: "800", color: "var(--dash-text)" }}>
+                        {patient.ageYears ? `${patient.ageYears} سنة` : "غير محدد"} • {patient.sex === "male" ? "ذكر" : patient.sex === "female" ? "أنثى" : "غير محدد"}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", fontWeight: "600", marginBottom: "4px" }}>رقم الهاتف</div>
+                      <div style={{ fontSize: "14px", fontWeight: "800", color: "var(--dash-text)" }} dir="ltr">{patient.phoneDisplay || "—"}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", fontWeight: "600", marginBottom: "4px" }}>البريد الإلكتروني</div>
+                      <div style={{ fontSize: "14px", fontWeight: "800", color: "var(--dash-text)" }}>{patient.email || "—"}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Subscription & Plans Card */}
+                <div style={{ background: "#fff", borderRadius: "20px", padding: "24px", border: "1.5px solid var(--dash-border)", boxShadow: "0 4px 12px rgba(0,0,0,0.02)" }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", margin: "0 0 16px", display: "flex", alignItems: "center", gap: "8px", color: "var(--dash-text)" }}>
+                    <CreditCard size={18} style={{ color: "var(--dash-primary)" }} /> حالة الاشتراك والبرامج
+                  </h3>
+                  <div style={{ display: "grid", gap: "12px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--dash-bg)", padding: "12px 16px", borderRadius: "12px" }}>
+                      <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)" }}>الاشتراك الحالي</span>
+                      <span style={{ fontSize: "14px", fontWeight: "800", color: subscription ? "var(--dash-primary)" : "var(--dash-text-soft)" }}>
+                        {subscription ? (subscription.package?.name || "باقة نشطة") : "لا يوجد اشتراك"}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--dash-bg)", padding: "12px 16px", borderRadius: "12px" }}>
+                      <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)" }}>برنامج التغذية</span>
+                      <span style={{ fontSize: "14px", fontWeight: "800", color: careProgram?.status === "active" ? "var(--dash-primary)" : "var(--dash-text-soft)" }}>
+                        {careProgram ? "مفعل" : "يحتاج خطة"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "24px" }}>
+              {/* Row 2: Progress Stats & Health Conditions */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" }}>
                 
-                {/* Latest Measurements */}
-                <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", padding: "24px", border: "1.5px solid var(--dash-border)" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
-                    <h3 style={{ fontSize: "18px", fontWeight: "800", display: "flex", alignItems: "center", gap: "8px", margin: 0 }}>
-                      <Scale size={20} style={{ color: "var(--dash-primary)" }} /> أحدث القياسات
-                    </h3>
-                    <button onClick={() => setActiveTab("progress")} style={{ background: "transparent", border: "none", color: "var(--dash-text-muted)", fontSize: "13px", fontWeight: "700", display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", fontFamily: "inherit" }}>
-                      عرض الكل <ChevronLeft size={14} />
-                    </button>
-                  </div>
-                  {progress?.latest?.length ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                      {progress.latest.map((m, i) => (
-                        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px", background: "var(--dash-bg)", borderRadius: "12px" }}>
-                          <span style={{ fontWeight: "700", color: "var(--dash-text)" }}>{m.type}</span>
-                          <div style={{ textAlign: "left" }}>
-                            <div style={{ fontWeight: "800", color: "var(--dash-primary)", fontSize: "16px" }}>{m.value} {m.unit}</div>
-                            <div style={{ fontSize: "11px", color: "var(--dash-text-muted)" }}>{m.measuredOn}</div>
-                          </div>
+                {/* Weight Stats Summary */}
+                <div style={{ background: "#fff", borderRadius: "20px", padding: "24px", border: "1.5px solid var(--dash-border)", boxShadow: "0 4px 12px rgba(0,0,0,0.02)" }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", margin: "0 0 16px", display: "flex", alignItems: "center", gap: "8px", color: "var(--dash-text)" }}>
+                    <Activity size={18} style={{ color: "var(--dash-primary)" }} /> ملخص القياسات والزيارات
+                  </h3>
+                  
+                  {weightStats ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                        <div style={{ background: "var(--dash-bg)", padding: "16px", borderRadius: "14px", textAlign: "center" }}>
+                          <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", fontWeight: "700", marginBottom: "4px" }}>الوزن في أول زيارة</div>
+                          <div style={{ fontSize: "20px", fontWeight: "900", color: "var(--dash-text)" }}>{weightStats.firstWeight} <span style={{ fontSize: "12px", fontWeight: "600" }}>كغ</span></div>
+                          <div style={{ fontSize: "11px", color: "var(--dash-text-soft)", marginTop: "4px" }}>{new Date(weightStats.firstDate).toLocaleDateString("ar-EG")}</div>
                         </div>
-                      ))}
+                        <div style={{ background: "var(--dash-primary-soft)", padding: "16px", borderRadius: "14px", textAlign: "center", border: "1px solid var(--dash-primary)" }}>
+                          <div style={{ fontSize: "12px", color: "var(--dash-primary)", fontWeight: "700", marginBottom: "4px" }}>الوزن الحالي</div>
+                          <div style={{ fontSize: "20px", fontWeight: "900", color: "var(--dash-primary)" }}>{weightStats.currentWeight} <span style={{ fontSize: "12px", fontWeight: "600" }}>كغ</span></div>
+                          <div style={{ fontSize: "11px", color: "var(--dash-primary)", opacity: 0.8, marginTop: "4px" }}>تحديث اليوم</div>
+                        </div>
+                      </div>
+                      
+                      {weightStats.diff > 0 && (
+                        <div style={{ background: weightStats.isLoss ? "#d1fae5" : "#fef3c7", color: weightStats.isLoss ? "#065f46" : "#92400e", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "10px", fontWeight: "800", fontSize: "14px" }}>
+                          <TrendingDown size={18} style={{ transform: weightStats.isLoss ? "none" : "scaleY(-1)" }} />
+                          <span>
+                            تم {weightStats.isLoss ? "خسارة" : "زيادة"} {weightStats.diff.toFixed(1)} كغ {weightStats.durationText}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div style={{ textAlign: "center", padding: "32px 0", color: "var(--dash-text-soft)" }}>
                       <Scale size={32} style={{ opacity: 0.5, margin: "0 auto 12px" }} />
-                      <p style={{ margin: 0, fontWeight: "600", fontSize: "14px" }}>لا توجد قياسات مسجلة</p>
+                      <p style={{ margin: 0, fontWeight: "600", fontSize: "14px" }}>لا توجد قياسات مسجلة بعد</p>
                     </div>
                   )}
                 </div>
 
-                {/* Subscriptions Entitlements */}
-                <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", padding: "24px", border: "1.5px solid var(--dash-border)" }}>
-                  <h3 style={{ fontSize: "18px", fontWeight: "800", display: "flex", alignItems: "center", gap: "8px", margin: "0 0 20px" }}>
-                    <CheckCircle2 size={20} style={{ color: "var(--dash-info)" }} /> صلاحيات الباقة
+                {/* Health Conditions */}
+                <div style={{ background: "#fff", borderRadius: "20px", padding: "24px", border: "1.5px solid var(--dash-border)", boxShadow: "0 4px 12px rgba(0,0,0,0.02)" }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", margin: "0 0 16px", display: "flex", alignItems: "center", gap: "8px", color: "var(--dash-text)" }}>
+                    <HeartPulse size={18} style={{ color: "var(--dash-danger)" }} /> السجل الطبي والحالات الخاصة
                   </h3>
-                  {subscription?.entitlements?.length ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                      {subscription.entitlements.map((e, i) => (
-                        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px", background: "var(--dash-bg)", borderRadius: "12px" }}>
-                          <span style={{ fontWeight: "700", color: "var(--dash-text)" }}>{e.code}</span>
-                          <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)", background: "var(--dash-border)", padding: "4px 10px", borderRadius: "999px" }}>
-                            تم استخدام {e.used} / {e.limit ?? "∞"}
-                          </span>
+                  
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    {/* Diseases */}
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <ShieldAlert size={14} /> الأمراض المزمنة
+                      </div>
+                      {profile?.conditions?.length > 0 ? (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                          {profile.conditions.map(c => (
+                            <span key={c.id} style={{ background: "#fee2e2", color: "#b91c1c", padding: "6px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "800" }}>{c.condition_code}</span>
+                          ))}
                         </div>
-                      ))}
+                      ) : <span style={{ fontSize: "13px", color: "var(--dash-text-soft)", fontWeight: "600" }}>لا يوجد أمراض مسجلة</span>}
                     </div>
-                  ) : (
-                    <div style={{ textAlign: "center", padding: "32px 0", color: "var(--dash-text-soft)" }}>
-                      <FileText size={32} style={{ opacity: 0.5, margin: "0 auto 12px" }} />
-                      <p style={{ margin: 0, fontWeight: "600", fontSize: "14px" }}>لا توجد صلاحيات لعرضها</p>
+
+                    {/* Allergies / Disliked Foods */}
+                    <div>
+                      <div style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <Ban size={14} /> الحساسية والممنوعات
+                      </div>
+                      {profile?.allergies?.length > 0 ? (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                          {profile.allergies.map(a => (
+                            <span key={a.id} style={{ background: "#ffedd5", color: "#c2410c", padding: "6px 12px", borderRadius: "8px", fontSize: "12px", fontWeight: "800" }}>{a.allergen}</span>
+                          ))}
+                        </div>
+                      ) : <span style={{ fontSize: "13px", color: "var(--dash-text-soft)", fontWeight: "600" }}>لا يوجد حساسيات مسجلة</span>}
                     </div>
-                  )}
+
+                    {/* Pregnancy */}
+                    {profile?.pregnancyRecords?.length > 0 && (
+                      <div style={{ background: "var(--dash-primary-soft)", color: "var(--dash-primary)", padding: "12px 16px", borderRadius: "12px", fontSize: "14px", fontWeight: "800" }}>
+                        🤰 حالة خاصة: المريضة حامل
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 3: Interactive Chart */}
+              <div style={{ background: "#fff", borderRadius: "20px", padding: "24px", border: "1.5px solid var(--dash-border)", boxShadow: "0 4px 12px rgba(0,0,0,0.02)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+                  <h3 style={{ fontSize: "16px", fontWeight: "800", display: "flex", alignItems: "center", gap: "8px", color: "var(--dash-text)", margin: 0 }}>
+                    <TrendingDown size={18} style={{ color: "var(--dash-primary)" }} /> تطور الوزن وتكوين الجسم
+                  </h3>
                 </div>
                 
+                {chartData.length > 0 ? (
+                  <div style={{ height: 300, width: "100%" }} dir="ltr">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="var(--dash-primary)" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="var(--dash-primary)" stopOpacity={0}/>
+                          </linearGradient>
+                          <linearGradient id="colorFat" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2}/>
+                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                          </linearGradient>
+                          <linearGradient id="colorMuscle" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--dash-border)" />
+                        <XAxis dataKey="date" tick={{ fontSize: 12, fill: "var(--dash-text-muted)" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 12, fill: "var(--dash-text-muted)" }} axisLine={false} tickLine={false} />
+                        <RechartsTooltip 
+                          contentStyle={{ borderRadius: '12px', border: '1px solid var(--dash-border)', boxShadow: 'var(--dash-shadow-md)', fontWeight: 700 }}
+                          itemStyle={{ fontWeight: 800 }}
+                        />
+                        <Legend iconType="circle" wrapperStyle={{ fontSize: '13px', fontWeight: 700 }} />
+                        <Area type="monotone" name="الوزن (كغ)" dataKey="weight" stroke="var(--dash-primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorWeight)" />
+                        <Area type="monotone" name="الدهون (%)" dataKey="body_fat_percentage" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorFat)" />
+                        <Area type="monotone" name="العضلات (كغ)" dataKey="muscle_mass_kg" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorMuscle)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div style={{ textAlign: "center", padding: "40px 0", color: "var(--dash-text-soft)" }}>
+                    <TrendingDown size={32} style={{ opacity: 0.5, margin: "0 auto 12px" }} />
+                    <p style={{ margin: 0, fontWeight: "600", fontSize: "14px" }}>تحتاج إلى قياسات متعددة لعرض التطور الزمني</p>
+                  </div>
+                )}
               </div>
+
             </div>
           )}
 
-          {activeTab === "care" && <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}><CarePrograms patientId={patientId} /></div>}
+          {activeTab === "care" && (
+            <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}>
+              <CarePrograms patientId={patientId} />
+            </div>
+          )}
           
-          {activeTab === "progress" && <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}><DoctorProgress patientId={patientId} /></div>}
+          {activeTab === "progress" && (
+            <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}>
+              <DoctorProgress patientId={patientId} />
+            </div>
+          )}
           
           {activeTab === "payments" && (
             <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}>
@@ -236,7 +382,7 @@ export default function PatientProfile({ patientId }) {
               {payments?.length ? (
                 <div style={{ display: "grid", gap: "12px" }}>
                   {payments.map((p) => (
-                    <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px", background: "var(--dash-bg)", borderRadius: "16px", border: "1px solid var(--dash-border)" }}>
+                     <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px", background: "var(--dash-bg)", borderRadius: "16px", border: "1px solid var(--dash-border)" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
                         <div style={{ width: 44, height: 44, borderRadius: "12px", background: "var(--dash-card-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px" }}>
                           {p.method === "vodafone_cash" ? "📱" : p.method === "instapay" ? "🏦" : "💳"}

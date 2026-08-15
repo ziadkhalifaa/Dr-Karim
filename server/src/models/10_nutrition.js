@@ -75,6 +75,7 @@ export const FoodItem = sequelize.define(
     name_en: { type: DataTypes.STRING(120), allowNull: false },
     category_code: { type: DataTypes.STRING(40), allowNull: true },
     unit: { type: DataTypes.STRING(20), allowNull: true },
+    macros_json: { type: DataTypes.JSON, allowNull: true },
     active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   },
   { tableName: "food_item", underscored: true }

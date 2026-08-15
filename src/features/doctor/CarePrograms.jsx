@@ -4,6 +4,7 @@ import {
   ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox, UserRound, BookTemplate, Check,
 } from "lucide-react";
 import { careApi, patientApi } from "../../api/client";
+import { navigate } from "../../lib/router";
 import PatientSelector from "../shared/PatientSelector";
 import { templateStore } from "../../lib/templateStore";
 
@@ -476,6 +477,11 @@ export default function CarePrograms({ patientId, patientLabel }) {
           </h3>
           <div className="dash-row-actions">
             <span className="dash-badge dash-badge--primary">{rows.length}</span>
+            {patientId && (
+              <button className="dash-btn dash-btn--primary dash-btn--sm" onClick={() => navigate(`/doctor/patients/${patientId}/nutrition-builder`)} style={{ background: "#f59e0b", color: "#fff", border: "none" }}>
+                🥗 إنشاء نظام غذائي متقدم
+              </button>
+            )}
             <button className="dash-btn dash-btn--primary dash-btn--sm" onClick={() => setShowCreate((s) => !s)}>
               <Plus />{t("doctorCare.newProgram")}
             </button>

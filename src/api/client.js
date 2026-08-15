@@ -46,6 +46,9 @@ export const patientApi = {
   home: () => api.get("/patients/me/home"),
   profile: (id) => reviewApi.get(id),
 };
+export const foodApi = {
+  list: (query = "") => api.get(`/food${query}`),
+};
 export const planApi = (domain) => ({ create: (body) => api.post(`/${domain}-plans`, body), get: (id) => api.get(`/${domain}-plans/${id}`), patient: (id) => api.get(`/patients/${id}/${domain}-plan`), version: (id, body) => api.post(`/${domain}-plans/${id}/versions`, body), note: (id, body) => api.post(`/${domain}-plans/${id}/notes`, body), submit: (id) => api.post(`/${domain}-plan-versions/${id}/submit-review`, {}), approve: (id) => api.post(`/${domain}-plan-versions/${id}/approve`, {}), activate: (id) => api.post(`/${domain}-plan-versions/${id}/activate`, {}), archive: (id) => api.post(`/${domain}-plan-versions/${id}/archive`, {}) });
 export const nutritionApi = planApi("nutrition");
 export const exerciseApi = planApi("exercise");

@@ -25,6 +25,7 @@ import CareTemplates from "./CareTemplates";
 import DoctorProgress from "./ProgressManager";
 import PatientsList from "./PatientsList";
 import PatientProfile from "./PatientProfile";
+import NutritionBuilder from "./NutritionBuilder";
 import { reviewApi, appointmentApi, notificationApi } from "../../api/client";
 import { useAuth } from "../../context/AuthProvider";
 
@@ -291,9 +292,11 @@ export default function DoctorDashboard({ path }) {
   ];
 
   const patientProfileMatch = path.match(/^\/doctor\/patients\/(\d+)$/);
+  const nutritionBuilderMatch = path.match(/^\/doctor\/patients\/(\d+)\/nutrition-builder$/);
 
   let page;
-  if (patientProfileMatch) page = <PatientProfile patientId={patientProfileMatch[1]} />;
+  if (nutritionBuilderMatch) page = <NutritionBuilder patientId={nutritionBuilderMatch[1]} />;
+  else if (patientProfileMatch) page = <PatientProfile patientId={patientProfileMatch[1]} />;
   else if (path === "/doctor/patients") page = <PatientsList />;
   else if (path === "/doctor/payments") page = <PaymentReview />;
   else if (path === "/doctor/configuration") page = <AdminConfiguration />;

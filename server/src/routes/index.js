@@ -14,6 +14,7 @@ import { phase5Router } from "./phase5.routes.js";
 import { careRouter } from "./care.routes.js";
 import { progressRouter } from "./progress.routes.js";
 import { patientRouter } from "./patient.routes.js";
+import { foodRouter } from "./food.routes.js";
 import { authenticateOptional, requireTenantAccess } from "../middleware/auth.js";
 import { tenantResolver } from "../middleware/tenant.js";
 
@@ -40,11 +41,11 @@ export function routes(app) {
   api.use(phase5Router());
   api.use(careRouter());
   api.use(progressRouter());
-api.use("/patients", patientRouter());
+  api.use("/patients", patientRouter());
+  api.use("/food", foodRouter());
   api.use("/services", placeholderRouter("services"));
   api.use("/appointments", placeholderRouter("appointments"));
   app.use("/api/v1", api);
 }
 
 export default routes;
-
