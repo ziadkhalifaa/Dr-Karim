@@ -14,10 +14,7 @@
 // existing derived rows are refreshed toward the frontend single source,
 // but NO row is ever deleted — legacy/removed questions stay intact.
 
-import { register } from "node:module";
 
-// Must register BEFORE any frontend dynamic import (hook appends .js on miss).
-register(new URL("./esm-loader.mjs", import.meta.url));
 
 // ---- frontend sources (single source of truth) ----
 const [{ QUESTIONS_RAW, QUESTIONS }, { FLAG_RULES }, { assessmentAr }, { assessmentEn }, { ar }, { en }, { CLINIC }] =
@@ -613,11 +610,8 @@ async function seedThinCatalogs() {
 // main
 // ---------------------------------------------------------------------------
 
-async function main() {
+export async function runSeed() {
   try {
-    await sequelize.authenticate();
-    console.log("Connected to MySQL.");
-
     const tenant = await seedTenantAndDoctor();
     console.log(`tenant + doctor seeded (tenant id=${tenant.id}).`);
 
@@ -627,7 +621,7 @@ async function main() {
     const assessment = await seedAssessmentDefinition(tenant);
     console.log(`assessment definition: ${assessment.total} questions, ${assessment.cfgCreated} config rows created, ${assessment.cfgUpdated} refreshed.`);
 
-const flags = await seedFlags();
+    const flags = await seedFlags();
     console.log(`flag rules: ${flags.ruleCreated} rules, ${flags.versionCreated} versions created, ${flags.versionUpdated} refreshed.`);
 
     const services = await buildServices(tenant);
@@ -643,12 +637,24 @@ const flags = await seedFlags();
     console.log("thin catalogs:", JSON.stringify(thin));
 
     console.log("Seed complete. Idempotent — safe to re-run.");
-  } finally {
-    await sequelize.close();
+  } catch (err) {
+    console.error("Seed failed:", err.stack || err.message);
+    throw err;
   }
 }
 
-main().catch((err) => {
-  console.error("Seed failed:", err.stack || err.message);
-  process.exit(1);
-});
+import { pathToFileURL } from "node:url";
+
+// Run directly from CLI
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  sequelize.authenticate()
+    .then(() => {
+      console.log("Connected to MySQL.");
+      return runSeed();
+    })
+    .then(() => sequelize.close())
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}

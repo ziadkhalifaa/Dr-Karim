@@ -4,7 +4,7 @@
 // A question is visible if its selector returns true (default: true).
 // "c" (conditionally required) is derived here too, so validation can ask.
 
-import { QUESTIONS_BY_ID } from "../data/questions";
+import { QUESTIONS_BY_ID } from "../data/questions.js";
 
 export function getSubject(state) {
   return state.answers.Q01_01 ?? null;

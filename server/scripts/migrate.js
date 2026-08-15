@@ -50,12 +50,10 @@ function checksum(file) {
   return crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
 }
 
-async function run() {
-  const statusOnly = process.argv.includes("--status");
+export async function runMigration(statusOnly = false) {
   const queryInterface = sequelize.getQueryInterface();
 
   try {
-    await sequelize.authenticate();
     await ensureMeta(queryInterface);
     const applied = await appliedRows(queryInterface);
     const migrations = listMigrations();
@@ -89,12 +87,16 @@ async function run() {
       });
     }
     console.log("All migrations applied.");
-  } finally {
-    await sequelize.close();
+  } catch (err) {
+    console.error("Migrate failed:", err.message);
+    throw err;
   }
 }
 
-run().catch((err) => {
-  console.error("Migrate failed:", err.message);
-  process.exit(1);
-});
+// Run directly from CLI
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  sequelize.authenticate()
+    .then(() => runMigration(process.argv.includes("--status")))
+    .then(() => sequelize.close())
+    .catch(() => process.exit(1));
+}

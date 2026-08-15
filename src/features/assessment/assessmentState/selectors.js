@@ -1,9 +1,9 @@
 // Selectors over assessment state (pure functions of `answers`).
 
-import { QUESTIONS } from "../data/questions";
-import { SECTIONS } from "../data/sections";
-import { isVisible, isMinor, getAgeYears, getSubject } from "../logic/conditions";
-import { deriveFlags, overallTier } from "../logic/flags";
+import { QUESTIONS } from "../data/questions.js";
+import { SECTIONS } from "../data/sections.js";
+import { isVisible, isMinor, getAgeYears, getSubject } from "../logic/conditions.js";
+import { deriveFlags, overallTier } from "../logic/flags.js";
 
 export function visibleQuestions(state, sectionNo) {
   return QUESTIONS.filter(

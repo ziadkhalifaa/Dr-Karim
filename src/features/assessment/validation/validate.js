@@ -1,8 +1,8 @@
 // Validation (docs/assessment-spec.md §5).
 // Per-question validity, full-section validity, and non-blocking cross-field warnings.
 
-import { QUESTIONS_BY_ID } from "../data/questions";
-import { isRequired, getWeightKg } from "../logic/conditions";
+import { QUESTIONS_BY_ID } from "../data/questions.js";
+import { isRequired, getWeightKg } from "../logic/conditions.js";
 
 const PHONE_RE = /^\+?\d[\d\s-]{8,14}$/;
 const PHONE_EG_HINT_RE = /^(\+?2)?01[0125][0-9]{8}$/;

@@ -20,7 +20,7 @@ async function start() {
     if (env.DB_AUTO_SYNC) {
       // Additive, idempotent migrate + seed so every deploy converges the DB
       // catalog with the frontend single-source files (never deletes data).
-      ensureDatabaseSync();
+      await ensureDatabaseSync();
     }
     await sequelize.authenticate();
     logger.info("database connected", { host: env.HOST, port: env.PORT });

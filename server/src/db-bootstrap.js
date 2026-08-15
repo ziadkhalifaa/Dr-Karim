@@ -10,23 +10,21 @@
 //
 // Enabled via env DB_AUTO_SYNC (default: on in production).
 
-import { execFileSync } from "node:child_process";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { logger } from "./utils/logger.js";
+import { runMigration } from "../../scripts/migrate.js";
+import { runSeed } from "../../scripts/seed.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SERVER_DIR = path.resolve(__dirname, "..");
-const SCRIPTS = ["scripts/migrate.js", "scripts/seed.js"];
+export async function ensureDatabaseSync() {
+  try {
+    logger.info("db sync starting", { step: "scripts/migrate.js" });
+    await runMigration(false);
+    logger.info("db sync done", { step: "scripts/migrate.js" });
 
-export function ensureDatabaseSync() {
-  for (const script of SCRIPTS) {
-    logger.info("db sync starting", { step: script });
-    execFileSync(process.execPath, [script], {
-      cwd: SERVER_DIR,
-      stdio: "inherit",
-      env: process.env,
-    });
-    logger.info("db sync done", { step: script });
+    logger.info("db sync starting", { step: "scripts/seed.js" });
+    await runSeed();
+    logger.info("db sync done", { step: "scripts/seed.js" });
+  } catch (err) {
+    logger.error("db sync failed", { errorMessage: err.message, stack: err.stack });
+    throw err;
   }
 }

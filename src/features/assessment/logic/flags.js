@@ -11,7 +11,7 @@
 //   - Cortisone/steroid use = prominent STANDARD flag (RS14), NOT URGENT.
 // Severity is configurable data (future doctor-controlled register).
 
-import { getWeightKg, getConditions } from "./conditions";
+import { getWeightKg, getConditions } from "./conditions.js";
 
 const T = { URGENT: "urgent", STANDARD: "standard" };
 

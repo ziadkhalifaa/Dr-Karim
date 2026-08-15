@@ -3,15 +3,15 @@
 
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { reducer, getInitialState } from "../assessmentState/reducer";
+import { reducer, getInitialState } from "../assessmentState/reducer.js";
 import {
   visibleQuestionsBySection,
   progressPercent,
   getBmi,
   getFlags,
   getOverallTier,
-} from "../assessmentState/selectors";
-import { loadDraft, saveDraft, clearDraft } from "../utils/storage";
+} from "../assessmentState/selectors.js";
+import { loadDraft, saveDraft, clearDraft } from "../utils/storage.js";
 
 const DEBOUNCE_MS = 500;
 
