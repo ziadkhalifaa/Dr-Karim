@@ -21,9 +21,9 @@ const MEASURES = [
 ];
 
 const STATUS_STYLES = {
-  nutrition: { bg: "#d1fae5", color: "#065f46", border: "#6ee7b7" },
+  nutrition: { bg: "#e6fbc2", color: "#2e7d00", border: "#c2f753" },
   exercise: { bg: "#dbeafe", color: "#1e40af", border: "#93c5fd" },
-  medication: { bg: "#fef3c7", color: "#92400e", border: "#fcd34d" },
+  medication: { bg: "#e6f2ff", color: "#022466", border: "#48d6f9" },
 };
 
 // ── Small Components ───────────────────────────────────────────────────────
@@ -369,7 +369,7 @@ export default function CareTemplates() {
         <motion.button
           whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
           onClick={() => setMode("create")}
-          style={{ display: "flex", alignItems: "center", gap: "8px", padding: "12px 24px", borderRadius: "14px", border: "none", background: "var(--dash-primary)", color: "#fff", fontSize: "15px", fontWeight: "800", cursor: "pointer", fontFamily: "inherit", marginBottom: "24px", boxShadow: "0 4px 16px rgba(16,185,129,0.3)" }}
+          style={{ display: "flex", alignItems: "center", gap: "8px", padding: "12px 24px", borderRadius: "14px", border: "none", background: "var(--dash-primary)", color: "#fff", fontSize: "15px", fontWeight: "800", cursor: "pointer", fontFamily: "inherit", marginBottom: "24px", boxShadow: "0 4px 16px rgba(111,208,5,0.3)" }}
         >
           <Plus size={20} /> إنشاء قالب جديد
         </motion.button>

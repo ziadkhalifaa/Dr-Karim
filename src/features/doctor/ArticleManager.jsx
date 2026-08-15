@@ -17,8 +17,8 @@ import {
 import { articleApi } from "../../api/client";
 
 const STATUS_COLORS = {
-  published: { bg: "#d1fae5", text: "#065f46" },
-  draft: { bg: "#fef3c7", text: "#92400e" },
+  published: { bg: "#e6fbc2", text: "#2e7d00" },
+  draft: { bg: "#e6f2ff", text: "#022466" },
   archived: { bg: "#f1f5f9", text: "#64748b" },
 };
 

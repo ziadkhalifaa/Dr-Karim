@@ -37,7 +37,7 @@ function Spinner() {
     <motion.div
       animate={{ rotate: 360 }}
       transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-      style={{ width: 48, height: 48, borderRadius: "50%", border: "4px solid rgba(255,255,255,0.15)", borderTopColor: "#10b981" }}
+      style={{ width: 48, height: 48, borderRadius: "50%", border: "4px solid rgba(255,255,255,0.15)", borderTopColor: "#6fd005" }}
     />
   );
 }
@@ -75,7 +75,7 @@ export default function PackagesPage() {
   const pageStyle = {
     minHeight: "100vh",
     background: "var(--deep)",
-    backgroundImage: "radial-gradient(ellipse at 70% 0%, rgba(16,185,129,0.25) 0%, transparent 60%), radial-gradient(ellipse at 30% 100%, rgba(5,150,105,0.15) 0%, transparent 60%)",
+    backgroundImage: "radial-gradient(ellipse at 70% 0%, rgba(111,208,5,0.25) 0%, transparent 60%), radial-gradient(ellipse at 30% 100%, rgba(111,208,5,0.15) 0%, transparent 60%)",
     direction: "rtl",
     fontFamily: "var(--font-body)",
   };
@@ -112,13 +112,13 @@ export default function PackagesPage() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.35)", color: "#34d399", padding: "7px 18px", borderRadius: "999px", fontSize: "13px", fontWeight: "800", letterSpacing: "0.06em", marginBottom: "24px" }}
+          style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(111,208,5,0.15)", border: "1px solid rgba(111,208,5,0.35)", color: "#c2f753", padding: "7px 18px", borderRadius: "999px", fontSize: "13px", fontWeight: "800", letterSpacing: "0.06em", marginBottom: "24px" }}
         >
           🎯 الخطوة الأخيرة — اختر باقتك
         </motion.div>
         <h1 style={{ fontSize: "clamp(28px, 5vw, 52px)", fontWeight: "900", lineHeight: "1.2", marginBottom: "16px" }}>
           ابدأ رحلتك نحو{" "}
-          <span style={{ color: "#34d399" }}>صحة أفضل</span>
+          <span style={{ color: "#c2f753" }}>صحة أفضل</span>
         </h1>
         <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.65)", maxWidth: "520px", margin: "0 auto", lineHeight: "1.7" }}>
           اختر الباقة المناسبة وادفع عن طريق فودافون كاش أو إنستاباي. سيتابعك الدكتور كريم شخصياً بعد تأكيد الدفع.
@@ -163,19 +163,19 @@ export default function PackagesPage() {
                   overflow: "hidden",
                   color: "#fff",
                   background: isFeatured
-                    ? "linear-gradient(145deg, #059669 0%, #10b981 60%, #34d399 100%)"
+                    ? "linear-gradient(145deg, #3ca503 0%, #6fd005 60%, #c2f753 100%)"
                     : "rgba(255,255,255,0.05)",
-                  border: "2px solid " + (isFeatured ? "transparent" : isSelected ? "#10b981" : "rgba(255,255,255,0.1)"),
+                  border: "2px solid " + (isFeatured ? "transparent" : isSelected ? "#6fd005" : "rgba(255,255,255,0.1)"),
                   backdropFilter: "blur(16px)",
                   boxShadow: isFeatured
-                    ? "0 24px 60px rgba(16,185,129,0.4)"
-                    : isSelected ? "0 0 0 4px rgba(16,185,129,0.25)" : "0 4px 24px rgba(0,0,0,0.2)",
+                    ? "0 24px 60px rgba(111,208,5,0.4)"
+                    : isSelected ? "0 0 0 4px rgba(111,208,5,0.25)" : "0 4px 24px rgba(0,0,0,0.2)",
                   transition: "box-shadow 0.3s ease",
                 }}
               >
                 {/* Featured badge */}
                 {isFeatured && (
-                  <div style={{ position: "absolute", top: "16px", left: "16px", background: "#fff", color: "#059669", fontSize: "11px", fontWeight: "900", padding: "5px 14px", borderRadius: "999px", letterSpacing: "0.04em" }}>
+                  <div style={{ position: "absolute", top: "16px", left: "16px", background: "#fff", color: "#3ca503", fontSize: "11px", fontWeight: "900", padding: "5px 14px", borderRadius: "999px", letterSpacing: "0.04em" }}>
                     ⭐ الأكثر طلباً
                   </div>
                 )}
@@ -201,7 +201,7 @@ export default function PackagesPage() {
                 <ul style={{ listStyle: "none", padding: 0, margin: "0 0 28px", display: "flex", flexDirection: "column", gap: "12px" }}>
                   {DEFAULT_FEATURES.map((f) => (
                     <li key={f} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14.5px", fontWeight: "600" }}>
-                      <span style={{ color: isFeatured ? "rgba(255,255,255,0.9)" : "#34d399", flexShrink: 0 }}><CheckIcon /></span>
+                      <span style={{ color: isFeatured ? "rgba(255,255,255,0.9)" : "#c2f753", flexShrink: 0 }}><CheckIcon /></span>
                       {f}
                     </li>
                   ))}
@@ -213,7 +213,7 @@ export default function PackagesPage() {
                   style={{
                     width: "100%", padding: "16px", borderRadius: "14px",
                     border: "2px solid rgba(255,255,255,0.35)",
-                    background: isFeatured ? "rgba(255,255,255,0.25)" : "rgba(16,185,129,0.15)",
+                    background: isFeatured ? "rgba(255,255,255,0.25)" : "rgba(111,208,5,0.15)",
                     color: "#fff", fontSize: "16px", fontWeight: "800",
                     cursor: "pointer", fontFamily: "inherit",
                     backdropFilter: "blur(8px)",
@@ -237,7 +237,7 @@ export default function PackagesPage() {
           style={{ maxWidth: "700px", margin: "0 auto 60px", padding: "0 24px" }}
         >
           <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "20px", padding: "28px", color: "#fff", backdropFilter: "blur(16px)" }}>
-            <div style={{ fontSize: "16px", fontWeight: "800", marginBottom: "18px", color: "#34d399" }}>💳 طرق الدفع المتاحة</div>
+            <div style={{ fontSize: "16px", fontWeight: "800", marginBottom: "18px", color: "#c2f753" }}>💳 طرق الدفع المتاحة</div>
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
               {settings.vodafone_cash_number && (
                 <div style={{ flex: 1, minWidth: "160px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "14px", padding: "18px", textAlign: "center" }}>

@@ -85,7 +85,7 @@ export default function AssessmentSection() {
                     alignItems: "center",
                     padding: "0 18px",
                     borderRadius: 14,
-                    background: "rgba(217, 119, 6, 0.18)",
+                    background: "rgba(2, 79, 171, 0.1)",
                     color: "var(--secondary-soft)",
                     fontWeight: 800,
                     fontSize: 15,

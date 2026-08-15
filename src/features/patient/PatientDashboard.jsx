@@ -206,11 +206,11 @@ function OnboardingGate({ state, onNavigate }) {
 
   if (state === "choose_package")
     return (
-      <div style={{ ...bannerBase, background: "linear-gradient(135deg, #d1fae5, #a7f3d0)", borderColor: "#6ee7b7" }}>
+      <div style={{ ...bannerBase, background: "linear-gradient(135deg, #e6fbc2, #e6fbc2)", borderColor: "#c2f753" }}>
         <span style={{ fontSize: "36px" }}>🎯</span>
         <div style={{ flex: 1 }}>
-          <h3 style={{ fontWeight: "800", fontSize: "18px", color: "#065f46", marginBottom: "6px" }}>{t("dashboard.patient.onboardingChooseTitle")}</h3>
-          <p style={{ color: "#047857", fontSize: "14px", lineHeight: "1.6", marginBottom: "16px" }}>{t("dashboard.patient.onboardingChooseBody")}</p>
+          <h3 style={{ fontWeight: "800", fontSize: "18px", color: "#2e7d00", marginBottom: "6px" }}>{t("dashboard.patient.onboardingChooseTitle")}</h3>
+          <p style={{ color: "#3ca503", fontSize: "14px", lineHeight: "1.6", marginBottom: "16px" }}>{t("dashboard.patient.onboardingChooseBody")}</p>
           <button className="dash-btn dash-btn--primary" onClick={() => onNavigate("/packages")}>
             <Wallet /> اختر باقتك الآن →
           </button>
@@ -220,11 +220,11 @@ function OnboardingGate({ state, onNavigate }) {
 
   if (state === "awaiting_payment_review")
     return (
-      <div style={{ ...bannerBase, background: "#fef3c7", borderColor: "#fcd34d" }}>
+      <div style={{ ...bannerBase, background: "#e6f2ff", borderColor: "#48d6f9" }}>
         <span style={{ fontSize: "36px" }}>⏳</span>
         <div style={{ flex: 1 }}>
-          <h3 style={{ fontWeight: "800", fontSize: "18px", color: "#92400e", marginBottom: "6px" }}>{t("dashboard.patient.onboardingPendingTitle")}</h3>
-          <p style={{ color: "#b45309", fontSize: "14px", lineHeight: "1.6", marginBottom: "16px" }}>{t("dashboard.patient.onboardingPendingBody", "تم استلام طلب دفعك وهو قيد المراجعة. سيتم تفعيل برنامجك فور موافقة الدكتور.")}</p>
+          <h3 style={{ fontWeight: "800", fontSize: "18px", color: "#022466", marginBottom: "6px" }}>{t("dashboard.patient.onboardingPendingTitle")}</h3>
+          <p style={{ color: "#024fab", fontSize: "14px", lineHeight: "1.6", marginBottom: "16px" }}>{t("dashboard.patient.onboardingPendingBody", "تم استلام طلب دفعك وهو قيد المراجعة. سيتم تفعيل برنامجك فور موافقة الدكتور.")}</p>
           <button className="dash-btn dash-btn--ghost" onClick={() => onNavigate("/patient/payments")}>
             {t("dashboard.patient.viewPayments")}
           </button>

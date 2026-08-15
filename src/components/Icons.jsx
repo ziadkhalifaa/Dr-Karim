@@ -127,10 +127,10 @@ export const PlanIcon = () => (
 
 export const SupportIcon = () => (
   <svg width="34" height="34" viewBox="0 0 48 48" fill="none">
-    <rect width="48" height="48" rx="14" fill="var(--gold)" />
-    <path d="M18 30V20a6 6 0 1 1 12 0v10" stroke="#6b4a1d" strokeWidth="3.4" strokeLinecap="round" fill="transparent" />
-    <rect x="14" y="25" width="6" height="9" rx="2.4" fill="#6b4a1d" />
-    <rect x="28" y="25" width="6" height="9" rx="2.4" fill="#6b4a1d" />
+    <rect width="48" height="48" rx="14" fill="var(--secondary)" />
+    <path d="M18 30V20a6 6 0 1 1 12 0v10" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" fill="transparent" />
+    <rect x="14" y="25" width="6" height="9" rx="2.4" fill="#fff" />
+    <rect x="28" y="25" width="6" height="9" rx="2.4" fill="#fff" />
   </svg>
 );
 

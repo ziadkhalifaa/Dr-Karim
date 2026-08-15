@@ -2,60 +2,60 @@
 
 /* ============================================================
    Dr. Kareem Eliethy — Design System v2
-   Premium Wellness · Emerald × Gold
+   Premium Wellness · Logo Green × Blue
    ============================================================ */
 
 :root {
   color-scheme: light;
 
-  /* Brand — the two signature colors */
-  --primary: #059669;            /* Signature Emerald */
-  --primary-deep: #047857;
-  --primary-soft: #34d399;
-  --primary-faint: #a7f3d0;
-  --primary-tint: #ecfdf5;
-  --primary-glow: rgba(5, 150, 105, 0.18);
+  /* Brand — the two signature colors (logo) */
+  --primary: #6fd005;            /* Logo Green */
+  --primary-deep: #3ca503;
+  --primary-soft: #c2f753;
+  --primary-faint: #e6fbc2;
+  --primary-tint: #f4fce4;
+  --primary-glow: rgba(111, 208, 5, 0.18);
 
-  --secondary: #d97706;          /* Signature Gold */
-  --secondary-deep: #b45309;
-  --secondary-soft: #fbbf24;
-  --secondary-tint: #fffbeb;
+  --secondary: #024fab;          /* Logo Blue */
+  --secondary-deep: #022466;
+  --secondary-soft: #48d6f9;
+  --secondary-tint: #e6f2ff;
   --on-secondary: #ffffff;
-  --gold: #d97706;
-  --gold-glow: rgba(217, 119, 6, 0.22);
+  --blue: #024fab;
+  --blue-glow: rgba(2, 79, 171, 0.22);
 
   /* Surfaces */
-  --surface-brand: #03231a;      /* Deep emerald — hero / footer */
-  --surface-brand-2: #062e22;
+  --surface-brand: #022466;      /* Deep blue — hero / footer */
+  --surface-brand-2: #04318c;
   --on-brand: #ffffff;
-  --deep: #03231a;
-  --highlight-bg: rgba(5, 150, 105, 0.09);
-  --highlight-text: #047857;
+  --deep: #022466;
+  --highlight-bg: rgba(111, 208, 5, 0.09);
+  --highlight-text: #3ca503;
 
   /* Neutrals */
-  --text: #0e241b;
-  --text-muted: #51645c;
-  --text-soft: #81918a;
-  --bg: #f6faf7;
-  --bg-soft: #eef4f0;
-  --bg-warm: #fffdf7;
+  --text: #101f2e;
+  --text-muted: #55677a;
+  --text-soft: #8696a8;
+  --bg: #f6fafc;
+  --bg-soft: #edf3f7;
+  --bg-warm: #f7faff;
   --card-bg: #ffffff;
-  --line: rgba(14, 36, 27, 0.1);
-  --line-soft: rgba(14, 36, 27, 0.06);
+  --line: rgba(16, 31, 46, 0.1);
+  --line-soft: rgba(16, 31, 46, 0.06);
 
   /* Glass */
   --glass-bg: rgba(255, 255, 255, 0.74);
   --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-shadow: 0 14px 44px rgba(3, 35, 26, 0.1);
+  --glass-shadow: 0 14px 44px rgba(2, 36, 102, 0.1);
   --glass-blur: blur(18px);
 
   /* Elevation */
-  --shadow-sm: 0 2px 8px rgba(3, 35, 26, 0.06);
-  --shadow: 0 8px 24px rgba(3, 35, 26, 0.08);
-  --shadow-md: 0 16px 40px -8px rgba(3, 35, 26, 0.14);
-  --shadow-lg: 0 30px 70px -16px rgba(3, 35, 26, 0.22);
-  --shadow-brand: 0 18px 44px -12px rgba(5, 150, 105, 0.4);
-  --shadow-gold: 0 18px 44px -12px rgba(217, 119, 6, 0.4);
+  --shadow-sm: 0 2px 8px rgba(2, 36, 102, 0.06);
+  --shadow: 0 8px 24px rgba(2, 36, 102, 0.08);
+  --shadow-md: 0 16px 40px -8px rgba(2, 36, 102, 0.14);
+  --shadow-lg: 0 30px 70px -16px rgba(2, 36, 102, 0.22);
+  --shadow-brand: 0 18px 44px -12px rgba(111, 208, 5, 0.4);
+  --shadow-blue: 0 18px 44px -12px rgba(2, 79, 171, 0.4);
 
   /* Shape */
   --radius-sm: 10px;
@@ -72,40 +72,40 @@
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --primary: #10b981;
-  --primary-deep: #34d399;
-  --primary-soft: #34d399;
-  --primary-faint: #059669;
-  --primary-tint: rgba(16, 185, 129, 0.1);
-  --primary-glow: rgba(16, 185, 129, 0.2);
+  --primary: #7ed90f;
+  --primary-deep: #c2f753;
+  --primary-soft: #c2f753;
+  --primary-faint: #6fd005;
+  --primary-tint: rgba(111, 208, 5, 0.14);
+  --primary-glow: rgba(111, 208, 5, 0.22);
 
-  --secondary: #f59e0b;
-  --secondary-deep: #fbbf24;
-  --secondary-soft: #fbbf24;
-  --secondary-tint: rgba(245, 158, 11, 0.1);
-  --on-secondary: #0b1f17;
-  --gold: #f59e0b;
-  --gold-glow: rgba(245, 158, 11, 0.22);
+  --secondary: #48d6f9;
+  --secondary-deep: #48d6f9;
+  --secondary-soft: #48d6f9;
+  --secondary-tint: rgba(72, 214, 249, 0.12);
+  --on-secondary: #022466;
+  --blue: #48d6f9;
+  --blue-glow: rgba(72, 214, 249, 0.22);
 
-  --surface-brand: #03231a;
-  --surface-brand-2: #062e22;
-  --on-brand: #f2faf6;
-  --deep: #020e09;
-  --highlight-bg: rgba(16, 185, 129, 0.14);
-  --highlight-text: #6ee7b7;
+  --surface-brand: #022466;
+  --surface-brand-2: #04318c;
+  --on-brand: #f2f7ff;
+  --deep: #010d24;
+  --highlight-bg: rgba(111, 208, 5, 0.16);
+  --highlight-text: #c2f753;
 
-  --text: #eef6f1;
-  --text-muted: #a8bdb2;
-  --text-soft: #6e857a;
-  --bg: #06120c;
-  --bg-soft: #0b1f17;
-  --bg-warm: #0d1a13;
-  --card-bg: #0e2219;
-  --line: rgba(238, 246, 241, 0.12);
-  --line-soft: rgba(238, 246, 241, 0.07);
+  --text: #eef6ff;
+  --text-muted: #a9c0d8;
+  --text-soft: #6e87a2;
+  --bg: #060d1c;
+  --bg-soft: #0c1a31;
+  --bg-warm: #0d1c34;
+  --card-bg: #0f1f38;
+  --line: rgba(238, 246, 255, 0.12);
+  --line-soft: rgba(238, 246, 255, 0.07);
 
-  --glass-bg: rgba(14, 34, 25, 0.7);
-  --glass-border: rgba(238, 246, 241, 0.1);
+  --glass-bg: rgba(15, 31, 56, 0.7);
+  --glass-border: rgba(238, 246, 255, 0.1);
   --glass-shadow: 0 14px 44px rgba(0, 0, 0, 0.45);
   --glass-blur: blur(18px);
 
@@ -113,8 +113,8 @@
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 16px 40px -8px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 30px 70px -16px rgba(0, 0, 0, 0.6);
-  --shadow-brand: 0 18px 44px -12px rgba(16, 185, 129, 0.35);
-  --shadow-gold: 0 18px 44px -12px rgba(245, 158, 11, 0.3);
+  --shadow-brand: 0 18px 44px -12px rgba(126, 217, 15, 0.35);
+  --shadow-blue: 0 18px 44px -12px rgba(72, 214, 249, 0.3);
 }
 
 /* ---------- Reset & base ---------- */
@@ -254,17 +254,17 @@ input, textarea, select { font-family: inherit; }
 }
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 24px 54px -12px rgba(5, 150, 105, 0.5);
+  box-shadow: 0 24px 54px -12px rgba(111, 208, 5, 0.45);
 }
 
 .btn-accent {
   background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-deep) 100%);
   color: #fff;
-  box-shadow: var(--shadow-gold);
+  box-shadow: var(--shadow-blue);
 }
 .btn-accent:hover {
   transform: translateY(-3px);
-  box-shadow: 0 24px 54px -12px rgba(217, 119, 6, 0.5);
+  box-shadow: 0 24px 54px -12px rgba(2, 79, 171, 0.5);
 }
 
 .btn-outline {

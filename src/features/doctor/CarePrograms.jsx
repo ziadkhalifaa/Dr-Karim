@@ -174,7 +174,7 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: "800", fontSize: "15px", color: "var(--dash-text)", lineHeight: 1.2 }}>{tmpl.name}</div>
                       {tmpl.description && <div style={{ fontSize: "13px", color: "var(--dash-text-muted)", marginTop: "6px", lineHeight: 1.4 }}>{tmpl.description}</div>}
-                      <div style={{ display: "inline-block", fontSize: "12px", color: "#059669", background: "#d1fae5", padding: "4px 8px", borderRadius: "6px", fontWeight: "700", marginTop: "8px" }}>
+                      <div style={{ display: "inline-block", fontSize: "12px", color: "#3ca503", background: "#e6fbc2", padding: "4px 8px", borderRadius: "6px", fontWeight: "700", marginTop: "8px" }}>
                         {tmpl.activities.length} نشاط مدرج
                       </div>
                     </div>
@@ -515,7 +515,7 @@ export default function CarePrograms({ patientId, patientLabel }) {
               <button 
                 className="dash-btn dash-btn--sm" 
                 onClick={() => navigate(`/doctor/patients/${patientId}/nutrition-builder`)} 
-                style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", color: "#fff", border: "none", boxShadow: "0 4px 15px rgba(245, 158, 11, 0.4)", display: "flex", alignItems: "center", gap: "6px", fontWeight: "900", padding: "8px 16px", borderRadius: "10px", transition: "all 0.2s" }}
+                style={{ background: "linear-gradient(135deg, #024fab 0%, #024fab 100%)", color: "#fff", border: "none", boxShadow: "0 4px 15px rgba(2, 79, 171, 0.4)", display: "flex", alignItems: "center", gap: "6px", fontWeight: "900", padding: "8px 16px", borderRadius: "10px", transition: "all 0.2s" }}
                 onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
                 onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
               >

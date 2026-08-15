@@ -6,8 +6,8 @@ import { patientApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 
 const STATUS_STYLES = {
-  active: { bg: "#d1fae5", color: "#065f46", border: "#6ee7b7", dot: "#10b981", label: "نشط" },
-  pending_payment: { bg: "#fef3c7", color: "#92400e", border: "#fcd34d", dot: "#f59e0b", label: "في انتظار الدفع" },
+  active: { bg: "#e6fbc2", color: "#2e7d00", border: "#c2f753", dot: "#6fd005", label: "نشط" },
+  pending_payment: { bg: "#e6f2ff", color: "#022466", border: "#48d6f9", dot: "#024fab", label: "في انتظار الدفع" },
   inactive: { bg: "#f1f5f9", color: "#475569", border: "#cbd5e1", dot: "#94a3b8", label: "غير نشط" },
   archived: { bg: "#f1f5f9", color: "#475569", border: "#cbd5e1", dot: "#94a3b8", label: "مؤرشف" },
 };
@@ -167,7 +167,7 @@ export default function PatientsList() {
               whileHover={{ y: -4, boxShadow: "var(--dash-shadow-lg)" }}
               onClick={() => navigate(`/doctor/patients/${p.id}`)}
               style={{
-                background: "var(--dash-card-bg)", border: "1.5px solid " + (p.hasPendingPayment ? "#fcd34d" : "var(--dash-border)"),
+                background: "var(--dash-card-bg)", border: "1.5px solid " + (p.hasPendingPayment ? "#48d6f9" : "var(--dash-border)"),
                 borderRadius: "20px", padding: "24px", cursor: "pointer", position: "relative",
                 boxShadow: "var(--dash-shadow-sm)", transition: "all 0.2s ease"
               }}

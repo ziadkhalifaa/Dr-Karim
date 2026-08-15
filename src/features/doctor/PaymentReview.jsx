@@ -10,8 +10,8 @@ const METHOD_ICONS = {
 };
 
 const STATUS_STYLES = {
-  pending: { bg: "#fef3c7", color: "#92400e", border: "#fcd34d", dot: "#f59e0b", label: "في الانتظار" },
-  approved: { bg: "#d1fae5", color: "#065f46", border: "#6ee7b7", dot: "#10b981", label: "مقبول" },
+  pending: { bg: "#e6f2ff", color: "#022466", border: "#48d6f9", dot: "#024fab", label: "في الانتظار" },
+  approved: { bg: "#e6fbc2", color: "#2e7d00", border: "#c2f753", dot: "#6fd005", label: "مقبول" },
   rejected: { bg: "#fee2e2", color: "#991b1b", border: "#fca5a5", dot: "#ef4444", label: "مرفوض" },
 };
 
@@ -151,12 +151,12 @@ export default function PaymentReview() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{ background: "linear-gradient(135deg, #fef3c7, #fde68a)", border: "1.5px solid #fcd34d", borderRadius: "16px", padding: "18px 24px", marginBottom: "24px", display: "flex", alignItems: "center", gap: "14px" }}
+          style={{ background: "linear-gradient(135deg, #e6f2ff, #fde68a)", border: "1.5px solid #48d6f9", borderRadius: "16px", padding: "18px 24px", marginBottom: "24px", display: "flex", alignItems: "center", gap: "14px" }}
         >
-          <Clock size={22} style={{ color: "#92400e", flexShrink: 0 }} />
+          <Clock size={22} style={{ color: "#022466", flexShrink: 0 }} />
           <div>
-            <strong style={{ color: "#92400e", fontSize: "15px" }}>{pending.length} طلب دفع في الانتظار</strong>
-            <p style={{ color: "#b45309", fontSize: "13px", marginTop: "2px" }}>هؤلاء المرضى ينتظرون موافقتك لبدء برامجهم</p>
+            <strong style={{ color: "#022466", fontSize: "15px" }}>{pending.length} طلب دفع في الانتظار</strong>
+            <p style={{ color: "#024fab", fontSize: "13px", marginTop: "2px" }}>هؤلاء المرضى ينتظرون موافقتك لبدء برامجهم</p>
           </div>
         </motion.div>
       )}
@@ -213,10 +213,10 @@ export default function PaymentReview() {
               key={p.id}
               variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}
               style={{
-                background: "var(--dash-card-bg)", border: "1.5px solid " + (p.status === "pending" ? "#fcd34d" : "var(--dash-border)"),
+                background: "var(--dash-card-bg)", border: "1.5px solid " + (p.status === "pending" ? "#48d6f9" : "var(--dash-border)"),
                 borderRadius: "16px", padding: "20px 24px", display: "grid",
                 gridTemplateColumns: "1fr auto", gap: "16px", alignItems: "center",
-                boxShadow: p.status === "pending" ? "0 4px 16px rgba(245,158,11,0.1)" : "var(--dash-shadow-sm)",
+                boxShadow: p.status === "pending" ? "0 4px 16px rgba(2,79,171,0.12)" : "var(--dash-shadow-sm)",
               }}
             >
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px", alignItems: "center" }}>

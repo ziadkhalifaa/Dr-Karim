@@ -17,7 +17,7 @@
 .section--alt { background: var(--bg-soft); }
 .section--tint { background: linear-gradient(180deg, var(--bg) 0%, var(--primary-tint) 100%); }
 .section--dark {
-  background: linear-gradient(160deg, var(--surface-brand) 0%, var(--surface-brand-2) 55%, #051712 100%);
+  background: linear-gradient(160deg, var(--surface-brand) 0%, var(--surface-brand-2) 55%, #01123a 100%);
   color: var(--on-brand);
 }
 .section--dark .sec-title { color: var(--on-brand); }
@@ -161,11 +161,11 @@
   color: #fff;
   font-size: 14.5px;
   font-weight: 800;
-  box-shadow: 0 8px 22px rgba(5, 150, 105, 0.35);
+  box-shadow: 0 8px 22px rgba(111, 208, 5, 0.32);
   transition: all 0.25s ease;
 }
 
-.site-header__cta:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(5, 150, 105, 0.45); }
+.site-header__cta:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(111, 208, 5, 0.42); }
 
 .site-header__burger { display: none; }
 
@@ -224,9 +224,9 @@
 .hero {
   position: relative;
   background:
-    radial-gradient(1100px 600px at 88% -10%, rgba(5, 150, 105, 0.32) 0%, transparent 55%),
-    radial-gradient(900px 600px at -10% 110%, rgba(217, 119, 6, 0.2) 0%, transparent 50%),
-    linear-gradient(160deg, var(--surface-brand) 0%, var(--surface-brand-2) 60%, #05261b 100%);
+    radial-gradient(1100px 600px at 88% -10%, rgba(111, 208, 5, 0.28) 0%, transparent 55%),
+    radial-gradient(900px 600px at -10% 110%, rgba(2, 79, 171, 0.28) 0%, transparent 50%),
+    linear-gradient(160deg, var(--surface-brand) 0%, var(--surface-brand-2) 60%, #01123a 100%);
   color: var(--on-brand);
   overflow: hidden;
   padding: 72px 0 96px;
@@ -254,7 +254,7 @@
   width: 460px;
   height: 460px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(111, 208, 5, 0.32) 0%, transparent 65%);
   filter: blur(30px);
   pointer-events: none;
 }
@@ -266,7 +266,7 @@
   width: 520px;
   height: 520px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(217, 119, 6, 0.25) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(2, 79, 171, 0.22) 0%, transparent 65%);
   filter: blur(50px);
   pointer-events: none;
 }
@@ -386,7 +386,7 @@
   position: absolute;
   inset: -18px;
   border-radius: 50%;
-  border: 1.5px dashed rgba(217, 119, 6, 0.45);
+  border: 1.5px dashed rgba(2, 79, 171, 0.4);
   animation: spin 40s linear infinite;
 }
 
@@ -394,7 +394,7 @@
   position: absolute;
   inset: 10px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 25%, rgba(16, 185, 129, 0.4), transparent 65%);
+  background: radial-gradient(circle at 30% 25%, rgba(111, 208, 5, 0.36), transparent 65%);
   filter: blur(8px);
 }
 
@@ -650,7 +650,7 @@ html[dir="rtl"] .mission__point:hover { transform: translateX(-6px); }
    ============================================================ */
 .assess {
   position: relative;
-  background: linear-gradient(150deg, var(--surface-brand) 0%, var(--surface-brand-2) 60%, #061d14 100%);
+  background: linear-gradient(150deg, var(--surface-brand) 0%, var(--surface-brand-2) 60%, #01123a 100%);
   border-radius: var(--radius-xl);
   color: var(--on-brand);
   overflow: hidden;
@@ -669,7 +669,7 @@ html[dir="rtl"] .mission__point:hover { transform: translateX(-6px); }
   width: 420px;
   height: 420px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.35), transparent 65%);
+  background: radial-gradient(circle, rgba(111, 208, 5, 0.32), transparent 65%);
   filter: blur(30px);
 }
 
@@ -681,7 +681,7 @@ html[dir="rtl"] .mission__point:hover { transform: translateX(-6px); }
   width: 480px;
   height: 480px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(217, 119, 6, 0.22), transparent 65%);
+  background: radial-gradient(circle, rgba(2, 79, 171, 0.2), transparent 65%);
   filter: blur(40px);
 }
 
@@ -723,7 +723,7 @@ html[dir="rtl"] .mission__point:hover { transform: translateX(-6px); }
   width: 34px;
   height: 34px;
   border-radius: 11px;
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(111, 208, 5, 0.18);
   color: var(--primary-soft);
   display: inline-flex;
   align-items: center;
@@ -779,13 +779,13 @@ html[dir="rtl"] .mission__point:hover { transform: translateX(-6px); }
   transition: all 0.25s ease;
 }
 
-.assess__goal:hover { border-color: rgba(217, 119, 6, 0.55); }
+.assess__goal:hover { border-color: rgba(2, 79, 171, 0.5); }
 
 .assess__goal.is-active {
   background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-deep) 100%);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 10px 26px rgba(217, 119, 6, 0.4);
+  box-shadow: 0 10px 26px rgba(2, 79, 171, 0.36);
 }
 
 .assess__goal-radio {
@@ -998,7 +998,7 @@ html[dir="rtl"] .values__tab.is-active .values__tab-arrow { transform: rotate(45
   margin-bottom: 6px;
 }
 
-.care__card--brand .care__card-ico { background: rgba(16, 185, 129, 0.2); color: var(--primary-soft); }
+.care__card--brand .care__card-ico { background: rgba(111, 208, 5, 0.18); color: var(--primary-soft); }
 
 .care__card-title { font-size: 21px; font-weight: 900; color: var(--text); }
 .care__card--brand .care__card-title { color: var(--on-brand); }
@@ -1151,7 +1151,7 @@ html[dir="rtl"] .values__tab.is-active .values__tab-arrow { transform: rotate(45
   font-weight: 900;
   padding: 8px 20px;
   border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-gold);
+  box-shadow: var(--shadow-blue);
   white-space: nowrap;
 }
 
@@ -1190,7 +1190,7 @@ html[dir="rtl"] .values__tab.is-active .values__tab-arrow { transform: rotate(45
 
 .price-card__feature-ico svg { width: 13px; height: 13px; }
 
-.price-card--featured .price-card__feature-ico { background: rgba(217, 119, 6, 0.25); color: var(--secondary-soft); }
+.price-card--featured .price-card__feature-ico { background: rgba(2, 79, 171, 0.22); color: var(--secondary-soft); }
 
 .price-card__cta { margin-top: 8px; }
 
@@ -1388,9 +1388,9 @@ html[dir="rtl"] .values__tab.is-active .values__tab-arrow { transform: rotate(45
 .page-hero {
   position: relative;
   background:
-    radial-gradient(900px 480px at 90% -10%, rgba(5, 150, 105, 0.28) 0%, transparent 55%),
-    radial-gradient(700px 460px at -8% 115%, rgba(217, 119, 6, 0.18) 0%, transparent 50%),
-    linear-gradient(160deg, var(--surface-brand) 0%, var(--surface-brand-2) 65%, #05261b 100%);
+    radial-gradient(900px 480px at 90% -10%, rgba(111, 208, 5, 0.24) 0%, transparent 55%),
+    radial-gradient(700px 460px at -8% 115%, rgba(2, 79, 171, 0.24) 0%, transparent 50%),
+    linear-gradient(160deg, var(--surface-brand) 0%, var(--surface-brand-2) 65%, #01123a 100%);
   color: var(--on-brand);
   padding: 110px 0 80px;
   overflow: hidden;
@@ -1508,7 +1508,7 @@ html[dir="rtl"] .values__tab.is-active .values__tab-arrow { transform: rotate(45
   width: 240px;
   height: 240px;
   border-radius: 50%;
-  border: 46px solid rgba(217, 119, 6, 0.12);
+  border: 46px solid rgba(2, 79, 171, 0.1);
 }
 
 .contact-info__title { font-size: 25px; font-weight: 900; margin-bottom: 10px; }
@@ -1660,7 +1660,7 @@ html[dir="rtl"] .contact-info__item:hover { transform: translateX(4px); }
   width: 420px;
   height: 420px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.22), transparent 65%);
+  background: radial-gradient(circle, rgba(111, 208, 5, 0.2), transparent 65%);
   filter: blur(40px);
   pointer-events: none;
 }
@@ -1719,7 +1719,7 @@ html[dir="rtl"] .contact-info__item:hover { transform: translateX(4px); }
 .footer-contact__btn { display: inline-flex; align-items: center; gap: 9px; padding: 12px 18px; border-radius: 13px; font-size: 14px; font-weight: 800; color: #fff; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.07); transition: all 0.25s ease; }
 .footer-contact__btn:hover { background: rgba(255, 255, 255, 0.14); transform: translateY(-2px); }
 .footer-contact__btn--gold { background: linear-gradient(135deg, var(--secondary), var(--secondary-deep)); border-color: transparent; }
-.footer-contact__btn--gold:hover { box-shadow: var(--shadow-gold); }
+.footer-contact__btn--gold:hover { box-shadow: var(--shadow-blue); }
 
 .footer-divider { border: none; height: 1px; background: rgba(255, 255, 255, 0.1); }
 

@@ -56,9 +56,9 @@ function FoodSearchModal({ onClose, onSelect }) {
               <div>
                 <div style={{ fontWeight: "800", color: "var(--dash-text)", fontSize: "15px" }}>{item.nameAr}</div>
                 <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "var(--dash-text-muted)", marginTop: "4px", fontWeight: "600" }}>
-                  <span><Flame size={12} style={{ display: "inline", color: "#f59e0b" }}/> {item.macros?.energy_kcal || 0} kcal</span>
+                  <span><Flame size={12} style={{ display: "inline", color: "#024fab" }}/> {item.macros?.energy_kcal || 0} kcal</span>
                   <span><Beef size={12} style={{ display: "inline", color: "#ef4444" }}/> {item.macros?.protein_g || 0}g بروتين</span>
-                  <span><Wheat size={12} style={{ display: "inline", color: "#eab308" }}/> {item.macros?.carb_g || 0}g كارب</span>
+                  <span><Wheat size={12} style={{ display: "inline", color: "#48d6f9" }}/> {item.macros?.carb_g || 0}g كارب</span>
                   <span><Droplet size={12} style={{ display: "inline", color: "#3b82f6" }}/> {item.macros?.fat_g || 0}g دهون</span>
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function NutritionBuilder({ planId, patientId }) {
                 <input type="number" value={targets.calories} onChange={(e) => setTargets({ ...targets, calories: Number(e.target.value) })} style={{ width: "60px", padding: "4px 8px", borderRadius: "8px", border: "1px solid var(--dash-border)", outline: "none", fontSize: "14px", fontWeight: "800", background: "var(--dash-bg)" }} />
               </div>
             </div>
-            <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.cal / (targets.calories || 1)) * 100, 100) + "%", background: "#f59e0b" }} /></div>
+            <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.cal / (targets.calories || 1)) * 100, 100) + "%", background: "#024fab" }} /></div>
           </div>
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)", marginBottom: "8px" }}>
@@ -295,7 +295,7 @@ export default function NutritionBuilder({ planId, patientId }) {
                 <input type="number" value={targets.carbs} onChange={(e) => setTargets({ ...targets, carbs: Number(e.target.value) })} style={{ width: "60px", padding: "4px 8px", borderRadius: "8px", border: "1px solid var(--dash-border)", outline: "none", fontSize: "14px", fontWeight: "800", background: "var(--dash-bg)" }} />
               </div>
             </div>
-            <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.c / (targets.carbs || 1)) * 100, 100) + "%", background: "#eab308" }} /></div>
+            <div className="macro-bar"><div className="macro-bar-fill" style={{ width: Math.min((dayTotals.c / (targets.carbs || 1)) * 100, 100) + "%", background: "#48d6f9" }} /></div>
           </div>
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "14px", fontWeight: "700", color: "var(--dash-text)", marginBottom: "8px" }}>
@@ -372,9 +372,9 @@ export default function NutritionBuilder({ planId, patientId }) {
                           <input type="number" step="0.1" value={it.quantity} onChange={(e) => handleChangeQty(activeDay, meal.code, idx, e.target.value)} style={{ width: "60px", padding: "6px 8px", border: "1px solid var(--dash-border)", borderRadius: "8px", outline: "none", fontSize: "14px", fontWeight: "700" }} />
                         </td>
                         <td style={{ padding: "16px 8px", fontWeight: "700", color: "var(--dash-text-muted)" }} dir="ltr">
-                          <span style={{color:"#f59e0b"}}>{Math.round((it.foodItem.macros?.energy_kcal || 0) * it.quantity)}</span> / 
+                          <span style={{color:"#024fab"}}>{Math.round((it.foodItem.macros?.energy_kcal || 0) * it.quantity)}</span> / 
                           <span style={{color:"#ef4444"}}>{Math.round((it.foodItem.macros?.protein_g || 0) * it.quantity)}</span> / 
-                          <span style={{color:"#eab308"}}>{Math.round((it.foodItem.macros?.carb_g || 0) * it.quantity)}</span> / 
+                          <span style={{color:"#48d6f9"}}>{Math.round((it.foodItem.macros?.carb_g || 0) * it.quantity)}</span> / 
                           <span style={{color:"#3b82f6"}}>{Math.round((it.foodItem.macros?.fat_g || 0) * it.quantity)}</span>
                         </td>
                         <td style={{ padding: "16px 8px", textAlign: "center" }}>

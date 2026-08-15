@@ -11,8 +11,8 @@
   --dash-sidebar-bg: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
   --dash-sidebar-text: #e2e8f0;
   --dash-sidebar-muted: #94a3b8;
-  --dash-sidebar-active-bg: rgba(16, 185, 129, 0.18);
-  --dash-sidebar-active-text: #34d399;
+  --dash-sidebar-active-bg: rgba(111, 208, 5, 0.18);
+  --dash-sidebar-active-text: #c2f753;
   --dash-sidebar-border: rgba(255, 255, 255, 0.08);
 
   --dash-topbar-bg: rgba(255, 255, 255, 0.92);
@@ -24,19 +24,19 @@
   --dash-text-muted: #64748b;
   --dash-text-soft: #94a3b8;
 
-  --dash-primary: #10b981;
-  --dash-primary-soft: #d1fae5;
+  --dash-primary: #6fd005;
+  --dash-primary-soft: #e6fbc2;
 
   --dash-danger: #ef4444;
   --dash-danger-soft: #fee2e2;
 
-  --dash-warning: #f59e0b;
-  --dash-warning-soft: #fef3c7;
+  --dash-warning: #024fab;
+  --dash-warning-soft: #e6f2ff;
 
   --dash-info: #3b82f6;
   --dash-info-soft: #dbeafe;
 
-  --dash-gold: #eab308;
+  --dash-gold: #48d6f9;
 
   --dash-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07);
   --dash-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
@@ -50,8 +50,8 @@
   --dash-sidebar-bg: #0f172a; /* Slate 900 */
   --dash-sidebar-text: #cbd5e1; /* Slate 300 */
   --dash-sidebar-muted: #94a3b8; /* Slate 400 */
-  --dash-sidebar-active-bg: rgba(16, 185, 129, 0.15);
-  --dash-sidebar-active-text: #34d399; /* Emerald 400 */
+  --dash-sidebar-active-bg: rgba(111, 208, 5, 0.15);
+  --dash-sidebar-active-text: #c2f753; /* Logo green light */
   --dash-sidebar-border: #1e293b; /* Slate 800 */
   
   --dash-topbar-bg: rgba(15, 23, 42, 0.85);
@@ -63,19 +63,19 @@
   --dash-text-muted: #94a3b8; /* Slate 400 */
   --dash-text-soft: #64748b; /* Slate 500 */
   
-  --dash-primary: #10b981; 
-  --dash-primary-soft: rgba(16, 185, 129, 0.15);
+  --dash-primary: #6fd005; 
+  --dash-primary-soft: rgba(111, 208, 5, 0.15);
   
   --dash-danger: #f87171; 
   --dash-danger-soft: rgba(239, 68, 68, 0.15);
   
-  --dash-warning: #fbbf24; 
-  --dash-warning-soft: rgba(245, 158, 11, 0.15);
+  --dash-warning: #48d6f9; 
+  --dash-warning-soft: rgba(72, 214, 249, 0.15);
   
   --dash-info: #60a5fa; 
   --dash-info-soft: rgba(59, 130, 246, 0.15);
   
-  --dash-gold: #fbbf24; 
+  --dash-gold: #48d6f9; 
   
   --dash-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
   --dash-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
@@ -247,7 +247,7 @@
   font-weight: 800;
   font-size: 15px;
   color: #fff;
-  background: linear-gradient(135deg, var(--dash-primary), #1a6b3a);
+  background: linear-gradient(135deg, var(--dash-primary), #3ca503);
   flex-shrink: 0;
   text-transform: uppercase;
 }
@@ -666,7 +666,7 @@
 }
 
 .dash-btn--primary:hover {
-  box-shadow: 0 10px 22px rgba(46, 139, 37, 0.3);
+  box-shadow: 0 10px 22px rgba(111, 208, 5, 0.28);
 }
 
 .dash-btn--ghost {

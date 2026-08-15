@@ -8,8 +8,8 @@ import DoctorProgress from "./ProgressManager";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
 
 const STATUS_STYLES = {
-  active: { bg: "#d1fae5", color: "#065f46", border: "#6ee7b7", dot: "#10b981", label: "نشط" },
-  pending_payment: { bg: "#fef3c7", color: "#92400e", border: "#fcd34d", dot: "#f59e0b", label: "في انتظار الدفع" },
+  active: { bg: "#e6fbc2", color: "#2e7d00", border: "#c2f753", dot: "#6fd005", label: "نشط" },
+  pending_payment: { bg: "#e6f2ff", color: "#022466", border: "#48d6f9", dot: "#024fab", label: "في انتظار الدفع" },
   inactive: { bg: "#f1f5f9", color: "#475569", border: "#cbd5e1", dot: "#94a3b8", label: "غير نشط" },
   archived: { bg: "#f1f5f9", color: "#475569", border: "#cbd5e1", dot: "#94a3b8", label: "مؤرشف" },
 };
@@ -250,7 +250,7 @@ export default function PatientProfile({ patientId }) {
                       </div>
                       
                       {weightStats.diff > 0 && (
-                        <div style={{ background: weightStats.isLoss ? "#d1fae5" : "#fef3c7", color: weightStats.isLoss ? "#065f46" : "#92400e", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "10px", fontWeight: "800", fontSize: "14px" }}>
+                        <div style={{ background: weightStats.isLoss ? "#e6fbc2" : "#e6f2ff", color: weightStats.isLoss ? "#2e7d00" : "#022466", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "10px", fontWeight: "800", fontSize: "14px" }}>
                           <TrendingDown size={18} style={{ transform: weightStats.isLoss ? "none" : "scaleY(-1)" }} />
                           <span>
                             تم {weightStats.isLoss ? "خسارة" : "زيادة"} {weightStats.diff.toFixed(1)} كغ {weightStats.durationText}
