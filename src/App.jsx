@@ -7,6 +7,7 @@ import ValuesSection from "./components/ValuesSection";
 import Banner from "./components/Banner";
 import CareSection from "./components/CareSection";
 import ServicesSection from "./components/ServicesSection";
+import MedicalTipsSection from "./components/MedicalTipsSection";
 import TestimonialsSection from "./components/TestimonialsSection";
 import WarningSection from "./components/WarningSection";
 import Footer from "./components/Footer";
@@ -21,6 +22,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AboutPage from "./pages/AboutPage";
 import ServicesPage from "./pages/ServicesPage";
 import ArticlesPage from "./pages/ArticlesPage";
+import ArticleSinglePage from "./pages/ArticleSinglePage";
 import ContactPage from "./pages/ContactPage";
 import ContentPage from "./pages/ContentPage";
 import PackagesPage from "./features/patient/PackagesPage";
@@ -49,6 +51,7 @@ export default function App() {
   if (path === "/about") return <AppProvider><AboutPage /></AppProvider>;
   if (path === "/services") return <AppProvider><ServicesPage /></AppProvider>;
   if (path === "/articles") return <AppProvider><ArticlesPage /></AppProvider>;
+  if (path.startsWith("/tips/")) return <AppProvider><ArticleSinglePage slug={path.replace("/tips/", "")} /></AppProvider>;
   if (path === "/contact") return <AppProvider><ContactPage /></AppProvider>;
   if (path === "/privacy") return <AppProvider><ContentPage title="سياسة الخصوصية" slug="privacy-policy" /></AppProvider>;
   if (path === "/terms") return <AppProvider><ContentPage title="شروط الاستخدام" slug="terms-of-use" /></AppProvider>;
@@ -65,6 +68,7 @@ export default function App() {
         <Banner />
         <CareSection />
         <ServicesSection />
+        <MedicalTipsSection />
         <TestimonialsSection />
         <WarningSection />
         <div className="spacer" />

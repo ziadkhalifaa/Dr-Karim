@@ -49,6 +49,25 @@ export const patientApi = {
 export const foodApi = {
   list: (query = "") => api.get(`/food${query}`),
 };
+export const articleApi = {
+  // public
+  list: (query = "") => api.get(`/content/articles${query}`),
+  get: (slug) => api.get(`/content/articles/${slug}`),
+  // doctor
+  doctorList: (query = "") => api.get(`/content/doctor/articles${query}`),
+  create: (body) => api.post("/content/doctor/articles", body),
+  update: (id, body) => api.patch(`/content/doctor/articles/${id}`, body),
+  delete: (id) => api.post(`/content/doctor/articles/${id}`, {}, { method: "DELETE" }),
+  uploadCover: (id, file) => {
+    const form = new FormData();
+    form.append("cover", file);
+    return fetch(`${(import.meta.env.VITE_API_BASE_URL || "/api/v1").replace(/\/$/, "")}/content/doctor/articles/${id}/cover`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${sessionStorage.getItem("drke-access-token")}` },
+      body: form,
+    }).then(r => r.json()).then(d => { if (!d.success) throw new Error(d.error?.message || "Upload failed"); return d.data; });
+  },
+};
 export const planApi = (domain) => ({ create: (body) => api.post(`/${domain}-plans`, body), get: (id) => api.get(`/${domain}-plans/${id}`), patient: (id) => api.get(`/patients/${id}/${domain}-plan`), version: (id, body) => api.post(`/${domain}-plans/${id}/versions`, body), note: (id, body) => api.post(`/${domain}-plans/${id}/notes`, body), submit: (id) => api.post(`/${domain}-plan-versions/${id}/submit-review`, {}), approve: (id) => api.post(`/${domain}-plan-versions/${id}/approve`, {}), activate: (id) => api.post(`/${domain}-plan-versions/${id}/activate`, {}), archive: (id) => api.post(`/${domain}-plan-versions/${id}/archive`, {}) });
 export const nutritionApi = planApi("nutrition");
 export const exerciseApi = planApi("exercise");

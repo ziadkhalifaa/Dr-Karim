@@ -22,6 +22,11 @@ export function createApp() {
   // Tenant resolution is applied to /api/v1/* inside routes (health first, then tenant)
   routes(app);
 
+  // Serve uploaded files (article covers, etc.)
+  const UPLOADS_PATH = path.resolve(__dirname, "../uploads");
+  app.use("/uploads", express.static(UPLOADS_PATH, { maxAge: "7d" }));
+
+
   if (env.IS_PRODUCTION) {
     // Serve hashed static assets with long-lived cache
     app.use(
