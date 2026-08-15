@@ -16,9 +16,10 @@ export default function Mission() {
             whileInView={{ opacity: 1, rotateY: 0, scale: 1 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+            style={{ borderRadius: "24px", boxShadow: "0 20px 40px rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.05)" }}
           >
             <div className="stat-card__badge" style={{ padding: "0" }}>
-              <img src="/assets/logo.png" alt="Dr Kareem Logo" style={{ width: "120px", height: "120px", objectFit: "contain" }} />
+              <img src="/assets/logo.png" alt="Dr Kareem Logo" style={{ width: "120px", height: "120px", objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.1))" }} />
             </div>
             <p className="stat-card__meta">
               {t("mission.years")}
@@ -39,8 +40,8 @@ export default function Mission() {
             transition={{ duration: 0.7, delay: 0.2 }}
           >
             <h2 className="mission__title">
-              <div className="sec-title">
-                {t("mission.title")} <strong>{t("mission.title2")}</strong>
+              <div className="sec-title" style={{ fontSize: "clamp(32px, 5vw, 42px)", color: "var(--text)" }}>
+                {t("mission.title")} <strong style={{ color: "var(--primary)" }}>{t("mission.title2")}</strong>
               </div>
             </h2>
             <p className="mission__text">{t("mission.body")}</p>

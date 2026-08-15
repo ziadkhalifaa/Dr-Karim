@@ -15,13 +15,16 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            style={{ textAlign: "center", marginBottom: "60px" }}
+            style={{ textAlign: "center", marginBottom: "80px" }}
           >
-            <h1 className="sec-title" style={{ fontSize: "44px", color: "var(--text)" }}>
+            <span style={{ display: "inline-block", background: "var(--highlight-bg)", color: "var(--primary-deep)", padding: "8px 16px", borderRadius: "100px", fontSize: "15px", fontWeight: "800", marginBottom: "16px" }}>
+              من نحن
+            </span>
+            <h1 className="sec-title" style={{ fontSize: "clamp(36px, 5vw, 54px)", color: "var(--text)" }}>
               عن <strong style={{ color: "var(--primary)" }}>الطبيب</strong>
             </h1>
-            <p style={{ color: "var(--text-muted)", fontSize: "18px", maxWidth: "700px", margin: "16px auto 0" }}>
-              تعرف على الدكتور كريم الليثي، خبرته، ومؤهلاته العلمية.
+            <p style={{ color: "var(--text-muted)", fontSize: "18px", maxWidth: "700px", margin: "20px auto 0", lineHeight: 1.8, fontWeight: 500 }}>
+              تعرف على الدكتور كريم الليثي، خبرته، ومؤهلاته العلمية التي تجعله خيارك الأمثل لحياة صحية.
             </p>
           </motion.div>
 
@@ -29,19 +32,23 @@ export default function AboutPage() {
             <motion.div 
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
+              transition={{ delay: 0.2, duration: 0.8, type: "spring", bounce: 0.4 }}
               style={{
-                background: "radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%), var(--surface-brand)",
-                borderRadius: "var(--radius-xl)",
+                background: "linear-gradient(135deg, var(--primary-deep) 0%, var(--deep) 100%)",
+                borderRadius: "32px",
                 padding: "20px",
                 display: "flex",
-                justifyContent: "center"
+                justifyContent: "center",
+                position: "relative",
+                overflow: "hidden",
+                boxShadow: "0 24px 48px rgba(0,0,0,0.15)"
               }}
             >
+              <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 60%)" }} />
               <img 
                 src="/assets/drkarim.png" 
                 alt="Dr Kareem Eliethy" 
-                style={{ width: "100%", maxWidth: "400px", objectFit: "contain", filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.3))" }} 
+                style={{ width: "100%", maxWidth: "400px", objectFit: "contain", filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.4))", position: "relative", zIndex: 1 }} 
               />
             </motion.div>
 
@@ -49,14 +56,14 @@ export default function AboutPage() {
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+              style={{ display: "flex", flexDirection: "column", gap: "24px" }}
             >
-              <h2 style={{ fontSize: "32px", color: "var(--primary)", fontWeight: "800" }}>د. كريم الليثي</h2>
-              <p style={{ fontSize: "18px", color: "var(--text-muted)", lineHeight: "1.8" }}>
-                استشاري التغذية العلاجية والسمنة والنحافة، ومدرب صحي معتمد (Health Coach). يهدف إلى تغيير مفهوم الدايت ليكون نمط حياة صحي ومستدام.
+              <h2 style={{ fontSize: "36px", color: "var(--primary-deep)", fontWeight: "900", letterSpacing: "-0.02em" }}>د. كريم الليثي</h2>
+              <p style={{ fontSize: "18px", color: "var(--text-muted)", lineHeight: "1.9", fontWeight: 500 }}>
+                استشاري التغذية العلاجية والسمنة والنحافة، ومدرب صحي معتمد (Health Coach). يهدف إلى تغيير مفهوم الدايت ليكون نمط حياة صحي ومستدام وليس مجرد حرمان مؤقت.
               </p>
               
-              <ul style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "20px" }}>
+              <ul style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "10px" }}>
                 {[
                   "ماجستير في كيمياء حيوية الغذاء",
                   "مدرب محترف معتمد من جامعة إسلسكا",
@@ -68,9 +75,19 @@ export default function AboutPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 + i * 0.1 }}
-                    style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "17px", fontWeight: "600", color: "var(--text)" }}
+                    style={{ 
+                      display: "flex", alignItems: "center", gap: "16px", 
+                      fontSize: "17px", fontWeight: "700", color: "var(--text)",
+                      background: "var(--card-bg)", padding: "16px 20px",
+                      borderRadius: "16px", boxShadow: "0 4px 12px rgba(0,0,0,0.03)",
+                      border: "1px solid var(--line)"
+                    }}
                   >
-                    <span style={{ width: "24px", height: "24px", borderRadius: "50%", background: "var(--highlight-bg)", color: "var(--highlight-text)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>✔</span>
+                    <span style={{ 
+                      width: "32px", height: "32px", borderRadius: "10px", 
+                      background: "var(--highlight-bg)", color: "var(--primary-deep)", 
+                      display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" 
+                    }}>✔</span>
                     {item}
                   </motion.li>
                 ))}

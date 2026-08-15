@@ -39,7 +39,7 @@ export default function ServicesSection() {
   };
 
   return (
-    <section className="section" id="services" style={{ paddingBlock: "80px 40px", background: "var(--bg-soft)" }}>
+    <section className="section" id="services" style={{ paddingBlock: "100px", background: "var(--bg)" }}>
       <div className="container">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
@@ -47,12 +47,15 @@ export default function ServicesSection() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
           className="services__head"
-          style={{ textAlign: "center", marginBottom: "60px" }}
+          style={{ textAlign: "center", marginBottom: "80px" }}
         >
-          <h2 className="sec-title" style={{ fontSize: "44px", color: "var(--text)" }}>
+          <span style={{ display: "inline-block", background: "var(--highlight-bg)", color: "var(--primary-deep)", padding: "8px 16px", borderRadius: "100px", fontSize: "15px", fontWeight: "800", marginBottom: "16px" }}>
+            مجالات التخصص
+          </span>
+          <h2 className="sec-title" style={{ fontSize: "clamp(32px, 5vw, 48px)", color: "var(--text)" }}>
             {t("services.title")} <strong style={{ color: "var(--primary)" }}>{t("services.title2")}</strong>
           </h2>
-          <p style={{ color: "var(--text-muted)", fontSize: "18px", maxWidth: "600px", margin: "16px auto 0" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: "18px", maxWidth: "600px", margin: "20px auto 0", lineHeight: 1.8, fontWeight: 500 }}>
             حلول غذائية شاملة ومخصصة لمساعدتك في الوصول إلى هدفك بأفضل طريقة صحية ومستدامة.
           </p>
         </motion.div>
@@ -108,11 +111,11 @@ export default function ServicesSection() {
                     </div>
                     
                     {/* Content Area */}
-                    <div style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column" }}>
-                      <h4 style={{ fontSize: "22px", fontWeight: "700", color: "var(--text)", marginBottom: "12px" }}>
+                    <div style={{ padding: "30px 24px", flex: 1, display: "flex", flexDirection: "column", background: "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 15%)" }}>
+                      <h4 style={{ fontSize: "22px", fontWeight: "900", color: "var(--text)", marginBottom: "12px" }}>
                         {item.title}
                       </h4>
-                      <p style={{ fontSize: "15.5px", lineHeight: "1.7", color: "var(--text-muted)", flex: 1 }}>
+                      <p style={{ fontSize: "16px", lineHeight: "1.7", color: "var(--text-muted)", flex: 1, fontWeight: 500 }}>
                         {item.body}
                       </p>
                     </div>

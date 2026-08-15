@@ -1,50 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 :root {
   color-scheme: light;
   
   /* Premium Palette */
-  --deep: #0f291e;
-  --primary: #10b981; /* Emerald 500 */
-  --primary-deep: #059669; /* Emerald 600 */
+  --deep: #061e14; /* Darker, richer emerald */
+  --primary: #059669; /* Emerald 600 - very elegant */
+  --primary-deep: #047857; /* Emerald 700 */
   --primary-soft: #34d399; /* Emerald 400 */
+  --primary-glow: rgba(5, 150, 105, 0.15);
   
-  --surface-brand: #0f291e;
+  --surface-brand: #061e14;
   --on-brand: #ffffff;
   
   --secondary: #10b981;
   --secondary-deep: #059669;
   --on-secondary: #ffffff;
   
-  --highlight-bg: #ecfdf5; /* Emerald 50 */
-  --highlight-text: #065f46; /* Emerald 800 */
+  --highlight-bg: #ecfdf5; 
+  --highlight-text: #065f46; 
   
-  --tint: #f0fdf4; /* Green 50 */
-  --tint-2: #f8fafc; /* Slate 50 */
+  --tint: #f0fdf4; 
+  --tint-2: #f8fafc; 
   
-  --gold: #fbbf24; /* Amber 400 */
-  --cream: #fbfdfc;
+  --gold: #d97706; /* Richer amber/gold */
+  --cream: #fafaf9; /* Warm white */
   
-  --text: #0f172a; /* Slate 900 */
-  --text-muted: #64748b; /* Slate 500 */
+  --text: #0f172a; 
+  --text-muted: #475569; /* Slightly darker for better contrast */
   
-  --bg: #f8fafc; /* Slate 50 */
-  --bg-soft: #f1f5f9; /* Slate 100 */
+  --bg: #f8fafc; 
+  --bg-soft: #f1f5f9; 
   --card-bg: #ffffff;
   
-  --line: #e2e8f0; /* Slate 200 */
+  --line: #e2e8f0; 
   
   /* Modern shadows & Radii */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 12px 24px -4px rgba(0, 0, 0, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.12), 0 12px 24px -8px rgba(0, 0, 0, 0.08);
   
   --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
   --radius-xl: 32px;
   
-  --font-body: "Inter", "Cairo", system-ui, -apple-system, sans-serif;
-  --font-latin: "Inter", system-ui, sans-serif;
+  /* Using Cairo for primary, Outfit for numbers/English */
+  --font-body: 'Cairo', 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-latin: 'Outfit', system-ui, sans-serif;
 }
 
 [data-theme="dark"] {
@@ -153,24 +157,27 @@ button {
   gap: 10px;
   font-family: var(--font-body);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   border: none;
-  border-radius: 15px;
-  padding: 16px 30px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease,
-    background 0.2s ease, filter 0.2s ease;
+  border-radius: var(--radius-md);
+  padding: 14px 32px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
 }
 
 .btn-primary {
   background: var(--primary);
   color: var(--on-brand);
+  box-shadow: 0 4px 15px var(--primary-glow);
 }
 
 .btn-primary:hover {
   background: var(--primary-deep);
-  transform: translateY(-3px);
-  box-shadow: 0 14px 28px rgba(18, 59, 74, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(4, 120, 87, 0.3);
 }
 
 .btn-accent {
@@ -197,14 +204,18 @@ button {
 
 /* Headings helpers */
 .sec-title {
-  font-size: 50px;
-  font-weight: 400;
-  line-height: 1.3;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .sec-title strong,
 .sec-title b {
-  font-weight: 800;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--primary), var(--primary-soft));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .bg-chip {

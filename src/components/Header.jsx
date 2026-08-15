@@ -59,10 +59,15 @@ export default function Header() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
-      className={`site-header ${scrolled ? "site-header--scrolled" : ""}`}
       style={{
+        position: "sticky", top: 0, zIndex: 100,
+        background: scrolled ? "rgba(6, 30, 20, 0.85)" : "rgba(6, 30, 20, 1)",
+        backdropFilter: scrolled ? "blur(16px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(16px)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.05)" : "1px solid transparent",
+        color: "var(--on-brand)",
         boxShadow: scrolled ? "0 10px 40px rgba(0,0,0,0.15)" : "none",
-        transition: "box-shadow 0.3s ease, background 0.3s ease",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
       <div className="container site-header__bar">
@@ -133,12 +138,17 @@ export default function Header() {
 
           {/* Login Button */}
           <motion.a 
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
             whileTap={{ scale: 0.95 }}
             href="/login" 
             onClick={goLogin} 
-            className="btn btn-outline"
-            style={{ padding: "10px 16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.3)" }}
+            style={{ 
+              display: "inline-flex", alignItems: "center", gap: "8px",
+              padding: "10px 18px", borderRadius: "14px", 
+              border: "1.5px solid rgba(255,255,255,0.2)",
+              color: "#fff", fontSize: "15px", fontWeight: "800",
+              transition: "all 0.2s"
+            }}
           >
             <LogIn size={18} />
             <span>{t("nav.login", "دخول")}</span>
@@ -146,12 +156,17 @@ export default function Header() {
 
           {/* Assessment Button */}
           <motion.a 
-            whileHover={{ scale: 1.05, boxShadow: "0px 10px 20px rgba(0,0,0,0.2)" }}
+            whileHover={{ scale: 1.05, boxShadow: "0px 10px 20px rgba(5, 150, 105, 0.4)" }}
             whileTap={{ scale: 0.95 }}
             href="/assessment" 
             onClick={goAssessment} 
-            className="btn btn-accent header-book"
-            style={{ borderRadius: "12px" }}
+            style={{ 
+              display: "inline-flex", alignItems: "center", gap: "8px",
+              background: "linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%)",
+              color: "#fff", padding: "12px 22px", borderRadius: "14px",
+              fontSize: "15px", fontWeight: "800", border: "none",
+              boxShadow: "0 4px 15px rgba(5, 150, 105, 0.2)"
+            }}
           >
             <PulseIcon />
             <span>{t("nav.assess")}</span>

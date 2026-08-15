@@ -37,8 +37,11 @@ export default function ValuesSection() {
   return (
     <section className="section values-section" style={{ paddingBlock: "80px", background: "var(--bg-soft)", overflow: "hidden" }}>
       <div className="container">
-        <div className="values__head" style={{ marginBottom: "50px", textAlign: "center" }}>
-          <h2 className="sec-title" style={{ fontSize: "40px", color: "var(--text)" }}>
+        <div className="values__head" style={{ marginBottom: "60px", textAlign: "center" }}>
+          <span style={{ display: "inline-block", background: "var(--highlight-bg)", color: "var(--primary-deep)", padding: "8px 16px", borderRadius: "100px", fontSize: "15px", fontWeight: "800", marginBottom: "16px" }}>
+            لماذا نحن؟
+          </span>
+          <h2 className="sec-title" style={{ fontSize: "clamp(32px, 5vw, 46px)", color: "var(--text)" }}>
             {t("values.title")} <strong style={{ color: "var(--primary)" }}>{t("values.title2")}</strong>
           </h2>
         </div>
@@ -50,25 +53,30 @@ export default function ValuesSection() {
                 .values-slider { grid-template-columns: 1fr 1fr !important; gap: 60px !important; }
               }
               .slider-nav-btn {
-                background: var(--bg);
-                border: 2px solid var(--line);
+                background: rgba(255,255,255,0.5);
+                border: 1.5px solid transparent;
                 color: var(--text);
-                padding: 12px 24px;
-                border-radius: 12px;
-                font-weight: 700;
+                padding: 16px 24px;
+                border-radius: 16px;
+                font-weight: 800;
                 cursor: pointer;
-                transition: all 0.3s ease;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 text-align: start;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+                font-size: 16px;
+              }
+              .slider-nav-btn:hover {
+                background: rgba(255,255,255,0.8);
+                border-color: rgba(5, 150, 105, 0.2);
               }
               .slider-nav-btn.is-active {
-                background: var(--primary);
-                border-color: var(--primary);
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+                border-color: transparent;
                 color: var(--on-brand);
                 transform: scale(1.02);
-                box-shadow: var(--shadow);
+                box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3);
               }
             `}
           </style>
@@ -124,10 +132,10 @@ export default function ValuesSection() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <h3 style={{ fontSize: "32px", color: "var(--primary-deep)", marginBottom: "16px", fontWeight: "800" }}>
+                  <h3 style={{ fontSize: "36px", color: "var(--primary-deep)", marginBottom: "16px", fontWeight: "900" }}>
                     {items[active].title}
                   </h3>
-                  <p style={{ fontSize: "18px", color: "var(--text-muted)", lineHeight: "1.8" }}>
+                  <p style={{ fontSize: "18px", color: "var(--text-muted)", lineHeight: "1.9", fontWeight: 500 }}>
                     {renderHighlighted(items[active].body)}
                   </p>
                 </motion.div>

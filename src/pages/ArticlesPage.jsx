@@ -8,33 +8,36 @@ import { articleApi } from "../api/client";
 function ArticleCard({ article }) {
   return (
     <motion.div
-      whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(0,0,0,0.12)" }}
+      whileHover={{ y: -8, boxShadow: "0 24px 48px rgba(0,0,0,0.08)", borderColor: "rgba(5, 150, 105, 0.3)" }}
       style={{
         background: "var(--card-bg)",
-        borderRadius: "var(--radius-lg)",
+        borderRadius: "24px",
         overflow: "hidden",
         border: "1px solid var(--line)",
         cursor: "pointer",
         display: "flex",
         flexDirection: "column",
-        height: "100%"
+        height: "100%",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
       }}
       onClick={() => window.location.href = `/tips/${article.slug}`}
     >
-      {article.coverImageUrl ? (
-        <img src={article.coverImageUrl} alt={article.title} style={{ width: "100%", height: "220px", objectFit: "cover" }} />
-      ) : (
-        <div style={{ width: "100%", height: "220px", background: "var(--dash-primary-soft)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--dash-primary)", fontSize: "40px", fontWeight: "900", opacity: 0.5 }}>
-          د. كريم الليثي
-        </div>
-      )}
-      <div style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column" }}>
-        <h3 style={{ fontSize: "20px", fontWeight: "900", color: "var(--text)", marginBottom: "12px", lineHeight: 1.4 }}>{article.title}</h3>
-        <p style={{ fontSize: "15px", color: "var(--text-muted)", marginBottom: "20px", flex: 1, lineHeight: 1.6 }}>{article.excerpt || "اقرأ المزيد عن هذا الموضوع لتكتشف أهم النصائح الطبية والغذائية..."}</p>
+      <div style={{ position: "relative", width: "100%", height: "240px", overflow: "hidden" }}>
+        {article.coverImageUrl ? (
+          <img src={article.coverImageUrl} alt={article.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.6s ease" }} className="article-img-hover" />
+        ) : (
+          <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, var(--highlight-bg) 0%, var(--bg) 100%)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--primary-soft)", fontSize: "40px", fontWeight: "900", opacity: 0.8 }}>
+            د. كريم الليثي
+          </div>
+        )}
+      </div>
+      <div style={{ padding: "30px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
+        <h3 style={{ fontSize: "22px", fontWeight: "900", color: "var(--text)", marginBottom: "12px", lineHeight: 1.5, letterSpacing: "-0.01em" }}>{article.title}</h3>
+        <p style={{ fontSize: "16px", color: "var(--text-muted)", marginBottom: "24px", flex: 1, lineHeight: 1.7, fontWeight: 500 }}>{article.excerpt || "اقرأ المزيد عن هذا الموضوع لتكتشف أهم النصائح الطبية والغذائية..."}</p>
         
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", color: "var(--text-soft)", fontSize: "13px", fontWeight: "700" }}>
-          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><User size={14} /> {article.authorName}</span>
-          {article.readTimeMinutes && <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Clock size={14} /> {article.readTimeMinutes} دقائق قراءة</span>}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", color: "var(--text-muted)", fontSize: "14px", fontWeight: "700", paddingTop: "20px", borderTop: "1px solid var(--line)" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><User size={16} color="var(--primary)" /> {article.authorName}</span>
+          {article.readTimeMinutes && <span style={{ display: "flex", alignItems: "center", gap: "6px" }}><Clock size={16} color="var(--primary)" /> {article.readTimeMinutes} دقائق قراءة</span>}
         </div>
       </div>
     </motion.div>
@@ -61,13 +64,16 @@ export default function ArticlesPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            style={{ textAlign: "center", marginBottom: "60px" }}
+            style={{ textAlign: "center", marginBottom: "80px" }}
           >
-            <h1 className="sec-title" style={{ fontSize: "44px", color: "var(--text)" }}>
+            <span style={{ display: "inline-block", background: "var(--highlight-bg)", color: "var(--primary-deep)", padding: "8px 16px", borderRadius: "100px", fontSize: "15px", fontWeight: "800", marginBottom: "16px" }}>
+              المدونة
+            </span>
+            <h1 className="sec-title" style={{ fontSize: "clamp(36px, 5vw, 54px)", color: "var(--text)" }}>
               نصائح <strong style={{ color: "var(--primary)" }}>طبية وغذائية</strong>
             </h1>
-            <p style={{ color: "var(--text-muted)", fontSize: "18px", maxWidth: "700px", margin: "16px auto 0" }}>
-              مكتبة شاملة لأهم النصائح والمقالات الطبية التي تساعدك في رحلتك نحو صحة أفضل وجسم مثالي
+            <p style={{ color: "var(--text-muted)", fontSize: "18px", maxWidth: "700px", margin: "20px auto 0", lineHeight: 1.8, fontWeight: 500 }}>
+              مكتبة شاملة لأهم النصائح والمقالات الطبية التي تساعدك في رحلتك نحو صحة أفضل وجسم مثالي بطرق علمية مدروسة.
             </p>
           </motion.div>
 
