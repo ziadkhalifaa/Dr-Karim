@@ -11,8 +11,8 @@
 // Enabled via env DB_AUTO_SYNC (default: on in production).
 
 import { logger } from "./utils/logger.js";
-import { runMigration } from "../../scripts/migrate.js";
-import { runSeed } from "../../scripts/seed.js";
+import { runMigration } from "../scripts/migrate.js";
+import { runSeed } from "../scripts/seed.js";
 
 export async function ensureDatabaseSync() {
   try {
