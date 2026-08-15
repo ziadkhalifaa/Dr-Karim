@@ -103,136 +103,170 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
     }
   };
   return (
-    <section className="dash-panel">
-      <div className="dash-panel__head">
-        <h3 className="dash-panel__title">
-          <Plus />
-          {t("doctorCare.createTitle")}
+    <div style={{ background: "#fff", border: "1.5px solid var(--dash-border)", borderRadius: "24px", overflow: "hidden", marginBottom: "32px", boxShadow: "0 10px 40px rgba(0,0,0,0.03)" }}>
+      <div style={{ background: "var(--dash-bg)", borderBottom: "1.5px solid var(--dash-border)", padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "800", color: "var(--dash-text)", display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ width: 36, height: 36, background: "var(--dash-primary)", color: "#fff", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}><Plus size={20} /></span>
+          إعداد مساحة عمل جديدة للمريض
         </h3>
-        <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={onCancel}><X />{t("dashboard.common.close") || "Close"}</button>
-      </div>
-
-      {/* Mode Toggle */}
-      <div style={{ display: "flex", gap: "10px", padding: "16px 16px 0" }}>
-        <button
-          type="button"
-          onClick={() => { setMode("manual"); setChosenTemplate(null); }}
-          style={{
-            padding: "8px 18px", borderRadius: "10px", fontSize: "13px", fontWeight: "800", border: "1.5px solid",
-            borderColor: mode === "manual" ? "var(--dash-primary)" : "var(--dash-border)",
-            background: mode === "manual" ? "var(--dash-primary-soft)" : "transparent",
-            color: mode === "manual" ? "var(--dash-primary)" : "var(--dash-text-muted)",
-            cursor: "pointer", fontFamily: "inherit",
-          }}
-        >
-          ✏️ إنشاء يدوي
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode("template")}
-          style={{
-            padding: "8px 18px", borderRadius: "10px", fontSize: "13px", fontWeight: "800", border: "1.5px solid",
-            borderColor: mode === "template" ? "var(--dash-primary)" : "var(--dash-border)",
-            background: mode === "template" ? "var(--dash-primary-soft)" : "transparent",
-            color: mode === "template" ? "var(--dash-primary)" : "var(--dash-text-muted)",
-            cursor: "pointer", fontFamily: "inherit",
-          }}
-        >
-          📋 استيراد من قالب {templates.length > 0 && `(${templates.length})`}
+        <button onClick={onCancel} style={{ background: "#fff", border: "1.5px solid var(--dash-border)", width: 32, height: 32, borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--dash-text-muted)" }}>
+          <X size={16} />
         </button>
       </div>
 
-      {/* Template Picker */}
-      {mode === "template" && (
-        <div style={{ padding: "16px", borderBottom: "1px solid var(--dash-border)" }}>
-          {templates.length === 0 ? (
-            <p style={{ color: "var(--dash-text-muted)", fontSize: "14px", fontWeight: "600", textAlign: "center", padding: "20px" }}>
-              لا توجد قوالب محفوظة بعد — اذهب لقسم "القوالب" لإنشاء أول قالب لك.
-            </p>
-          ) : (
-            <div style={{ display: "grid", gap: "10px" }}>
-              {templates.map((tmpl) => (
-                <div
-                  key={tmpl.id}
-                  onClick={() => setChosenTemplate(chosenTemplate?.id === tmpl.id ? null : tmpl)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: "14px",
-                    padding: "14px 18px", borderRadius: "14px", cursor: "pointer",
-                    border: "1.5px solid " + (chosenTemplate?.id === tmpl.id ? "var(--dash-primary)" : "var(--dash-border)"),
-                    background: chosenTemplate?.id === tmpl.id ? "var(--dash-primary-soft)" : "var(--dash-bg)",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  <div style={{ width: 36, height: 36, borderRadius: "10px", background: chosenTemplate?.id === tmpl.id ? "var(--dash-primary)" : "var(--dash-bg)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    {chosenTemplate?.id === tmpl.id ? <Check size={20} style={{ color: "#fff" }} /> : <ClipboardList size={20} style={{ color: "var(--dash-text-soft)" }} />}
+      <div style={{ padding: "24px" }}>
+        {/* Mode Toggle */}
+        <div style={{ display: "flex", gap: "12px", marginBottom: "24px", background: "var(--dash-bg)", padding: "6px", borderRadius: "14px", width: "fit-content" }}>
+          <button
+            type="button"
+            onClick={() => { setMode("manual"); setChosenTemplate(null); }}
+            style={{
+              padding: "10px 20px", borderRadius: "10px", fontSize: "14px", fontWeight: "800", border: "none",
+              background: mode === "manual" ? "#fff" : "transparent",
+              color: mode === "manual" ? "var(--dash-primary)" : "var(--dash-text-muted)",
+              boxShadow: mode === "manual" ? "0 4px 12px rgba(0,0,0,0.05)" : "none",
+              cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s"
+            }}
+          >
+            ✏️ إنشاء وتخصيص يدوي
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("template")}
+            style={{
+              padding: "10px 20px", borderRadius: "10px", fontSize: "14px", fontWeight: "800", border: "none",
+              background: mode === "template" ? "#fff" : "transparent",
+              color: mode === "template" ? "var(--dash-primary)" : "var(--dash-text-muted)",
+              boxShadow: mode === "template" ? "0 4px 12px rgba(0,0,0,0.05)" : "none",
+              cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: "8px", transition: "all 0.2s"
+            }}
+          >
+            📋 استيراد من قالب جاهز
+          </button>
+        </div>
+
+        {/* Template Picker */}
+        {mode === "template" && (
+          <div style={{ padding: "20px", background: "var(--dash-bg)", borderRadius: "16px", border: "1.5px dashed var(--dash-border)", marginBottom: "24px" }}>
+            <div style={{ fontWeight: "800", fontSize: "15px", color: "var(--dash-text)", marginBottom: "16px" }}>اختر قالب الرعاية:</div>
+            {templates.length === 0 ? (
+              <p style={{ color: "var(--dash-text-muted)", fontSize: "14px", fontWeight: "600", textAlign: "center", margin: 0 }}>
+                لا توجد قوالب محفوظة بعد — اذهب لقسم "القوالب" لإنشاء أول قالب لك.
+              </p>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "12px" }}>
+                {templates.map((tmpl) => (
+                  <div
+                    key={tmpl.id}
+                    onClick={() => setChosenTemplate(chosenTemplate?.id === tmpl.id ? null : tmpl)}
+                    style={{
+                      display: "flex", alignItems: "flex-start", gap: "12px",
+                      padding: "16px", borderRadius: "12px", cursor: "pointer",
+                      border: "2px solid " + (chosenTemplate?.id === tmpl.id ? "var(--dash-primary)" : "transparent"),
+                      background: "#fff",
+                      boxShadow: chosenTemplate?.id === tmpl.id ? "0 4px 12px rgba(var(--dash-primary-rgb), 0.15)" : "0 2px 8px rgba(0,0,0,0.04)",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    <div style={{ width: 40, height: 40, borderRadius: "10px", background: chosenTemplate?.id === tmpl.id ? "var(--dash-primary)" : "var(--dash-primary-soft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {chosenTemplate?.id === tmpl.id ? <Check size={20} style={{ color: "#fff" }} /> : <BookTemplate size={20} style={{ color: "var(--dash-primary)" }} />}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: "800", fontSize: "15px", color: "var(--dash-text)", lineHeight: 1.2 }}>{tmpl.name}</div>
+                      {tmpl.description && <div style={{ fontSize: "13px", color: "var(--dash-text-muted)", marginTop: "6px", lineHeight: 1.4 }}>{tmpl.description}</div>}
+                      <div style={{ display: "inline-block", fontSize: "12px", color: "#059669", background: "#d1fae5", padding: "4px 8px", borderRadius: "6px", fontWeight: "700", marginTop: "8px" }}>
+                        {tmpl.activities.length} نشاط مدرج
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: "800", fontSize: "15px", color: chosenTemplate?.id === tmpl.id ? "var(--dash-primary)" : "var(--dash-text)" }}>{tmpl.name}</div>
-                    {tmpl.description && <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", marginTop: "2px" }}>{tmpl.description}</div>}
-                    <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", marginTop: "4px" }}>{tmpl.activities.length} نشاط</div>
-                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px" }}>
+            <div style={{ background: "var(--dash-bg)", padding: "20px", borderRadius: "16px", border: "1px solid var(--dash-border)" }}>
+              <h4 style={{ margin: "0 0 16px", fontSize: "14px", fontWeight: "800", color: "var(--dash-text-muted)", display: "flex", alignItems: "center", gap: "8px" }}>
+                <UserRound size={16} /> بيانات المريض
+              </h4>
+              {patientId ? (
+                <div style={{ fontSize: "16px", fontWeight: "800", color: "var(--dash-primary)", background: "#fff", padding: "12px 16px", borderRadius: "12px", border: "1.5px solid var(--dash-border)" }}>
+                  {selected?.fullName}
                 </div>
-              ))}
-              {chosenTemplate && (
-                <div style={{ background: "#d1fae5", border: "1px solid #6ee7b7", borderRadius: "12px", padding: "10px 14px", fontSize: "13px", fontWeight: "700", color: "#065f46" }}>
-                  ✅ سيتم إضافة {chosenTemplate.activities.length} نشاط من قالب "{chosenTemplate.name}" تلقائياً بعد إنشاء البرنامج
-                </div>
+              ) : (
+                <PatientSelector value={selected} onSelect={setSelected} />
               )}
             </div>
-          )}
-        </div>
-      )}
 
-      <form className="dash-form" onSubmit={submit}>
-        <div className="dash-form--grid">
-          {patientId ? (
-            <p className="dash-hint dash-patient-context">
-              <UserRound /> {t("patientSelector.selected")}: <strong>{selected?.fullName}</strong>
-            </p>
-          ) : (
-            <PatientSelector value={selected} onSelect={setSelected} />
-          )}
-          <label className="dash-field">
-            <span>{t("doctorCare.startDate")}</span>
-            <input type="date" name="startDate" required />
+            <div style={{ background: "var(--dash-bg)", padding: "20px", borderRadius: "16px", border: "1px solid var(--dash-border)" }}>
+              <h4 style={{ margin: "0 0 16px", fontSize: "14px", fontWeight: "800", color: "var(--dash-text-muted)", display: "flex", alignItems: "center", gap: "8px" }}>
+                <ClipboardList size={16} /> توقيت وحالة البرنامج
+              </h4>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
+                <label style={{ display: "block" }}>
+                  <span style={{ fontSize: "12px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "6px", display: "block" }}>تاريخ البداية</span>
+                  <input type="date" name="startDate" required style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1.5px solid var(--dash-border)", fontSize: "14px", fontFamily: "inherit" }} />
+                </label>
+                <label style={{ display: "block" }}>
+                  <span style={{ fontSize: "12px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "6px", display: "block" }}>تاريخ النهاية</span>
+                  <input type="date" name="endDate" required style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1.5px solid var(--dash-border)", fontSize: "14px", fontFamily: "inherit" }} />
+                </label>
+              </div>
+              <label style={{ display: "block" }}>
+                <span style={{ fontSize: "12px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "6px", display: "block" }}>حالة البرنامج (الآن)</span>
+                <select name="status" style={{ width: "100%", padding: "10px 14px", borderRadius: "10px", border: "1.5px solid var(--dash-border)", fontSize: "14px", fontFamily: "inherit", background: "#fff" }}>
+                  <option value="draft">مسودة (Draft) - يمكن التعديل عليه</option>
+                  <option value="scheduled">مجدول (Scheduled) - سيبدأ قريباً</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div style={{ background: "var(--dash-bg)", padding: "24px", borderRadius: "16px", border: "1px solid var(--dash-border)" }}>
+            <h4 style={{ margin: "0 0 16px", fontSize: "15px", fontWeight: "800", color: "var(--dash-text)", display: "flex", alignItems: "center", gap: "8px" }}>
+              ربط مساحة العمل بخطط أخرى (اختياري)
+            </h4>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+              <div style={{ background: "#fff", padding: "16px", borderRadius: "12px", border: "1px solid var(--dash-border)" }}>
+                <PlanVersionSelect
+                  options={versions?.nutrition}
+                  busy={versionsBusy}
+                  label="🥗 الخطة الغذائية المرتبطة"
+                  value={nutritionVersionId}
+                  onChange={setNutritionVersionId}
+                />
+              </div>
+              <div style={{ background: "#fff", padding: "16px", borderRadius: "12px", border: "1px solid var(--dash-border)" }}>
+                <PlanVersionSelect
+                  options={versions?.exercise}
+                  busy={versionsBusy}
+                  label="💪 خطة التمارين المرتبطة"
+                  value={exerciseVersionId}
+                  onChange={setExerciseVersionId}
+                />
+              </div>
+            </div>
+          </div>
+
+          <label style={{ display: "block" }}>
+            <span style={{ fontSize: "14px", fontWeight: "800", color: "var(--dash-text)", marginBottom: "8px", display: "block" }}>تعليمات وإرشادات إضافية للبرنامج (تظهر للمريض)</span>
+            <textarea name="programInstructions" rows="3" placeholder="اكتب أي تعليمات عامة للمريض خلال فترة البرنامج..." style={{ width: "100%", padding: "14px", borderRadius: "12px", border: "1.5px solid var(--dash-border)", fontSize: "14px", fontFamily: "inherit", resize: "vertical", background: "var(--dash-bg)" }} />
           </label>
-          <label className="dash-field">
-            <span>{t("doctorCare.endDate")}</span>
-            <input type="date" name="endDate" required />
-          </label>
-          <label className="dash-field">
-            <span>{t("doctorCare.programStatus")}</span>
-            <select className="dash-select" name="status">
-              <option value="draft">{t("dashboard.status.draft") || "Draft"}</option>
-              <option value="scheduled">{t("doctorCare.scheduled")}</option>
-            </select>
-          </label>
-          <PlanVersionSelect
-            options={versions?.nutrition}
-            busy={versionsBusy}
-            label={t("doctorCare.nutritionVersion")}
-            value={nutritionVersionId}
-            onChange={setNutritionVersionId}
-          />
-          <PlanVersionSelect
-            options={versions?.exercise}
-            busy={versionsBusy}
-            label={t("doctorCare.exerciseVersion")}
-            value={exerciseVersionId}
-            onChange={setExerciseVersionId}
-          />
-        </div>
-        <label className="dash-field">
-          <span>{t("doctorCare.instructions")}</span>
-          <textarea name="programInstructions" rows="2" />
-        </label>
-        {error && <p className="dash-muted" style={{ color: "var(--dash-danger)" }}>{error}</p>}
-        <button className="dash-btn dash-btn--primary" disabled={busy || !selected?.id}>
-          <Save />{busy ? t("dashboard.common.loading") : t("doctorCare.create")}
-          {chosenTemplate && ` (+ ${chosenTemplate.activities.length} نشاط من القالب)`}
-        </button>
-      </form>
-    </section>
+
+          {error && <div style={{ background: "#fee2e2", color: "#991b1b", padding: "12px 16px", borderRadius: "10px", fontSize: "14px", fontWeight: "700" }}>{error}</div>}
+
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", borderTop: "1.5px solid var(--dash-border)", paddingTop: "24px" }}>
+            <button type="button" onClick={onCancel} style={{ padding: "12px 24px", borderRadius: "12px", fontSize: "14px", fontWeight: "800", background: "var(--dash-bg)", border: "1.5px solid var(--dash-border)", color: "var(--dash-text)", cursor: "pointer", fontFamily: "inherit" }}>إلغاء</button>
+            <button type="submit" disabled={busy || !selected?.id} style={{ padding: "12px 24px", borderRadius: "12px", fontSize: "14px", fontWeight: "800", background: "var(--dash-primary)", border: "none", color: "#fff", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 4px 12px rgba(var(--dash-primary-rgb), 0.3)" }}>
+              <Save size={18} /> {busy ? "جاري الإنشاء..." : "إنشاء مساحة العمل"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
 
@@ -478,8 +512,14 @@ export default function CarePrograms({ patientId, patientLabel }) {
           <div className="dash-row-actions">
             <span className="dash-badge dash-badge--primary">{rows.length}</span>
             {patientId && (
-              <button className="dash-btn dash-btn--primary dash-btn--sm" onClick={() => navigate(`/doctor/patients/${patientId}/nutrition-builder`)} style={{ background: "#f59e0b", color: "#fff", border: "none" }}>
-                🥗 إنشاء نظام غذائي متقدم
+              <button 
+                className="dash-btn dash-btn--sm" 
+                onClick={() => navigate(`/doctor/patients/${patientId}/nutrition-builder`)} 
+                style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", color: "#fff", border: "none", boxShadow: "0 4px 15px rgba(245, 158, 11, 0.4)", display: "flex", alignItems: "center", gap: "6px", fontWeight: "900", padding: "8px 16px", borderRadius: "10px", transition: "all 0.2s" }}
+                onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+                onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
+              >
+                🥗 إضافة وتعديل النظام الغذائي (الأكل)
               </button>
             )}
             <button className="dash-btn dash-btn--primary dash-btn--sm" onClick={() => setShowCreate((s) => !s)}>
