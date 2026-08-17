@@ -5,7 +5,8 @@ import { usePublicSettings } from "../hooks/usePublicSettings";
 import { navigate, useRoute } from "../lib/router";
 import { motion, AnimatePresence } from "framer-motion";
 import { SunIcon, MoonIcon, CloseIcon, WhatsAppIcon, PulseIcon } from "./Icons";
-import { LogIn, Menu, Globe } from "lucide-react";
+import { LogIn, Menu, Globe, LayoutDashboard, LogOut } from "lucide-react";
+import { useAuth } from "../context/AuthProvider";
 
 const NAV = [
   { key: "home", href: "/" },
@@ -19,9 +20,13 @@ export default function Header() {
   const { t } = useTranslation();
   const { settings } = usePublicSettings();
   const { theme, toggleTheme, lang, changeLang } = useApp();
+  const { user, authenticated, logout } = useAuth();
   const path = useRoute();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const isStaff = authenticated && user?.role !== "patient";
+  const acctHref = user?.role === "patient" ? "/patient" : "/doctor";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -46,6 +51,11 @@ export default function Header() {
   const goLogin = (e) => {
     e.preventDefault();
     navigate("/login");
+  };
+
+  const goAcct = (e) => {
+    e.preventDefault();
+    navigate(acctHref);
   };
 
   const navTo = (e, href) => {
@@ -107,15 +117,36 @@ export default function Header() {
             {theme === "light" ? <MoonIcon /> : <SunIcon />}
           </button>
 
-          <a href="/login" onClick={goLogin} className="site-header__login">
-            <LogIn size={18} />
-            <span>{t("nav.login", "دخول")}</span>
-          </a>
+          {authenticated && (
+            <button
+              type="button"
+              className="site-header__icon"
+              onClick={logout}
+              aria-label={t("dashboard.shell.signOut")}
+              title={t("dashboard.shell.signOut")}
+            >
+              <LogOut size={18} />
+            </button>
+          )}
 
-          <a href="/assessment" onClick={goAssessment} className="site-header__cta">
-            <PulseIcon />
-            <span>{t("nav.assess")}</span>
-          </a>
+          {authenticated ? (
+            <a href={acctHref} onClick={goAcct} className="site-header__login">
+              <LayoutDashboard size={18} />
+              <span>{user?.role === "patient" ? t("nav.myAccount") : t("nav.dashboard")}</span>
+            </a>
+          ) : (
+            <a href="/login" onClick={goLogin} className="site-header__login">
+              <LogIn size={18} />
+              <span>{t("nav.login", "دخول")}</span>
+            </a>
+          )}
+
+          {!isStaff && (
+            <a href="/assessment" onClick={goAssessment} className="site-header__cta">
+              <PulseIcon />
+              <span>{t("nav.assess")}</span>
+            </a>
+          )}
 
           <button
             type="button"
@@ -168,14 +199,29 @@ export default function Header() {
             </nav>
 
             <div className="mobile-menu__foot">
-              <a href="/login" onClick={goLogin} className="site-header__login">
-                <LogIn size={18} />
-                <span>{t("nav.login", "تسجيل الدخول")}</span>
-              </a>
-              <a href="/assessment" onClick={goAssessment} className="site-header__cta" style={{ justifyContent: "center" }}>
-                <PulseIcon />
-                <span>{t("nav.assess")}</span>
-              </a>
+              {authenticated ? (
+                <a href={acctHref} onClick={goAcct} className="site-header__login">
+                  <LayoutDashboard size={18} />
+                  <span>{user?.role === "patient" ? t("nav.myAccount") : t("nav.dashboard")}</span>
+                </a>
+              ) : (
+                <a href="/login" onClick={goLogin} className="site-header__login">
+                  <LogIn size={18} />
+                  <span>{t("nav.login", "تسجيل الدخول")}</span>
+                </a>
+              )}
+              {!isStaff && (
+                <a href="/assessment" onClick={goAssessment} className="site-header__cta" style={{ justifyContent: "center" }}>
+                  <PulseIcon />
+                  <span>{t("nav.assess")}</span>
+                </a>
+              )}
+              {authenticated && (
+                <button onClick={logout} className="site-header__login" style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
+                  <LogOut size={18} />
+                  <span>{t("dashboard.shell.signOut")}</span>
+                </button>
+              )}
               <a
                 href={settings?.social?.whatsapp || "#"}
                 target="_blank"

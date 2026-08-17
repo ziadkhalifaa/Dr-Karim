@@ -50,18 +50,18 @@ export default function App() {
   if (path === "/packages") return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PackagesPage /></ProtectedRoute></AuthProvider></AppProvider>;
   if (path.startsWith("/payment")) return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PaymentPage path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
 
-  if (path === "/about") return <AppProvider><AboutPage /></AppProvider>;
-  if (path === "/services") return <AppProvider><ServicesPage /></AppProvider>;
-  if (path.startsWith("/services/")) return <AppProvider><ServiceSinglePage code={path.replace("/services/", "")} /></AppProvider>;
-  if (path === "/articles") return <AppProvider><ArticlesPage /></AppProvider>;
-  if (path.startsWith("/tips/")) return <AppProvider><ArticleSinglePage slug={path.replace("/tips/", "")} /></AppProvider>;
-  if (path === "/contact") return <AppProvider><ContactPage /></AppProvider>;
-  if (path === "/privacy") return <AppProvider><ContentPage title="سياسة الخصوصية" slug="privacy-policy" /></AppProvider>;
-  if (path === "/terms") return <AppProvider><ContentPage title="شروط الاستخدام" slug="terms-of-use" /></AppProvider>;
-  if (path === "/faq") return <AppProvider><ContentPage title="الأسئلة الشائعة" slug="faq" /></AppProvider>;
+  if (path === "/about") return <PublicSite><AboutPage /></PublicSite>;
+  if (path === "/services") return <PublicSite><ServicesPage /></PublicSite>;
+  if (path.startsWith("/services/")) return <PublicSite><ServiceSinglePage code={path.replace("/services/", "")} /></PublicSite>;
+  if (path === "/articles") return <PublicSite><ArticlesPage /></PublicSite>;
+  if (path.startsWith("/tips/")) return <PublicSite><ArticleSinglePage slug={path.replace("/tips/", "")} /></PublicSite>;
+  if (path === "/contact") return <PublicSite><ContactPage /></PublicSite>;
+  if (path === "/privacy") return <PublicSite><ContentPage title="سياسة الخصوصية" slug="privacy-policy" /></PublicSite>;
+  if (path === "/terms") return <PublicSite><ContentPage title="شروط الاستخدام" slug="terms-of-use" /></PublicSite>;
+  if (path === "/faq") return <PublicSite><ContentPage title="الأسئلة الشائعة" slug="faq" /></PublicSite>;
 
   return (
-    <AppProvider>
+    <PublicSite>
       <Header />
       <main>
         <Hero />
@@ -78,6 +78,16 @@ export default function App() {
         <div className="spacer" />
       </main>
       <Footer />
+    </PublicSite>
+  );
+}
+
+// The public website is auth-aware (logged-in patients/doctors previewing the
+// site get a different header and section treatments).
+function PublicSite({ children }) {
+  return (
+    <AppProvider>
+      <AuthProvider>{children}</AuthProvider>
     </AppProvider>
   );
 }

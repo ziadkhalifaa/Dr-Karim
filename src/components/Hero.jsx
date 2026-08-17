@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { navigate } from "../lib/router";
+import { useAuth } from "../context/AuthProvider";
 
 const SLIDES = [
   "/assets/dr_karim_hero.png",
@@ -14,6 +15,8 @@ const SLIDES = [
 
 export default function Hero() {
   const { t, i18n } = useTranslation();
+  const { user, authenticated } = useAuth();
+  const isStaff = authenticated && user?.role !== "patient";
   const isAr = i18n.language === "ar";
   const [index, setIndex] = useState(0);
 
@@ -49,11 +52,11 @@ export default function Hero() {
 
           <div className="hero__actions">
             <a
-              href="/assessment"
-              onClick={(e) => { e.preventDefault(); navigate("/assessment"); }}
+              href={isStaff ? "/doctor" : "/assessment"}
+              onClick={(e) => { e.preventDefault(); navigate(isStaff ? "/doctor" : "/assessment"); }}
               className="btn btn-accent btn-lg"
             >
-              {t("hero.cta")}
+              {isStaff ? t("nav.dashboard", { defaultValue: "لوحة التحكم" }) : t("hero.cta")}
             </a>
             <a
               href="/about"

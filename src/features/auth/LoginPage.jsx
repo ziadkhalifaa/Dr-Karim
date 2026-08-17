@@ -3,7 +3,6 @@ import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import Logo from "../../components/Logo";
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -50,7 +49,7 @@ export default function LoginPage() {
           transition={{ type: "spring", delay: 0.2 }}
           style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}
         >
-          <Logo size={70} />
+          <img src="/assets/logo.png" alt={t("brand.name")} style={{ width: 84, height: 84, objectFit: "cover", borderRadius: "50%" }} />
         </motion.div>
         
         <h1 style={{ fontSize: "28px", fontWeight: "800", color: "var(--text)", marginBottom: "8px" }}>

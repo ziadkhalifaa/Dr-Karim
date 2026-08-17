@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { paymentApi } from "../../api/client";
 import { navigate } from "../../lib/router";
-import Logo from "../../components/Logo";
 
 function usePackageId(path) {
   const params = new URLSearchParams((path || "").split("?")[1] || "");
@@ -114,7 +113,7 @@ export default function PaymentPage({ path }) {
   if (success) {
     return (
       <div style={pageStyle}>
-        <div style={topbarStyle}><Logo size={40} /></div>
+        <div style={topbarStyle}><img src="/assets/logo.png" alt="د. كريم الليثي" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} /></div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "80vh", padding: "20px" }}>
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -151,7 +150,7 @@ export default function PaymentPage({ path }) {
   return (
     <div style={pageStyle}>
       <div style={topbarStyle}>
-        <Logo size={40} />
+        <img src="/assets/logo.png" alt="د. كريم الليثي" style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} />
         <button onClick={() => navigate("/packages")}
           style={{ background: "var(--bg-soft)", border: "1px solid var(--line)", color: "var(--text)", padding: "10px 18px", borderRadius: "12px", cursor: "pointer", fontSize: "14px", fontWeight: "700", fontFamily: "inherit" }}>
           ← تغيير الباقة

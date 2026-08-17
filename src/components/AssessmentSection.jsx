@@ -3,9 +3,12 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { CheckCircle2, Clock, Lock } from "lucide-react";
 import { navigate } from "../lib/router";
+import { useAuth } from "../context/AuthProvider";
 
 export default function AssessmentSection() {
   const { t } = useTranslation();
+  const { user, authenticated } = useAuth();
+  const isStaff = authenticated && user?.role !== "patient";
   const goals = t("assessment.goals", { returnObjects: true });
   const [weight, setWeight] = useState("");
   const [goal, setGoal] = useState(goals ? goals[0] : "");
@@ -53,6 +56,36 @@ export default function AssessmentSection() {
             </div>
           </motion.div>
 
+          {isStaff ? (
+            <motion.div
+              className="assess__card"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", gap: 14, padding: "40px 32px" }}
+            >
+              <span style={{ fontSize: 44 }}>🩺</span>
+              <p className="assess__kicker" style={{ margin: 0 }}>
+                {t("assessment.previewTitle", { defaultValue: "أنت في وضع المعاينة" })}
+              </p>
+              <h3 style={{ fontSize: 20, fontWeight: 800, color: "#fff", margin: 0 }}>
+                {t("assessment.previewTitle", { defaultValue: "أنت في وضع المعاينة" })}
+              </h3>
+              <div style={{ color: "rgba(255,255,255,0.75)", fontSize: 14.5, lineHeight: 1.8, marginTop: 4 }}>
+                {t("assessment.previewBody", {
+                  defaultValue: "هذا القسم مخصص للمرضى للبدء في التقييم الغذائي. انتقل إلى لوحة التحكم لإدارة المرضى والباقات والخطط.",
+                })}
+              </div>
+              <button
+                className="btn btn-accent"
+                style={{ width: "100%", padding: "16px 24px", justifyContent: "center" }}
+                onClick={() => navigate("/doctor")}
+              >
+                {t("nav.dashboard", { defaultValue: "لوحة التحكم" })}
+              </button>
+            </motion.div>
+          ) : (
           <motion.form
             className="assess__card"
             onSubmit={submit}
@@ -123,6 +156,7 @@ export default function AssessmentSection() {
               {t("assessment.meta")}
             </p>
           </motion.form>
+          )}
         </div>
       </div>
     </section>

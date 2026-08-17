@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useApp } from "../../../context/appContext";
 import { navigate } from "../../../lib/router";
-import Logo from "../../../components/Logo";
 import { SunIcon, MoonIcon } from "../../../components/Icons";
 
 export default function AssessmentHeader() {
@@ -19,7 +18,7 @@ export default function AssessmentHeader() {
       <div className="aq-header__bar">
         <a href="/" onClick={goHome} className="aq-header__logo" aria-label={t("brand.name")}>
           <span className="aq-header__mark">
-            <Logo size={44} />
+            <img src="/assets/logo.png" alt={t("brand.name")} style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} />
           </span>
           <span className="aq-header__brand">
             <span className="aq-header__name">{t("brand.name")}</span>
