@@ -3,6 +3,7 @@ import { models, sequelize } from "../models/index.js";
 import { AppError } from "../utils/errors.js";
 import { auditService } from "./audit.service.js";
 import { progressMeasurementService } from "./progress-measurement.service.js";
+import { entitlementService } from "./entitlement.service.js";
 
 const { Patient, PatientCheckin, PatientCheckinMeasurement, PatientCheckinAdherence, NutritionPlan, NutritionPlanVersion, ExercisePlan, ExercisePlanVersion } = models;
 
@@ -53,6 +54,7 @@ export const checkinService = {
     if (!(["patient", "doctor"].includes(current.role))) throw new AppError(403, "CHECKIN_WRITE_FORBIDDEN", "Only the patient or doctor may create a check-in");
     const created = await sequelize.transaction(async (transaction) => {
       await patientInTenant(patientId, tenantId, transaction);
+      if (current.role === "patient") await entitlementService.requireEntitlement({ tenantId, patientId, code: "weekly_checkin", transaction });
       const context = await activeContext(patientId, tenantId, transaction);
       const weightKg = numberInRange(body.weightKg, 0.1, 500, "weightKg");
       const checkin = await PatientCheckin.create({

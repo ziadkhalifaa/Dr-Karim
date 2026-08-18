@@ -115,7 +115,7 @@ export default function PackagesManager() {
                 {/* Price */}
                 <div style={{ fontSize: "28px", fontWeight: "900", color: "var(--dash-primary)", marginBottom: "16px" }}>
                   {pkg.price} <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--dash-text-muted)" }}>
-                    {pkg.currency} / {pkg.durationValue} {pkg.durationUnit === "month" ? "شهر" : "مرة"}
+                    {pkg.currency} / {pkg.durationValue} {pkg.durationUnit === "month" ? "شهر" : pkg.durationUnit === "week" ? "أسبوع" : "مرة"}
                   </span>
                 </div>
 
@@ -295,6 +295,7 @@ function PackageModal({ pkg, onClose, onSave }) {
                 onChange={e => setFormData({ ...formData, durationUnit: e.target.value })}
               >
                 <option value="month">شهر</option>
+                <option value="week">أسبوع</option>
                 <option value="one_time">مرة واحدة</option>
               </select>
             </label>

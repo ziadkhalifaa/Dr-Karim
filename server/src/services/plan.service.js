@@ -3,6 +3,7 @@ import { AppError } from "../utils/errors.js";
 import { ENUM } from "../config/constants.js";
 import { auditService } from "./audit.service.js";
 import { notificationService } from "./notification.service.js";
+import { entitlementService } from "./entitlement.service.js";
 
 const {
   Patient, DoctorReview, AssessmentSession,
@@ -205,6 +206,7 @@ export const planService = {
       assertVersionTransition(version.status, "active");
       const plan = await loadPlan(domain, version.plan_id, tenantId, transaction, true);
       if (String(plan.doctor_id) !== String(actor.doctorId)) throw new AppError(403, "PLAN_WRITE_FORBIDDEN", "Only the plan doctor may activate it");
+      await entitlementService.requireEntitlement({ tenantId, patientId: plan.patient_id, code: domain === "nutrition" ? "nutrition_plan" : "exercise_plan", transaction });
       const active = await config.version.findOne({ where: { plan_id: plan.id, tenant_id: tenantId, status: "active" }, transaction, lock: transaction.LOCK.UPDATE, raw: true });
       if (active && String(active.id) !== String(version.id)) { const previous = await config.version.findByPk(active.id, { transaction }); previous.status = "archived"; await previous.save({ transaction }); }
       const instance = await config.version.findByPk(version.id, { transaction }); instance.status = "active"; await instance.save({ transaction });

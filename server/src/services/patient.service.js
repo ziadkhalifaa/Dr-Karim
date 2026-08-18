@@ -7,6 +7,7 @@ import { Op } from "sequelize";
 import { models } from "../models/index.js";
 import { AppError } from "../utils/errors.js";
 import { auditService } from "./audit.service.js";
+import { entitlementService } from "./entitlement.service.js";
 
 const {
   Patient, DoctorReview, PatientSession,
@@ -59,12 +60,24 @@ async function activeSubscription(patientId, tenantId) {
   });
 }
 
-async function subscriptionWith(tierId, patientId, tenantId) {
-  const sub = await activeSubscription(patientId, tenantId);
-  if (!sub) return null;
-  const pack = await Package.findByPk(sub.package_id, { raw: true });
-  const entitlements = await SubscriptionEntitlement.findAll({ where: { subscription_id: sub.id, tenant_id: tenantId }, raw: true });
-  return { subscription: { id: String(sub.id), status: sub.status, startsAt: sub.starts_at, endsAt: sub.ends_at, package: pack ? { id: String(pack.id), name: pack.name, slug: pack.slug } : null, entitlements: entitlements.map((e) => ({ code: e.code, allowed: e.allowed, limit: e.limit_value, used: e.used_value })) } };
+async function subscriptionWith(patientId, tenantId) {
+  const state = await entitlementService.subscriptionState({ tenantId, patientId });
+  if (!state.subscription) return null;
+  const { subscription, entitlements } = state;
+  return {
+    subscription: {
+      id: subscription.id,
+      status: subscription.status,
+      startsAt: subscription.startsAt,
+      endsAt: subscription.endsAt,
+      duration: subscription.duration,
+      remainingDays: subscription.remainingDays,
+      periodActive: subscription.periodActive,
+      package: subscription.package,
+      hasLiveSession: entitlements.some((ent) => ent.code === "live_session" && ent.allowed),
+      entitlements: entitlements.map((ent) => ({ code: ent.code, allowed: ent.allowed, limit: ent.limit_value, used: ent.used_value })),
+    },
+  };
 }
 
 async function recentPayments(patientId, tenantId, limit = 5) {
@@ -174,24 +187,53 @@ export const patientService = {
       ids.length ? Payment.findAll({ where: { tenant_id: tenantId, patient_id: { [Op.in]: ids }, status: "pending" }, attributes: ["patient_id"], raw: true }) : [],
     ]);
     const latestSub = new Map();
-    for (const sub of subscriptions) if (!latestSub.has(String(sub.patient_id))) latestSub.set(String(sub.patient_id), sub.status);
+    for (const sub of subscriptions) if (!latestSub.has(String(sub.patient_id))) latestSub.set(String(sub.patient_id), sub);
+    const packageIds = [...new Set([...latestSub.values()].map((sub) => sub.package_id))];
+    const activeSubIds = [...latestSub.values()].filter((sub) => sub.status === "active").map((sub) => sub.id);
+    const [packages, activeEntitlements] = await Promise.all([
+      packageIds.length ? Package.findAll({ where: { id: { [Op.in]: packageIds } }, raw: true }) : [],
+      activeSubIds.length ? SubscriptionEntitlement.findAll({ where: { subscription_id: { [Op.in]: activeSubIds } }, raw: true }) : [],
+    ]);
+    const packageById = Object.fromEntries(packages.map((p) => [String(p.id), p]));
+    const entitlementsBySub = new Map();
+    for (const ent of activeEntitlements) {
+      if (!entitlementsBySub.has(String(ent.subscription_id))) entitlementsBySub.set(String(ent.subscription_id), []);
+      entitlementsBySub.get(String(ent.subscription_id)).push(ent);
+    }
     const pendingSet = new Set(pendingPayments.map((row) => String(row.patient_id)));
 
     await auditService.record({ tenantId, action: "patient.list", entity: "patient", entityRef: "directory", metadata: { count: rows.length, status: status.length ? status : null }, actorType: current.role, actorId: current.userId });
 
     return {
-      items: rows.map((row) => ({
-        id: String(row.id),
-        fullName: row.full_name,
-        sex: row.sex,
-        ageYears: row.age_years,
-        phoneDisplay: row.phone_display,
-        email: row.email,
-        status: row.status,
-        subscriptionStatus: latestSub.get(String(row.id)) || null,
-        hasPendingPayment: pendingSet.has(String(row.id)),
-        createdAt: row.created_at,
-      })),
+      items: rows.map((row) => {
+        const sub = latestSub.get(String(row.id));
+        const pack = sub ? packageById[String(sub.package_id)] : null;
+        const profile = pack ? entitlementService.durationProfile(pack) : null;
+        const isActive = sub?.status === "active";
+        const periodActive = isActive && profile ? entitlementService.isPeriodActive(sub, profile) : false;
+        const subEnts = sub ? (entitlementsBySub.get(String(sub.id)) || []) : [];
+        return {
+          id: String(row.id),
+          fullName: row.full_name,
+          sex: row.sex,
+          ageYears: row.age_years,
+          phoneDisplay: row.phone_display,
+          email: row.email,
+          status: row.status,
+          subscriptionStatus: sub?.status || null,
+          subscription: sub ? {
+            status: sub.status,
+            expiresAt: sub.ends_at,
+            periodActive,
+            remainingDays: entitlementService.remainingDays(sub),
+            duration: profile,
+            package: pack ? { id: String(pack.id), name: pack.name, slug: pack.slug } : null,
+            hasLiveSession: subEnts.some((ent) => ent.code === "live_session" && ent.allowed),
+          } : null,
+          hasPendingPayment: pendingSet.has(String(row.id)),
+          createdAt: row.created_at,
+        };
+      }),
       pagination: { total, page, limit, pages: Math.max(1, Math.ceil(total / limit)) },
     };
   },
@@ -325,6 +367,13 @@ export const patientService = {
       progress,
       review,
     };
+  },
+
+  async meSubscription({ tenantId, auth }) {
+    const current = actor(auth);
+    if (current.role !== "patient" || !current.patientId) throw new AppError(403, "PATIENT_HOME_FORBIDDEN", "Patients only");
+    const patient = await requirePatientInTenant(current.patientId, tenantId);
+    return subscriptionWith(patient.id, tenantId);
   },
 };
 

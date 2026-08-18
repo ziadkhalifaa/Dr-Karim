@@ -9,6 +9,7 @@ export function patientRouter() {
   r.use(requireAuth);
   r.get("/", requireRole("doctor", "staff"), patientController.list);
   r.get("/me/home", requireRole("patient"), patientController.home);
+  r.get("/me/subscription", requireRole("patient"), patientController.meSubscription);
   r.get("/:id/plan-versions", requireRole("doctor", "staff"), patientController.planVersions);
   r.get("/:id", requireRole("doctor", "staff", "patient"), patientController.get);
   return r;

@@ -211,10 +211,32 @@ export default function PatientProfile({ patientId }) {
                   <div style={{ display: "grid", gap: "12px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--dash-bg)", padding: "12px 16px", borderRadius: "12px" }}>
                       <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)" }}>الاشتراك الحالي</span>
-                      <span style={{ fontSize: "14px", fontWeight: "800", color: subscription ? "var(--dash-primary)" : "var(--dash-text-soft)" }}>
+                      <span style={{ fontSize: "14px", fontWeight: "800", color: subscription ? (subscription.periodActive === false ? "var(--dash-danger)" : "var(--dash-primary)") : "var(--dash-text-soft)" }}>
                         {subscription ? (subscription.package?.name || "باقة نشطة") : "لا يوجد اشتراك"}
                       </span>
                     </div>
+                    {subscription && (
+                      <>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--dash-bg)", padding: "12px 16px", borderRadius: "12px" }}>
+                          <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)" }}>مدة الباقة</span>
+                          <span style={{ fontSize: "14px", fontWeight: "800", color: "var(--dash-text)" }}>
+                            {subscription.duration?.value ?? 1} {subscription.duration?.unit === "week" ? "أسبوع" : subscription.duration?.unit === "month" ? "شهر" : "مرة واحدة"}
+                          </span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--dash-bg)", padding: "12px 16px", borderRadius: "12px" }}>
+                          <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)" }}>الأيام المتبقية</span>
+                          <span style={{ fontSize: "14px", fontWeight: "800", color: "var(--dash-text)" }}>
+                            {subscription.remainingDays != null ? subscription.remainingDays + " يوم" : "—"}
+                          </span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--dash-bg)", padding: "12px 16px", borderRadius: "12px" }}>
+                          <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)" }}>البث المباشر</span>
+                          <span style={{ fontSize: "14px", fontWeight: "800", color: subscription.hasLiveSession ? "var(--dash-primary)" : "var(--dash-text-soft)" }}>
+                            {subscription.hasLiveSession ? "مشمول 🎥" : "غير مشمول"}
+                          </span>
+                        </div>
+                      </>
+                    )}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--dash-bg)", padding: "12px 16px", borderRadius: "12px" }}>
                       <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)" }}>برنامج التغذية</span>
                       <span style={{ fontSize: "14px", fontWeight: "800", color: careProgram?.status === "active" ? "var(--dash-primary)" : "var(--dash-text-soft)" }}>

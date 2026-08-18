@@ -61,7 +61,7 @@ export default function PaymentPage({ path }) {
                 if (!Number.isNaN(starts)) {
                   const totalDays = ends && !Number.isNaN(ends)
                     ? Math.max(1, Math.round((ends - starts) / 86400000))
-                    : (current.durationValue || 1) * 30;
+                    : (current.durationValue || 1) * (current.durationUnit === "week" ? 7 : 30);
                   const usedDays = Math.max(0, Math.round((Date.now() - starts) / 86400000));
                   const frac = Math.max(0, Math.min(1, (totalDays - usedDays) / totalDays));
                   const remainingValue = Math.round(Number(current.price) * frac);

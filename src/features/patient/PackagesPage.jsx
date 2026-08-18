@@ -12,7 +12,7 @@ const cardAnim = {
   show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 100, damping: 20 } },
 };
 
-const DURATION_LABELS = { one_time: "مرة واحدة", month: "شهر" };
+const DURATION_LABELS = { one_time: "مرة واحدة", month: "شهر", week: "أسبوع" };
 
 const DEFAULT_FEATURES = [
   "متابعة شخصية مع الدكتور كريم",

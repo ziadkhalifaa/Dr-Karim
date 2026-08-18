@@ -208,12 +208,26 @@ export default function PatientsList() {
               {/* Footer Subscription Status */}
               <div style={{ background: "var(--dash-bg)", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: "12px", fontWeight: "700", color: "var(--dash-text-muted)" }}>الاشتراك</span>
-                <span style={{
-                  fontSize: "13px", fontWeight: "800",
-                  color: p.subscriptionStatus === "active" ? "var(--dash-primary)" : "var(--dash-text-soft)"
-                }}>
-                  {p.subscriptionStatus === "active" ? "✅ نشط" : "غير مشترك"}
-                </span>
+                <div style={{ textAlign: "left", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
+                  {p.subscription?.package?.name ? (
+                    <>
+                      <span style={{ fontSize: "13px", fontWeight: "800", color: p.subscription.periodActive === false ? "var(--dash-danger)" : "var(--dash-primary)" }}>
+                        {p.subscription.package.name}
+                        {p.subscription.periodActive === false ? " — منتهي" : ""}
+                        {p.subscription.hasLiveSession ? " • 🎥" : ""}
+                      </span>
+                      {p.subscription.remainingDays != null && (
+                        <span style={{ fontSize: "11.5px", fontWeight: "700", color: "var(--dash-text-muted)" }}>
+                          متبقي {p.subscription.remainingDays} يوم{p.subscription.expiresAt ? ` — ${new Date(p.subscription.expiresAt).toLocaleDateString("ar-EG")}` : ""}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span style={{ fontSize: "13px", fontWeight: "800", color: p.subscriptionStatus === "active" ? "var(--dash-primary)" : "var(--dash-text-soft)" }}>
+                      {p.subscriptionStatus === "active" ? "✅ نشط" : "غير مشترك"}
+                    </span>
+                  )}
+                </div>
               </div>
             </motion.div>
           ))}

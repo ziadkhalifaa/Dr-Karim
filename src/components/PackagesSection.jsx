@@ -44,7 +44,7 @@ export default function PackagesSection() {
     const ends = subscription.endsAt ? new Date(subscription.endsAt).getTime() : null;
     const totalDays = ends && !Number.isNaN(ends)
       ? Math.max(1, Math.round((ends - starts) / DAY_MS))
-      : (current.durationValue || 1) * 30;
+      : (current.durationValue || 1) * (current.durationUnit === "week" ? 7 : 30);
     const usedDays = Math.max(0, Math.round((Date.now() - starts) / DAY_MS));
     const frac = Math.max(0, Math.min(1, (totalDays - usedDays) / totalDays));
     return {
@@ -253,7 +253,7 @@ export default function PackagesSection() {
                 <div className="price-card__price-row">
                   <span className="price-card__price">{canUpgrade ? diff : pkg.price}</span>
                   <span className="price-card__per">
-                    {pkg.currency} / {pkg.durationValue} {t(`packages.unit.${pkg.durationUnit}`, pkg.durationUnit === "month" ? "شهر" : "مرة واحدة")}
+                    {pkg.currency} / {pkg.durationValue} {t(`packages.unit.${pkg.durationUnit}`, pkg.durationUnit === "week" ? "أسبوع" : pkg.durationUnit === "month" ? "شهر" : "مرة واحدة")}
                   </span>
                 </div>
                 {canUpgrade && (

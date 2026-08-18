@@ -68,7 +68,62 @@ function PlanCard({ title, plan, icon: Icon, status }) {
   );
 }
 
-function NextAppointment({ appointment, busy, onJoin }) {
+const UNIT_LABEL = { month: "شهر", week: "أسبوع", one_time: "مرة واحدة" };
+
+function SubscriptionCard({ sub }) {
+  const { t } = useTranslation();
+  if (!sub) return null;
+  const unit = sub.duration?.unit || sub.package?.durationUnit || "one_time";
+  const value = sub.duration?.value ?? sub.package?.durationValue ?? 1;
+  const expired = sub.status === "expired" || sub.periodActive === false || sub.status === "cancelled" || sub.status === "rejected";
+  const live = Boolean(sub.hasLiveSession && sub.periodActive !== false);
+  const remaining = sub.remainingDays;
+  return (
+    <section className="dash-panel">
+      <div className="dash-panel__head">
+        <h3 className="dash-panel__title">
+          <Wallet />
+          {t("dashboard.patient.subscriptionTitle", "اشتراكي")}
+        </h3>
+        <span className={`dash-badge ${expired ? "dash-badge--danger" : "dash-badge--success"}`}>
+          {expired ? t("dashboard.patient.subscriptionExpired", "منتهي") : t("dashboard.patient.subscriptionActive", "نشط")}
+        </span>
+      </div>
+      <div className="dash-panel__body">
+        <div className="dash-appt-meta">
+          <span className="dash-appt-meta__icon">
+            <Wallet />
+          </span>
+          <div>
+            <div className="dash-appt-meta__value">{sub.package?.name || t("dashboard.patient.noPackage", "بدون باقة")}</div>
+            <div className="dash-appt-meta__label">
+              {value} {UNIT_LABEL[unit] || unit}
+            </div>
+          </div>
+        </div>
+        <div className="dash-appt-meta">
+          <span className="dash-appt-meta__icon">
+            <Clock />
+          </span>
+          <div>
+            <div className="dash-appt-meta__value">
+              {remaining != null ? `${remaining} ${t("dashboard.patient.remainingDays", "يوم متبقي")}` : "—"}
+            </div>
+            <div className="dash-appt-meta__label">
+              {sub.endsAt ? `${t("dashboard.patient.endsAt", "ينتهي")}: ${new Date(sub.endsAt).toLocaleDateString()}` : t("dashboard.patient.noExpiry", "بدون تاريخ انتهاء")}
+            </div>
+          </div>
+        </div>
+        <p className="dash-muted" style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10 }}>
+          <Video size={15} />
+          {live ? t("dashboard.patient.liveIncluded", "البث المباشر مشمول في باقتك") : t("dashboard.patient.liveNotIncluded", "البث المباشر غير مشمول في باقتك الحالية")}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function NextAppointment({ appointment, busy, onJoin, canJoinLive }) {
   const { t } = useTranslation();
   if (!appointment)
     return (
@@ -108,9 +163,9 @@ function NextAppointment({ appointment, busy, onJoin }) {
           </div>
         </div>
         {appointment.liveSessionId || appointment.live_session_id ? (
-          <button className="dash-btn dash-btn--primary" disabled={busy} onClick={onJoin}>
+          <button className="dash-btn dash-btn--primary" disabled={busy || !canJoinLive} onClick={onJoin} title={canJoinLive ? "" : t("dashboard.patient.liveNotIncluded", "البث المباشر غير مشمول في باقتك الحالية")}>
             <Video />
-            {t("dashboard.patient.joinSession")}
+            {canJoinLive ? t("dashboard.patient.joinSession") : t("dashboard.patient.liveNotIncluded", "البث غير مشمول")}
           </button>
         ) : null}
       </div>
@@ -370,6 +425,8 @@ export default function PatientDashboard({ path }) {
 
         <OnboardingGate state={home?.onboarding?.state} onNavigate={navigate} />
 
+        <SubscriptionCard sub={home?.subscription || null} />
+
         <div className="dash-stat-grid">
           <section className="dash-stat dash-stat--primary">
             <span className="dash-stat__icon">
@@ -401,7 +458,7 @@ export default function PatientDashboard({ path }) {
         </div>
 
         <div className="dash-split">
-          <NextAppointment appointment={next} busy={busy} onJoin={join} />
+          <NextAppointment appointment={next} busy={busy} onJoin={join} canJoinLive={Boolean(home?.subscription?.hasLiveSession && home?.subscription?.periodActive !== false)} />
           <NotificationsPanel compact />
         </div>
       </>

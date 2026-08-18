@@ -10,6 +10,7 @@ import { models, sequelize } from "../models/index.js";
 import { AppError } from "../utils/errors.js";
 import { auditService } from "./audit.service.js";
 import { notificationService } from "./notification.service.js";
+import { entitlementService } from "./entitlement.service.js";
 import { tenantTimezone, todayInTimeZone } from "../utils/care-time.js";
 
 const {
@@ -183,6 +184,7 @@ export const careExecutionService = {
     const created = await sequelize.transaction(async (transaction) => {
       const { instance, day, program } = await loadInstance(instanceId, tenantId);
       canAct(program, current);
+      if (current.role === "patient") await entitlementService.requireActivePeriod({ tenantId, patientId: program.patient_id, transaction });
       assertRecordable(program, day, today);
       const byType = current.role === "patient" ? "patient" : "doctor";
       const key = normalizeIdempotencyKey(body);

@@ -5,6 +5,7 @@ import { AppError } from "../utils/errors.js";
 import { auditService } from "./audit.service.js";
 import { dailyProvider } from "./daily.provider.js";
 import { notificationService } from "./notification.service.js";
+import { entitlementService } from "./entitlement.service.js";
 
 const { Appointment, Patient, Doctor, LiveSession, VideoMeeting, VideoMeetingProvider, SessionNote, SessionNoteClarification } = models;
 
@@ -24,6 +25,7 @@ export const liveSessionService = {
       if (appointment.type !== "online") throw new AppError(409, "LIVE_SESSION_REQUIRES_ONLINE", "Live sessions require online appointments");
       if (appointment.status !== "confirmed") throw new AppError(409, "LIVE_SESSION_REQUIRES_CONFIRMED", "Appointment must be confirmed before creating a live session");
       if (String(appointment.doctor_id) !== String(current.doctorId)) throw new AppError(403, "LIVE_SESSION_ACCESS_FORBIDDEN", "Only the assigned doctor may create this session");
+      await entitlementService.requireEntitlement({ tenantId, patientId: appointment.patient_id, code: "live_session", transaction });
       const existing = await LiveSession.findOne({ where: { appointment_id: appointment.id, tenant_id: tenantId, status: { [Op.notIn]: ["failed", "ended"] } }, transaction, raw: true });
       if (existing) throw new AppError(409, "LIVE_SESSION_ALREADY_EXISTS", "An active live session already exists for this appointment");
       const session = await LiveSession.create({ tenant_id: tenantId, appointment_id: appointment.id, patient_id: appointment.patient_id, doctor_id: appointment.doctor_id, scheduled_at: appointment.scheduled_start_at, status: "not_started" }, { transaction });
@@ -46,7 +48,7 @@ export const liveSessionService = {
   },
   async get({ tenantId, id, auth }) { const current = actor(auth); const row = await loadLive(id, tenantId); participantAllowed(row, current); return sessionPayload(row, await meeting(row, tenantId)); },
   async join({ tenantId, id, auth }) {
-    const current = actor(auth); const row = await loadLive(id, tenantId); participantAllowed(row, current, true); if (!["not_started", "waiting", "active"].includes(row.status)) throw new AppError(409, "LIVE_SESSION_NOT_JOINABLE", "Live session is not joinable"); const vm = await meeting(row, tenantId); if (!vm?.external_room_ref || vm.status !== "created") throw new AppError(409, "LIVE_SESSION_NOT_READY", "Live provider room is not ready");
+    const current = actor(auth); const row = await loadLive(id, tenantId); participantAllowed(row, current, true); if (!["not_started", "waiting", "active"].includes(row.status)) throw new AppError(409, "LIVE_SESSION_NOT_JOINABLE", "Live session is not joinable"); if (current.role === "patient") await entitlementService.requireEntitlement({ tenantId, patientId: row.patient_id, code: "live_session" }); const vm = await meeting(row, tenantId); if (!vm?.external_room_ref || vm.status !== "created") throw new AppError(409, "LIVE_SESSION_NOT_READY", "Live provider room is not ready");
     const [person] = current.role === "doctor" ? await Doctor.findAll({ where: { id: row.doctor_id, tenant_id: tenantId }, limit: 1, raw: true }) : await Patient.findAll({ where: { id: row.patient_id, tenant_id: tenantId }, limit: 1, raw: true });
     const expiresAt = new Date(Date.now() + env.DAILY_TOKEN_TTL_SECONDS * 1000); const credential = await dailyProvider.createJoinToken({ roomName: vm.external_room_ref, userId: current.userId, userName: person?.name || person?.full_name || "Participant", isOwner: current.role === "doctor", expiresAt });
     const nextStatus = current.role === "doctor" ? "active" : row.status === "not_started" ? "waiting" : row.status;

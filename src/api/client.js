@@ -44,6 +44,7 @@ export const patientApi = {
   get: (id) => api.get(`/patients/${id}`),
   planVersions: (id) => api.get(`/patients/${id}/plan-versions`),
   home: () => api.get("/patients/me/home"),
+  subscription: () => api.get("/patients/me/subscription"),
   profile: (id) => reviewApi.get(id),
 };
 export const foodApi = {

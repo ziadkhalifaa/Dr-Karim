@@ -35,7 +35,7 @@ import ArticleManager from "./ArticleManager";
 import ServicesManager from "./ServicesManager";
 import ContactMessages from "./ContactMessages";
 import PackagesManager from "./PackagesManager";
-import { reviewApi, appointmentApi, notificationApi, liveSessionApi } from "../../api/client";
+import { reviewApi, appointmentApi, notificationApi, liveSessionApi, patientApi } from "../../api/client";
 import { useAuth } from "../../context/AuthProvider";
 
 function Empty({ text }) {
@@ -167,10 +167,19 @@ function Reviews({ rows, reload }) {
   );
 }
 
-function Appointments({ rows, reload }) {
+function Appointments({ rows, reload, subscriptions }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(null);
   const [notice, setNotice] = useState("");
+
+  const liveEntitlement = (a) => {
+    const sub = subscriptions[String(a.patient_id || a.patientId)];
+    if (!sub) return { entitled: true, label: t("dashboard.appointments.noSubscription", "بدون اشتراك") };
+    if (sub.periodActive === false || sub.status === "expired" || sub.status === "cancelled" || sub.status === "rejected")
+      return { entitled: false, label: t("dashboard.appointments.expired", "منتهي") };
+    if (!sub.hasLiveSession) return { entitled: false, label: t("dashboard.appointments.noLive", "بدون بث") };
+    return { entitled: true, label: sub.packageName || t("dashboard.appointments.active", "نشط") };
+  };
 
   const run = async (id, action) => {
     setBusy(id);
@@ -257,6 +266,7 @@ function Appointments({ rows, reload }) {
               <thead>
                 <tr>
                   <th>{t("dashboard.appointments.patient")}</th>
+                  <th>{t("dashboard.appointments.subscription", "الاشتراك")}</th>
                   <th>{t("dashboard.appointments.start")}</th>
                   <th>{t("dashboard.appointments.type")}</th>
                   <th>{t("dashboard.appointments.status")}</th>
@@ -268,6 +278,13 @@ function Appointments({ rows, reload }) {
                   <tr key={a.id}>
                     <td>
                       <span className="dash-cell-main">{a.patient_id || a.patientId || "—"}</span>
+                    </td>
+                    <td>
+                      {(() => { const ent = liveEntitlement(a); const sub = subscriptions[String(a.patient_id || a.patientId)]; return (
+                        <span className={`dash-badge ${ent.entitled ? "dash-badge--success" : "dash-badge--danger"}`} title={`${ent.label}${sub?.expiresAt ? ` — ${t("dashboard.appointments.endsAt", "ينتهي")}: ${new Date(sub.expiresAt).toLocaleDateString()}` : ""}`}>
+                          {ent.label}
+                        </span>
+                      ); })()}
                     </td>
                     <td className="dash-cell-muted">
                       {a.scheduled_start_at ? new Date(a.scheduled_start_at).toLocaleString() : "—"}
@@ -287,7 +304,7 @@ function Appointments({ rows, reload }) {
                             {t("dashboard.appointments.confirm")}
                           </button>
                         )}
-                        {a.status === "confirmed" && !a.liveSessionId && (
+                        {a.status === "confirmed" && !a.liveSessionId && liveEntitlement(a).entitled && (
                           <button
                             className="dash-btn dash-btn--primary dash-btn--sm"
                             disabled={busy === a.id}
@@ -347,17 +364,33 @@ export default function DoctorDashboard({ path }) {
   const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [appointments, setAppointments] = useState([]);
+  const [subscriptions, setSubscriptions] = useState({});
   const [unread, setUnread] = useState(0);
 
   const reload = async () => {
-    const [r, a, notifs] = await Promise.all([
+    const [r, a, notifs, patients] = await Promise.all([
       reviewApi.list(),
       user.doctorId ? appointmentApi.doctorList(user.doctorId) : Promise.resolve([]),
       notificationApi.list().catch(() => []),
+      patientApi.list("?limit=100").catch(() => []),
     ]);
+    const subs = {};
+    for (const p of patients?.items || []) {
+      const pid = String(p.id);
+      subs[pid] = p.subscription
+        ? {
+            status: p.subscription.status,
+            periodActive: p.subscription.periodActive,
+            hasLiveSession: p.subscription.hasLiveSession,
+            expiresAt: p.subscription.expiresAt,
+            packageName: p.subscription.package?.name || null,
+          }
+        : null;
+    }
     setReviews(r || []);
     setAppointments(a || []);
     setUnread((notifs || []).filter((n) => !n.read_at && !n.readAt).length);
+    setSubscriptions(subs);
   };
 
   useEffect(() => {
@@ -405,7 +438,7 @@ export default function DoctorDashboard({ path }) {
   else if (path === "/doctor/services") page = <ServicesManager />;
   else if (path === "/doctor/packages") page = <PackagesManager />;
   else if (path === "/doctor/messages") page = <ContactMessages />;
-  else if (path === "/doctor/appointments") page = <Appointments rows={appointments} reload={reload} />;
+  else if (path === "/doctor/appointments") page = <Appointments rows={appointments} reload={reload} subscriptions={subscriptions} />;
   else
     page = (
       <>
