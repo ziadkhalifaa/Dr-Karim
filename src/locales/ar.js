@@ -388,6 +388,10 @@ export const ar = {
       actions: "إجراءات",
       confirm: "تأكيد",
       complete: "إتمام",
+      createSession: "إنشاء جلسة فيديو",
+      openSession: "فتح الجلسة",
+      endSession: "إنهاء الجلسة",
+      noUrl: "رابط الجلسة غير متاح بعد",
       empty: "لا توجد مواعيد.",
     },
     payments: {

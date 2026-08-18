@@ -4,6 +4,7 @@ import env from "../config/env.js";
 import { AppError } from "../utils/errors.js";
 import { auditService } from "./audit.service.js";
 import { dailyProvider } from "./daily.provider.js";
+import { notificationService } from "./notification.service.js";
 
 const { Appointment, Patient, Doctor, LiveSession, VideoMeeting, VideoMeetingProvider, SessionNote, SessionNoteClarification } = models;
 
@@ -37,6 +38,7 @@ export const liveSessionService = {
         await VideoMeeting.update({ status: "failed" }, { where: { id: vm.id }, transaction });
       }
       await auditService.record({ tenantId, action: failure ? "live_session.failed" : "live_session.created", entity: "live_session", entityRef: String(session.id), metadata: { appointmentId: String(appointment.id), provider: "daily" }, actorType: current.role, actorId: current.userId, ip, transaction });
+      await notificationService.emitForPatient({ tenantId, patientId: appointment.patient_id, type: failure ? "live_session_failed" : "live_session_ready", relatedEntity: "live_session", relatedRef: String(session.id), transaction });
       return { session: session.toJSON(), meeting: await VideoMeeting.findByPk(vm.id, { transaction, raw: true }) };
     });
     if (failure) throw new AppError(failure.status || 502, "LIVE_PROVIDER_FAILURE", "Video provider unavailable; appointment remains confirmed");

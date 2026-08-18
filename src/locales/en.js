@@ -389,6 +389,10 @@ export const en = {
       actions: "Actions",
       confirm: "Confirm",
       complete: "Complete",
+      createSession: "Create video session",
+      openSession: "Open session",
+      endSession: "End session",
+      noUrl: "Session link is not available yet",
       empty: "No appointments found.",
     },
     payments: {

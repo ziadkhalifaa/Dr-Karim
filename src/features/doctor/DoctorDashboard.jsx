@@ -16,6 +16,9 @@ import {
   Users,
   FileText,
   MessageCircle,
+  Video,
+  Plus,
+  StopCircle,
 } from "lucide-react";
 import DashboardShell from "../shared/DashboardShell";
 import NotificationsPanel from "../shared/NotificationsPanel";
@@ -32,7 +35,7 @@ import ArticleManager from "./ArticleManager";
 import ServicesManager from "./ServicesManager";
 import ContactMessages from "./ContactMessages";
 import PackagesManager from "./PackagesManager";
-import { reviewApi, appointmentApi, notificationApi } from "../../api/client";
+import { reviewApi, appointmentApi, notificationApi, liveSessionApi } from "../../api/client";
 import { useAuth } from "../../context/AuthProvider";
 
 function Empty({ text }) {
@@ -167,11 +170,57 @@ function Reviews({ rows, reload }) {
 function Appointments({ rows, reload }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(null);
+  const [notice, setNotice] = useState("");
+
   const run = async (id, action) => {
     setBusy(id);
+    setNotice("");
     try {
       await appointmentApi.transition(id, action);
       await reload();
+    } catch (err) {
+      setNotice(err.message);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const createSession = async (a) => {
+    setBusy(a.id);
+    setNotice("");
+    try {
+      await liveSessionApi.create(a.id);
+      await reload();
+    } catch (err) {
+      setNotice(err.message);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const joinSession = async (a) => {
+    setBusy(a.id);
+    setNotice("");
+    try {
+      const session = await liveSessionApi.join(a.liveSessionId);
+      if (session?.joinUrl)
+        window.open(`${session.joinUrl}?t=${encodeURIComponent(session.token)}`, "_blank", "noopener,noreferrer");
+      else setNotice(t("dashboard.appointments.noUrl", "رابط الجلسة غير متاح بعد"));
+    } catch (err) {
+      setNotice(err.message);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const endSession = async (a) => {
+    setBusy(a.id);
+    setNotice("");
+    try {
+      await liveSessionApi.end(a.liveSessionId);
+      await reload();
+    } catch (err) {
+      setNotice(err.message);
     } finally {
       setBusy(null);
     }
@@ -195,6 +244,13 @@ function Appointments({ rows, reload }) {
           </h3>
           <span className="dash-badge dash-badge--info">{rows.length}</span>
         </div>
+        {notice && (
+          <p role="alert" style={{ margin: "14px 20px 0", background: "#fee2e2", border: "1px solid #fca5a5", color: "#991b1b", padding: "11px 14px", borderRadius: 10, fontSize: 13.5, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
+            <AlertTriangle size={15} />
+            <span style={{ flex: 1 }}>{notice}</span>
+            <button onClick={() => setNotice("")} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: 16, lineHeight: 1 }} aria-label="close">×</button>
+          </p>
+        )}
         {rows.length ? (
           <div className="dash-table-wrap dash-panel__body--flush">
             <table className="dash-table">
@@ -231,9 +287,39 @@ function Appointments({ rows, reload }) {
                             {t("dashboard.appointments.confirm")}
                           </button>
                         )}
-                        {a.status === "confirmed" && (
+                        {a.status === "confirmed" && !a.liveSessionId && (
                           <button
                             className="dash-btn dash-btn--primary dash-btn--sm"
+                            disabled={busy === a.id}
+                            onClick={() => createSession(a)}
+                          >
+                            <Plus size={14} />
+                            {t("dashboard.appointments.createSession")}
+                          </button>
+                        )}
+                        {a.status === "confirmed" && a.liveSessionId && (
+                          <>
+                            <button
+                              className="dash-btn dash-btn--primary dash-btn--sm"
+                              disabled={busy === a.id}
+                              onClick={() => joinSession(a)}
+                            >
+                              <Video size={14} />
+                              {t("dashboard.appointments.openSession")}
+                            </button>
+                            <button
+                              className="dash-btn dash-btn--danger dash-btn--sm"
+                              disabled={busy === a.id}
+                              onClick={() => endSession(a)}
+                            >
+                              <StopCircle size={14} />
+                              {t("dashboard.appointments.endSession")}
+                            </button>
+                          </>
+                        )}
+                        {a.status === "confirmed" && (
+                          <button
+                            className="dash-btn dash-btn--ghost dash-btn--sm"
                             disabled={busy === a.id}
                             onClick={() => run(a.id, "complete")}
                           >
