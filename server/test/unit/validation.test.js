@@ -82,13 +82,18 @@ describe("Assessment validation (H, I, J, K, guardian)", () => {
     assert.ok(missing, "missing patientName should error");
   });
 
-  it("I: invalid conditional answer rejected (Q04_D3 without diabetes)", () => {
+  it("I: removed conditional answer rejected (Q04_D3 without diabetes)", () => {
     const p = basePayload({
       answers: { ...basePayload().answers, Q04_D3: "daily" },
     });
     const r = runValidation(p);
-    const hidden = r.errors.find((e) => e.field === "answers.Q04_D3" && e.message.includes("not eligible"));
-    assert.ok(hidden, "Q04_D3 not visible without diabetes should be rejected");
+    // Q04_D3 was removed by the 5-step intake: an answer to it is rejected as
+    // an unknown code (it used to be rejected as not-eligible — either way the
+    // client-side bypass must not slip through).
+    const rejected = r.errors.find(
+      (e) => e.field === "answers.Q04_D3" && (e.message.includes("not eligible") || e.message.includes("Unknown question code"))
+    );
+    assert.ok(rejected, "Q04_D3 should be rejected");
   });
 
   it("J: unknown question code rejected", () => {

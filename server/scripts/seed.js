@@ -132,35 +132,64 @@ async function seedTenantAndDoctor() {
 // 2. reference code catalogs
 // ---------------------------------------------------------------------------
 
+// Catalog derivation is resilient to catalog changes in the 5-step intake:
+// a catalog whose source question still exists is derived from it (single
+// source of truth); a catalog whose source question was removed keeps its
+// last approved spec values as a static fallback. Additive-only policy means
+// legacy DB rows are never deleted either way.
+function optionsById(id) {
+  const q = QUESTIONS_RAW.find((x) => x.id === id);
+  return q && Array.isArray(q.options) ? q.options : null;
+}
+
+function toCodeRows(options) {
+  return (options || []).map((o) => ({ code: o.value, name_ar: o.ar, name_en: o.en, sort_order: 0 }));
+}
+
+// Q01_02 was removed by the 5-step intake (subject is always "self"). The
+// relationship catalog remains valid: contact-person relationships are still
+// validated server-side (ALL_RELATIONSHIPS in validation/assessment.validation.js).
+const RELATIONSHIP_FALLBACK = [
+  { value: "parent", ar: "والد/والدة", en: "Parent" },
+  { value: "grandparent", ar: "جد/جدة", en: "Grandparent" },
+  { value: "sibling", ar: "أخ/أخت", en: "Sibling" },
+  { value: "spouse", ar: "زوج/زوجة", en: "Spouse" },
+  { value: "legal_guardian", ar: "ولي أمر", en: "Legal guardian" },
+  { value: "other", ar: "آخر", en: "Other" },
+];
+
+// Q08_02 (allergy reaction matrix) was replaced by a free-text allergies
+// field; the reaction/severity catalogs keep the approved spec values still
+// referenced by flag rules (RU5 anaphylaxis etc.).
+const REACTION_FALLBACK = [
+  { value: "mild", ar: "خفيف", en: "Mild" },
+  { value: "moderate", ar: "متوسط", en: "Moderate" },
+  { value: "severe", ar: "شديد", en: "Severe" },
+  { value: "anaphylaxis", ar: "حساسية مفرطة (أنافيلاكسيس)", en: "Anaphylaxis" },
+];
+
 function buildRelationshipCodes() {
-  const opts = QUESTIONS_RAW.find((q) => q.id === "Q01_02").options;
-  return opts.map((o) => ({ code: o.value, name_ar: o.ar, name_en: o.en, sort_order: 0 }));
+  return toCodeRows(optionsById("Q01_02") ?? RELATIONSHIP_FALLBACK);
 }
 
 function buildGoalCodes() {
-  const opts = QUESTIONS_RAW.find((q) => q.id === "Q03_01").options;
-  return opts.map((o) => ({ code: o.value, name_ar: o.ar, name_en: o.en, sort_order: 0 }));
+  return toCodeRows(optionsById("Q03_01"));
 }
 
 function buildDietPatternCodes() {
-  const opts = QUESTIONS_RAW.find((q) => q.id === "Q08_04").options;
-  return opts.map((o) => ({ code: o.value, name_ar: o.ar, name_en: o.en, sort_order: 0 }));
+  return toCodeRows(optionsById("FOOD_DIET"));
 }
 
 function buildReactionCodes() {
-  const q = QUESTIONS_RAW.find((x) => x.id === "Q08_02");
-  const col = q.columns.find((c) => c.key === "reaction");
-  return col.options.map((o) => ({ code: o.value, name_ar: o.ar, name_en: o.en, sort_order: 0 }));
+  return toCodeRows(REACTION_FALLBACK);
 }
 
 function buildSeverityCodes() {
-  const reaction = buildReactionCodes();
-  return reaction.map((r, i) => ({ ...r, sort_order: i }));
+  return buildReactionCodes().map((r, i) => ({ ...r, sort_order: i }));
 }
 
 function buildConditionCodes() {
-  const opts = QUESTIONS_RAW.find((q) => q.id === "Q04_02").options;
-  return opts.map((o) => ({ code: o.value, name_ar: o.ar, name_en: o.en, sort_order: 0 }));
+  return toCodeRows(optionsById("HEALTH_CONDITIONS"));
 }
 
 function buildAppointmentStatuses() {

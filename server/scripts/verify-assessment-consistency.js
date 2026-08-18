@@ -197,9 +197,11 @@ async function main() {
   }
 
   try {
-    const def = await AssessmentDefinition.findOne({ where: { code: "nutrition-assessment", version: "1.0" } });
+    // Resolve the active published definition (same rule as definition.service
+    // — seed keeps exactly one active row; legacy definitions stay inactive).
+    const def = await AssessmentDefinition.findOne({ where: { is_active: true, status: "published" } });
     if (!def) {
-      report("definition", "assessment_definition nutrition-assessment v1.0 not found.");
+      report("definition", "no active published assessment_definition found.");
     } else {
       await verifyCatalog(def);
     }
