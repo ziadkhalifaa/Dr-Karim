@@ -41,4 +41,6 @@ function pickUploadsRoot() {
 
 export const uploadsRoot = pickUploadsRoot();
 export const coversDir = path.join(uploadsRoot, "covers");
+export const paymentReceiptsDir = path.join(uploadsRoot, "private", "payment-receipts");
 ensure(coversDir);
+ensure(paymentReceiptsDir);
