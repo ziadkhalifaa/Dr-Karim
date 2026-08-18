@@ -108,26 +108,33 @@ export default function ServicesPage() {
                         className="service-card"
                         style={{ cursor: "pointer" }}
                         onClick={(e) => openService(e, item.code)}
+                        tabIndex={0}
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-40px" }}
                         transition={{ delay: i * 0.06, duration: 0.5 }}
                       >
-                        <div className="service-card__media">
-                          {item.coverImageUrl ? (
-                            <img
-                              src={item.coverImageUrl}
-                              alt={item.title}
-                              onError={(e) => { e.currentTarget.src = FALLBACK_COVER; }}
-                            />
-                          ) : (
-                            <span className="service-card__fallback"><Sparkles size={40} /></span>
-                          )}
-                        </div>
-                        <div className="service-card__body">
-                          <span className="service-card__cat">{group.title}</span>
-                          <h4 className="service-card__title">{item.title}</h4>
-                          <p className="service-card__desc">{item.body}</p>
+                        <div className="service-card__inner">
+                          <div className="service-card__face service-card__face--front">
+                            <div className="service-card__media">
+                              {item.coverImageUrl ? (
+                                <img
+                                  src={item.coverImageUrl}
+                                  alt={item.title}
+                                  onError={(e) => { e.currentTarget.src = FALLBACK_COVER; }}
+                                />
+                              ) : (
+                                <span className="service-card__fallback"><Sparkles size={40} /></span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="service-card__face service-card__face--back">
+                            <div className="service-card__body">
+                              <span className="service-card__cat">{group.title}</span>
+                              <h4 className="service-card__title">{item.title}</h4>
+                              <p className="service-card__desc">{item.body}</p>
+                            </div>
+                          </div>
                         </div>
                       </motion.article>
                     ))}
