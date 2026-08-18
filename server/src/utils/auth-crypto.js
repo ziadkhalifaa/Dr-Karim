@@ -5,7 +5,7 @@ const scrypt = promisify(crypto.scrypt);
 const SCRYPT_OPTIONS = { N: 16384, r: 8, p: 1, maxmem: 32 * 1024 * 1024 };
 
 export async function hashPassword(password) {
-  if (typeof password !== "string" || password.length < 12) throw new Error("Password does not meet minimum length");
+  if (typeof password !== "string" || password.length < 8) throw new Error("Password does not meet minimum length");
   const salt = crypto.randomBytes(16).toString("base64url");
   const derived = await scrypt(password, salt, 64, SCRYPT_OPTIONS);
   return `scrypt$${salt}$${Buffer.from(derived).toString("base64url")}`;

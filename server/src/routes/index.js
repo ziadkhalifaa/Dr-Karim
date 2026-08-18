@@ -55,6 +55,7 @@ export function routes(app) {
   // api.use("/services", placeholderRouter("services"));
   api.use("/appointments", placeholderRouter("appointments"));
   app.use("/api/v1", api);
+  app.use("/api/health", healthRouter());
 }
 
 export default routes;
