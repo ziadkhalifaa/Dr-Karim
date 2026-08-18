@@ -19,6 +19,7 @@ import NotificationsPanel from "../shared/NotificationsPanel";
 import PaymentCenter from "./PaymentCenter";
 import DailyCare from "./DailyCare";
 import PatientProgress from "./Progress";
+import BookSlotPage from "./BookSlotPage";
 import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
 import {
@@ -362,6 +363,7 @@ export default function PatientDashboard({ path }) {
     { path: "/patient/care", label: t("dailyCare.nav"), icon: ClipboardList },
     { path: "/patient/progress", label: t("patientProgress.nav"), icon: Scale },
     { path: "/patient/plan", label: t("dashboard.nav.myPlan"), icon: Salad },
+    { path: "/patient/book", label: "احجز جلسة", icon: Video },
     { path: "/patient/checkin", label: t("dashboard.patient.checkinTitle"), icon: ClipboardCheck },
     { path: "/patient/payments", label: t("dashboard.nav.payments"), icon: Wallet },
     { path: "/patient/notifications", label: t("dashboard.nav.notifications"), icon: Bell },
@@ -372,6 +374,7 @@ export default function PatientDashboard({ path }) {
   else if (path === "/patient/progress") page = <PatientProgress />;
   else if (path === "/patient/payments") page = <PaymentCenter />;
   else if (path === "/patient/notifications") page = <NotificationsPanel />;
+  else if (path === "/patient/book") page = <BookSlotPage />;
   else if (path === "/patient/plan")
     page = (
       <>

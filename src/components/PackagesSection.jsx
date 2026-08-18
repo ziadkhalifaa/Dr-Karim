@@ -5,7 +5,7 @@ import { publicApi, patientApi } from "../api/client";
 import { navigate } from "../lib/router";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthProvider";
-import { entitlementLabel } from "../constants/entitlements";
+import { featureLabel } from "../constants/entitlements";
 
 const DAY_MS = 86400000;
 
@@ -275,7 +275,7 @@ export default function PackagesSection() {
                       <span className="price-card__feature-ico">
                         <Check size={14} />
                       </span>
-                      {typeof feature === "string" ? entitlementLabel(feature) : entitlementLabel(feature?.code)}
+                      {featureLabel(feature)}
                     </li>
                   ))}
                   {(!pkg.features || pkg.features.length === 0) && (

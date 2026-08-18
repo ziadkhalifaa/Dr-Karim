@@ -43,6 +43,8 @@ export async function listPackages(req, res, next) {
           id: String(f.id),
           code: f.code,
           allowed: f.allowed,
+          limitValue: f.limit_value ?? null,
+          periodUnit: f.period_unit || null,
         })),
       };
     });
@@ -75,12 +77,17 @@ export async function createPackage(req, res, next) {
       }, { transaction: t });
 
       if (features && features.length > 0) {
-        const entData = features.map(f => ({
-          tenant_id: tenantId,
-          package_id: newPkg.id,
-          code: f.code || f,
-          allowed: typeof f.allowed === "boolean" ? f.allowed : true,
-        }));
+        const entData = features.map(f => {
+          const code = typeof f === "string" ? f : f.code || f;
+          return {
+            tenant_id: tenantId,
+            package_id: newPkg.id,
+            code,
+            allowed: typeof f.allowed === "boolean" ? f.allowed : true,
+            limit_value: f.limitValue ?? null,
+            period_unit: f.periodUnit || null,
+          };
+        });
         await PackageEntitlement.bulkCreate(entData, { transaction: t });
       }
 
@@ -119,12 +126,17 @@ export async function updatePackage(req, res, next) {
       if (features) {
         await PackageEntitlement.destroy({ where: { package_id: id }, transaction: t });
         if (features.length > 0) {
-          const entData = features.map(f => ({
-            tenant_id: tenantId,
-            package_id: id,
-            code: f.code || f,
-            allowed: typeof f.allowed === "boolean" ? f.allowed : true,
-          }));
+          const entData = features.map(f => {
+            const code = typeof f === "string" ? f : f.code || f;
+            return {
+              tenant_id: tenantId,
+              package_id: id,
+              code,
+              allowed: typeof f.allowed === "boolean" ? f.allowed : true,
+              limit_value: f.limitValue ?? null,
+              period_unit: f.periodUnit || null,
+            };
+          });
           await PackageEntitlement.bulkCreate(entData, { transaction: t });
         }
       }

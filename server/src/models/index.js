@@ -45,7 +45,7 @@ const {
   ContentCategory, ContentCategoryTranslation, Content, ContentTranslation,
   ClinicInfo, WorkingHour, PlatformSetting, _FeatureFlag,
 } = GROUP_07;
-const { Appointment } = GROUP_08;
+const { Appointment, AppointmentSlot } = GROUP_08;
 const { VideoMeetingProvider, VideoMeeting, LiveSession, SessionNote, SessionNoteClarification } = GROUP_09;
 const {
   NutritionPlan, NutritionPlanVersion, FoodItem, MealTemplate, MealItem,
@@ -75,7 +75,7 @@ const TENANT_SCOPED = [
   PatientCondition, PatientAllergy, PatientMedication, PatientMeasurement,
   PatientLabValue, PatientPregnancyRecord, PatientGoalHistory,
   ServiceCategory, Service, ContentCategory, Content, ClinicInfo, WorkingHour, PlatformSetting,
-  Appointment, VideoMeeting, LiveSession, SessionNote, SessionNoteClarification,
+  Appointment, AppointmentSlot, VideoMeeting, LiveSession, SessionNote, SessionNoteClarification,
   NutritionPlan, NutritionPlanVersion, MealTemplate, MealItem, FoodSubstitution, NutritionPlanNote,
   ExercisePlan, ExercisePlanVersion, ExerciseSubstitution, ExercisePlanNote,
   PatientCheckin, PatientCheckinMeasurement, PatientCheckinAdherence,
@@ -187,6 +187,11 @@ Appointment.belongsTo(Doctor, { foreignKey: "doctor_id" });
 Appointment.belongsTo(Service, { foreignKey: "service_id" });
 Doctor.hasMany(Appointment, { foreignKey: "doctor_id" });
 Patient.hasMany(Appointment, { foreignKey: "patient_id" });
+
+AppointmentSlot.belongsTo(Doctor, { foreignKey: "doctor_id" });
+AppointmentSlot.belongsTo(Appointment, { foreignKey: "appointment_id" });
+Doctor.hasMany(AppointmentSlot, { foreignKey: "doctor_id" });
+Appointment.hasOne(AppointmentSlot, { foreignKey: "appointment_id" });
 
 // ---- Live sessions / video / notes ----
 LiveSession.belongsTo(Appointment, { foreignKey: "appointment_id" });

@@ -20,3 +20,13 @@ export function entitlementLabel(code) {
   const str = String(code || "").replace(/[_-]+/g, " ");
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function featureLabel(feature) {
+  const f = typeof feature === "object" ? feature : { code: feature };
+  const base = entitlementLabel(f.code);
+  if (f.code === "live_session" && f.limitValue != null) {
+    const period = f.periodUnit === "month" ? "شهر" : "أسبوع";
+    return `${base} — ${f.limitValue} جلسة / ${period}`;
+  }
+  return base;
+}

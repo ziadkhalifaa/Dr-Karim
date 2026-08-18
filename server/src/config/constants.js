@@ -33,6 +33,8 @@ export const ENUM = {
   NOTE_VISIBILITY: ["doctor_private", "patient_visible"], // §31 default doctor_private
   APPOINTMENT_TYPE: ["clinic", "online"], // §15
   APPOINTMENT_STATUS: ["pending", "confirmed", "cancelled", "completed", "no_show"], // §15/§28
+  SLOT_STATUS: ["open", "booked", "cancelled"], // booking engine
+  SLOT_REPEAT_UNIT: ["none", "weekly", "biweekly"], // recurrence presets
   LIVE_SESSION_STATUS: ["not_started", "waiting", "active", "ended", "failed"], // §28
   VIDEO_MEETING_STATUS: ["pending", "created", "started", "ended", "failed"], // §29
   CHECKIN_STATUS: ["submitted", "reviewed"], // §27 default submitted

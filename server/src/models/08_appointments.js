@@ -1,5 +1,5 @@
 // Group 08 — Appointments (future-ready booking lifecycle, §15/§28).
-// Table: appointment. No scheduling engine in this phase.
+// Tables: appointment, appointment_slot (bookable time windows).
 
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/database.js";
@@ -35,4 +35,30 @@ export const Appointment = sequelize.define(
   }
 );
 
-export const GROUP_08 = { Appointment };
+export const AppointmentSlot = sequelize.define(
+  "appointment_slot",
+  {
+    id: BIGID,
+    tenant_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    doctor_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    appointment_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
+    series_ref: { type: DataTypes.STRING(64), allowNull: true },
+    starts_at: { type: DataTypes.DATE, allowNull: false },
+    ends_at: { type: DataTypes.DATE, allowNull: true },
+    duration_min: { type: DataTypes.SMALLINT.UNSIGNED, allowNull: true },
+    status: { type: DataTypes.ENUM(...ENUM.SLOT_STATUS), allowNull: false, defaultValue: "open" },
+    branch_ref: { type: DataTypes.STRING(40), allowNull: true },
+    deleted_at: { type: DataTypes.DATE, allowNull: true },
+  },
+  {
+    tableName: "appointment_slot",
+    underscored: true,
+    indexes: [
+      { name: "as_tenant_doctor_start", fields: ["tenant_id", "doctor_id", "starts_at"] },
+      { name: "as_tenant_status_start", fields: ["tenant_id", "status", "starts_at"] },
+      { name: "as_tenant_series", fields: ["tenant_id", "series_ref"] },
+    ],
+  }
+);
+
+export const GROUP_08 = { Appointment, AppointmentSlot };

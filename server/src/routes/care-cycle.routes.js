@@ -3,10 +3,18 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 import { checkinController } from "../controllers/checkin.controller.js";
 import { appointmentController } from "../controllers/appointment.controller.js";
 import { liveSessionController } from "../controllers/live-session.controller.js";
+import { bookingController } from "../controllers/booking.controller.js";
 
 export function careCycleRouter() {
   const router = express.Router();
   router.use(requireAuth);
+
+  // Slot endpoints registered before /appointments/:id to avoid :id shadowing.
+  router.post("/appointments/slots", requireRole("doctor"), bookingController.createSlots);
+  router.get("/appointments/slots", requireRole("patient", "doctor", "staff"), bookingController.list);
+  router.post("/appointments/slots/:id/book", requireRole("patient"), bookingController.book);
+  router.post("/appointments/slots/:id/cancel", requireRole("doctor"), bookingController.cancel);
+
   router.post("/patients/:id/checkins", requireRole("patient", "doctor"), checkinController.create);
   router.get("/patients/:id/checkins", requireRole("patient", "doctor", "staff"), checkinController.list);
   router.get("/patients/:id/checkins/:checkinId", requireRole("patient", "doctor", "staff"), checkinController.get);

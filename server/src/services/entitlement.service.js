@@ -14,8 +14,9 @@
 
 import { models } from "../models/index.js";
 import { AppError } from "../utils/errors.js";
+import { Op } from "sequelize";
 
-const { Subscription, Package, SubscriptionEntitlement } = models;
+const { Subscription, Package, SubscriptionEntitlement, Appointment } = models;
 
 const UNIT_DAYS = { month: 30, week: 7, one_time: null };
 
@@ -114,8 +115,39 @@ export async function useEntitlement({ tenantId, patientId, code, amount = 1, tr
   return entitlement;
 }
 
+export async function sessionQuota({ tenantId, patientId, transaction } = {}) {
+  const state = await subscriptionState({ tenantId, patientId, transaction });
+  if (state.legacy || !state.subscription)
+    return { subscribed: Boolean(state.subscription), legacy: state.legacy, entitled: true, allowed: null, limit: null, periodUnit: null, used: 0, oneTime: false };
+  const entitlement = state.entitlementsByCode["live_session"];
+  const allowed = Boolean(entitlement?.allowed);
+  const limit = entitlement?.limit_value ?? null;
+  const periodUnit = entitlement?.period_unit || (state.subscription.duration?.unit !== "one_time" ? state.subscription.duration?.unit : null);
+  if (!allowed) return { subscribed: true, legacy: false, entitled: false, allowed: false, limit, periodUnit, used: 0, oneTime: state.subscription.duration?.unit === "one_time" };
+  if (state.subscription.duration?.unit === "one_time")
+    return { subscribed: true, legacy: false, entitled: true, allowed: true, limit, periodUnit: null, used: entitlement?.used_value || 0, remaining: limit == null ? null : Math.max(0, limit - (entitlement?.used_value || 0)), oneTime: true };
+  const periodDays = periodUnit === "month" ? 30 : periodUnit === "week" ? 7 : null;
+  if (!periodDays) return { subscribed: true, legacy: false, entitled: true, allowed: true, limit, periodUnit, used: 0, remaining: limit, oneTime: false };
+  const ann = new Date(state.subscription.startsAt || Date.now()).getTime();
+  const now = Date.now();
+  const index = Math.max(0, Math.floor((now - ann) / (periodDays * 86400000)));
+  const windowStart = new Date(ann + index * periodDays * 86400000);
+  const windowEnd = new Date(windowStart.getTime() + periodDays * 86400000);
+  const used = await Appointment.count({
+    where: {
+      tenant_id: tenantId,
+      patient_id: patientId,
+      deleted_at: null,
+      status: { [Op.in]: ["pending", "confirmed", "completed"] },
+      scheduled_start_at: { [Op.gte]: windowStart, [Op.lt]: windowEnd },
+    },
+    transaction,
+  });
+  return { subscribed: true, legacy: false, entitled: true, allowed: true, limit, periodUnit, used, remaining: limit == null ? null : Math.max(0, limit - used), oneTime: false };
+}
+
 export const entitlementService = {
-  UNIT_DAYS, durationProfile, isPeriodActive, remainingDays, subscriptionState, requireEntitlement, useEntitlement, requireActivePeriod,
+  UNIT_DAYS, durationProfile, isPeriodActive, remainingDays, subscriptionState, requireEntitlement, useEntitlement, requireActivePeriod, sessionQuota,
 };
 
 export default entitlementService;

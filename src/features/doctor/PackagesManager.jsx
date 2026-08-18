@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash, Check, X } from "lucide-react";
 import { packageAdminApi } from "../../api/client";
-import { ENTITLEMENTS, entitlementLabel } from "../../constants/entitlements";
+import { ENTITLEMENTS, featureLabel } from "../../constants/entitlements";
 
 export default function PackagesManager() {
   const [packages, setPackages] = useState([]);
@@ -126,7 +126,7 @@ export default function PackagesManager() {
                     {pkg.features.map((f, i) => (
                       <li key={i} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: "var(--dash-text)" }}>
                         <Check size={14} style={{ color: "var(--dash-success)", flexShrink: 0 }} />
-                        {entitlementLabel(typeof f === "object" ? f.code : f)}
+                        {featureLabel(f)}
                       </li>
                     ))}
                   </ul>
@@ -168,6 +168,7 @@ export default function PackagesManager() {
 
 /* ─── Package Modal ─────────────────────────────────────────────────── */
 function PackageModal({ pkg, onClose, onSave }) {
+  const featureObjects = (pkg?.features || []).map(f => (typeof f === "object" ? f : { code: f }));
   const [formData, setFormData] = useState({
     name: pkg?.name || "",
     slug: pkg?.slug || "",
@@ -176,14 +177,29 @@ function PackageModal({ pkg, onClose, onSave }) {
     durationValue: pkg?.durationValue || 1,
     durationUnit: pkg?.durationUnit || "month",
     active: pkg ? pkg.active : true,
-    features: pkg?.features?.map(f => (typeof f === "object" ? f.code : f)) || [""],
+    features: featureObjects.map(f => f.code).filter(Boolean),
   });
+  const [quotas, setQuotas] = useState(
+    Object.fromEntries(
+      featureObjects.filter(f => f.code === "live_session").map(f => [
+        f.code,
+        { limit: f.limitValue ?? "", period: f.periodUnit || "week" },
+      ])
+    )
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const cleanFeatures = formData.features
       .filter(f => f.trim())
-      .map(f => ({ code: f, allowed: true }));
+      .map(f => {
+        const quota = quotas[f];
+        return {
+          code: f,
+          allowed: true,
+          ...(quota && quota.limit !== "" ? { limitValue: Number(quota.limit), periodUnit: quota.period || "week" } : {}),
+        };
+      });
     onSave({ ...formData, features: cleanFeatures });
   };
 
@@ -331,6 +347,29 @@ function PackageModal({ pkg, onClose, onSave }) {
                     />
                     <span style={{ fontWeight: "800", fontSize: "13.5px", color: "var(--dash-text)" }}>{ent.label}</span>
                     <span style={{ fontSize: "11.5px", fontWeight: "600", color: "var(--dash-text-muted)" }}>{ent.hint}</span>
+                    {ent.code === "live_session" && enabled && (
+                      <div style={{ display: "flex", gap: "8px", width: "100%", marginTop: "6px" }}>
+                        <input
+                          type="number"
+                          min="1"
+                          className="dash-input"
+                          style={{ width: "70px", padding: "6px 8px" }}
+                          placeholder="حد"
+                          title="عدد الجلسات المسموح بها في الفترة"
+                          value={quotas.live_session?.limit ?? ""}
+                          onChange={(e) => setQuotas(q => ({ ...q, live_session: { ...(q.live_session || {}), limit: e.target.value, period: (q.live_session || {}).period || "week" } }))}
+                        />
+                        <select
+                          className="dash-input"
+                          style={{ flex: 1, padding: "6px 8px" }}
+                          value={quotas.live_session?.period || "week"}
+                          onChange={(e) => setQuotas(q => ({ ...q, live_session: { ...(q.live_session || {}), period: e.target.value } }))}
+                        >
+                          <option value="week">جلسات / أسبوع</option>
+                          <option value="month">جلسات / شهر</option>
+                        </select>
+                      </div>
+                    )}
                   </label>
                 );
               })}

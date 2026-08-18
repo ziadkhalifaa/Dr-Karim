@@ -35,6 +35,7 @@ import ArticleManager from "./ArticleManager";
 import ServicesManager from "./ServicesManager";
 import ContactMessages from "./ContactMessages";
 import PackagesManager from "./PackagesManager";
+import SlotManager from "./SlotManager";
 import { reviewApi, appointmentApi, notificationApi, liveSessionApi, patientApi } from "../../api/client";
 import { useAuth } from "../../context/AuthProvider";
 
@@ -438,7 +439,10 @@ export default function DoctorDashboard({ path }) {
   else if (path === "/doctor/services") page = <ServicesManager />;
   else if (path === "/doctor/packages") page = <PackagesManager />;
   else if (path === "/doctor/messages") page = <ContactMessages />;
-  else if (path === "/doctor/appointments") page = <Appointments rows={appointments} reload={reload} subscriptions={subscriptions} />;
+  else if (path === "/doctor/appointments") page = (<>
+      <SlotManager />
+      <Appointments rows={appointments} reload={reload} subscriptions={subscriptions} />
+    </>);
   else
     page = (
       <>
