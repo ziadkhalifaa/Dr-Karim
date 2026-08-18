@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash, Check, X } from "lucide-react";
 import { packageAdminApi } from "../../api/client";
+import { ENTITLEMENTS, entitlementLabel } from "../../constants/entitlements";
 
 export default function PackagesManager() {
   const [packages, setPackages] = useState([]);
@@ -125,7 +126,7 @@ export default function PackagesManager() {
                     {pkg.features.map((f, i) => (
                       <li key={i} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", color: "var(--dash-text)" }}>
                         <Check size={14} style={{ color: "var(--dash-success)", flexShrink: 0 }} />
-                        {typeof f === "object" ? f.code : f}
+                        {entitlementLabel(typeof f === "object" ? f.code : f)}
                       </li>
                     ))}
                   </ul>
@@ -185,15 +186,6 @@ function PackageModal({ pkg, onClose, onSave }) {
       .map(f => ({ code: f, allowed: true }));
     onSave({ ...formData, features: cleanFeatures });
   };
-
-  const updateFeature = (i, val) => {
-    const next = [...formData.features];
-    next[i] = val;
-    setFormData({ ...formData, features: next });
-  };
-
-  const addFeature = () => setFormData({ ...formData, features: [...formData.features, ""] });
-  const removeFeature = (i) => setFormData({ ...formData, features: formData.features.filter((_, idx) => idx !== i) });
 
   return (
     <div style={{
@@ -304,24 +296,73 @@ function PackageModal({ pkg, onClose, onSave }) {
           {/* Features */}
           <div style={{ marginBottom: "24px" }}>
             <span style={{ display: "block", fontSize: "14px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "12px" }}>
-              المميزات والخدمات
+              المميزات والخدمات المشمولة في الباقة
+            </span>
+
+            {/* Standard entitlement codes */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "10px", marginBottom: "16px" }}>
+              {ENTITLEMENTS.map((ent) => {
+                const enabled = formData.features.includes(ent.code);
+                return (
+                  <label
+                    key={ent.code}
+                    className="dash-check"
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      gap: "6px",
+                      padding: "12px 14px",
+                      background: "var(--dash-surface)",
+                      borderRadius: "12px",
+                      border: "1.5px solid " + (enabled ? "var(--dash-primary)" : "var(--dash-line)"),
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={enabled}
+                      onChange={() => {
+                        const next = enabled
+                          ? formData.features.filter((f) => f !== ent.code)
+                          : [...formData.features, ent.code];
+                        setFormData({ ...formData, features: next });
+                      }}
+                    />
+                    <span style={{ fontWeight: "800", fontSize: "13.5px", color: "var(--dash-text)" }}>{ent.label}</span>
+                    <span style={{ fontSize: "11.5px", fontWeight: "600", color: "var(--dash-text-muted)" }}>{ent.hint}</span>
+                  </label>
+                );
+              })}
+            </div>
+
+            {/* Custom / extra feature codes */}
+            <span style={{ display: "block", fontSize: "13px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "10px" }}>
+              ميزات إضافية (كود مخصص بالإنجليزي — اختياري)
             </span>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {formData.features.map((f, i) => (
-                <div key={i} style={{ display: "flex", gap: "8px" }}>
+              {formData.features.filter((f) => !ENTITLEMENTS.some((e) => e.code === f)).map((f, i) => (
+                <div key={`custom-${i}`} style={{ display: "flex", gap: "8px" }}>
                   <input
                     type="text"
                     className="dash-input"
                     style={{ flex: 1 }}
-                    placeholder="مثال: متابعة أسبوعية عبر واتساب"
+                    placeholder="مثال: gym_access"
                     value={f}
-                    onChange={e => updateFeature(i, e.target.value)}
+                    onChange={(e) => {
+                      const next = [...formData.features];
+                      const idx = next.indexOf(f);
+                      if (idx !== -1) next[idx] = e.target.value;
+                      setFormData({ ...formData, features: next });
+                    }}
                   />
                   <button
                     type="button"
                     className="dash-btn dash-btn--ghost"
                     style={{ color: "var(--dash-danger)" }}
-                    onClick={() => removeFeature(i)}
+                    onClick={() => {
+                      setFormData({ ...formData, features: formData.features.filter((x) => x !== f) });
+                    }}
                   >
                     <Trash size={15} />
                   </button>
@@ -331,9 +372,9 @@ function PackageModal({ pkg, onClose, onSave }) {
                 type="button"
                 className="dash-btn dash-btn--ghost"
                 style={{ width: "100%", borderStyle: "dashed" }}
-                onClick={addFeature}
+                onClick={() => setFormData({ ...formData, features: [...formData.features, ""] })}
               >
-                <Plus size={16} /> إضافة ميزة
+                <Plus size={16} /> إضافة ميزة مخصصة
               </button>
             </div>
           </div>

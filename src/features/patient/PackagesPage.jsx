@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { paymentApi } from "../../api/client";
 import { navigate } from "../../lib/router";
+import { entitlementLabel } from "../../constants/entitlements";
 
 const containerAnim = {
   hidden: { opacity: 0 },
@@ -198,7 +199,10 @@ export default function PackagesPage() {
 
                 {/* Features */}
                 <ul style={{ listStyle: "none", padding: 0, margin: "0 0 28px", display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {DEFAULT_FEATURES.map((f) => (
+                  {(pkg.features && pkg.features.length > 0
+                    ? pkg.features.map((f) => (typeof f === "string" ? entitlementLabel(f) : entitlementLabel(f?.code)))
+                    : DEFAULT_FEATURES
+                  ).map((f) => (
                     <li key={f} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14.5px", fontWeight: "600" }}>
                       <span style={{ color: isFeatured ? "rgba(255,255,255,0.9)" : "#c2f753", flexShrink: 0 }}><CheckIcon /></span>
                       {f}
