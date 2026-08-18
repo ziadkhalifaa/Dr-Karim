@@ -8,7 +8,6 @@ import {
   CalendarDays,
   Bell,
   Inbox,
-  Clock,
   AlertTriangle,
   CheckCircle2,
   ClipboardList,
@@ -36,7 +35,8 @@ import ServicesManager from "./ServicesManager";
 import ContactMessages from "./ContactMessages";
 import PackagesManager from "./PackagesManager";
 import SlotManager from "./SlotManager";
-import { reviewApi, appointmentApi, notificationApi, liveSessionApi, patientApi } from "../../api/client";
+import DoctorOverview from "./DoctorOverview";
+import { reviewApi, appointmentApi, liveSessionApi, patientApi } from "../../api/client";
 import { useAuth } from "../../context/AuthProvider";
 
 function Empty({ text }) {
@@ -241,7 +241,7 @@ function Appointments({ rows, reload, subscriptions }) {
       <div className="dash-page-head">
         <span className="dash-eyebrow">
           <CalendarDays />
-          {t("dashboard.appointments")}
+          {t("dashboard.appointments.title")}
         </span>
         <h2>{t("dashboard.appointments.title")}</h2>
       </div>
@@ -366,13 +366,11 @@ export default function DoctorDashboard({ path }) {
   const [reviews, setReviews] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [subscriptions, setSubscriptions] = useState({});
-  const [unread, setUnread] = useState(0);
 
   const reload = async () => {
-    const [r, a, notifs, patients] = await Promise.all([
+    const [r, a, patients] = await Promise.all([
       reviewApi.list(),
       user.doctorId ? appointmentApi.doctorList(user.doctorId) : Promise.resolve([]),
-      notificationApi.list().catch(() => []),
       patientApi.list("?limit=100").catch(() => []),
     ]);
     const subs = {};
@@ -390,7 +388,6 @@ export default function DoctorDashboard({ path }) {
     }
     setReviews(r || []);
     setAppointments(a || []);
-    setUnread((notifs || []).filter((n) => !n.read_at && !n.readAt).length);
     setSubscriptions(subs);
   };
 
@@ -398,11 +395,6 @@ export default function DoctorDashboard({ path }) {
     reload().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.doctorId]);
-
-  const urgent = reviews.filter(
-    (r) => r.status !== "approved" && r.status !== "rejected" && (r.priority === "urgent" || r.tier === "urgent")
-  ).length;
-  const pending = reviews.filter((r) => r.status !== "approved" && r.status !== "rejected").length;
 
   const nav = [
     { path: "/doctor", label: t("dashboard.nav.overview"), icon: LayoutDashboard },
@@ -444,62 +436,7 @@ export default function DoctorDashboard({ path }) {
       <Appointments rows={appointments} reload={reload} subscriptions={subscriptions} />
     </>);
   else
-    page = (
-      <>
-        <div className="dash-page-head">
-          <span className="dash-eyebrow">
-            <LayoutDashboard />
-            {t("dashboard.nav.overview")}
-          </span>
-          <h2>{t("dashboard.stats.overviewTitle")}</h2>
-          <p>{t("dashboard.stats.overviewSubtitle")}</p>
-        </div>
-
-        <div className="dash-stat-grid">
-          <section className="dash-stat">
-            <span className="dash-stat__icon">
-              <Clock />
-            </span>
-            <div>
-              <div className="dash-stat__value">{pending}</div>
-              <div className="dash-stat__label">{t("dashboard.stats.pendingReviews")}</div>
-            </div>
-          </section>
-
-          <section className="dash-stat dash-stat--danger">
-            <span className="dash-stat__icon">
-              <AlertTriangle />
-            </span>
-            <div>
-              <div className="dash-stat__value">{urgent}</div>
-              <div className="dash-stat__label">{t("dashboard.stats.urgentReviews")}</div>
-            </div>
-          </section>
-
-          <section className="dash-stat dash-stat--info">
-            <span className="dash-stat__icon">
-              <CalendarDays />
-            </span>
-            <div>
-              <div className="dash-stat__value">{appointments.length}</div>
-              <div className="dash-stat__label">{t("dashboard.stats.appointments")}</div>
-            </div>
-          </section>
-
-          <section className="dash-stat dash-stat--warning">
-            <span className="dash-stat__icon">
-              <Bell />
-            </span>
-            <div>
-              <div className="dash-stat__value">{unread}</div>
-              <div className="dash-stat__label">{t("dashboard.stats.unread")}</div>
-            </div>
-          </section>
-        </div>
-
-        <NotificationsPanel compact />
-      </>
-    );
+    page = <DoctorOverview />;
 
   return (
     <DashboardShell

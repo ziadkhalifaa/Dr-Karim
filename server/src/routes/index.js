@@ -18,7 +18,8 @@ import { patientRouter } from "./patient.routes.js";
 import { foodRouter } from "./food.routes.js";
 import packageRouter from "./package.routes.js";
 import servicesRouter from "./services.routes.js";
-import { authenticateOptional, requireTenantAccess } from "../middleware/auth.js";
+import { doctorStatsController } from "../controllers/doctor-stats.controller.js";
+import { authenticateOptional, requireTenantAccess, requireAuth, requireRole } from "../middleware/auth.js";
 import { tenantResolver } from "../middleware/tenant.js";
 
 export function routes(app) {
@@ -49,6 +50,7 @@ export function routes(app) {
   api.use(progressRouter());
   api.use("/patients", patientRouter());
   api.use("/food", foodRouter());
+  api.get("/doctor/overview", requireAuth, requireRole("doctor", "staff"), doctorStatsController.overview);
   // /services is now served dynamically via /public/services
   // api.use("/services", placeholderRouter("services"));
   api.use("/appointments", placeholderRouter("appointments"));

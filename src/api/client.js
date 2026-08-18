@@ -151,3 +151,8 @@ export const packageAdminApi = {
   delete: (id) => api.delete(`/monetization/packages/${id}`),
 };
 
+/** Doctor overview statistics */
+export const doctorStatsApi = {
+  overview: () => api.get("/doctor/overview"),
+};
+
