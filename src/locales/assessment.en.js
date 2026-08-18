@@ -13,15 +13,15 @@ export const assessmentEn = {
     required: "Required",
     yes: "Yes",
     no: "No",
-    step: "Step {{n}} of 9",
+    step: "Step {{n}} of 5",
     start: "Start assessment",
     loading: "Loading…",
   },
   intro: {
     kicker: "Before you start",
-    title: "Important note",
+    title: "Before we build your nutrition plan",
     para1:
-      "This assessment is a data-collection tool for your nutrition profile, not a medical diagnosis and not a treatment recommendation.",
+      "Five short steps — each step adds a piece of your data \"plate\".",
     para2:
       "Your answers will be reviewed by a licensed doctor / nutrition consultant. No nutrition plan can be suggested until that review is complete.",
     para3: "This assessment does not replace medical care.",
@@ -36,7 +36,7 @@ export const assessmentEn = {
       "Doctor review required",
       "Fully confidential",
     ],
-    cta: "Start assessment",
+    cta: "Start your nutrition assessment",
   },
   resume: {
     title: "You have an incomplete assessment",
@@ -50,6 +50,12 @@ export const assessmentEn = {
   progress: {
     label: "Progress",
     urgentNotice: "You will be contacted promptly after submission",
+  },
+  review: {
+    title: "Quick review",
+    desc: "Double-check your data before sending it to the doctor.",
+    contactTitle: "Contact information",
+    submit: "Submit data",
   },
   safety: {
     kicker: "Safety Review",
@@ -111,15 +117,16 @@ export const assessmentEn = {
     refLabel: "Reference number",
     body: "Thank you — we have received your assessment.",
     nextTitle: "What happens next",
-    next1: "Your doctor / nutrition consultant will begin reviewing your data.",
+    next1:
+      "Your data has reached Dr. Kareem's team — they will review it and prepare the right nutrition plan for you.",
     next2:
-      "If any clarification or additions are needed, the team will contact you.",
+      "Next, create your account, choose a suitable package, and complete the payment.",
     next3:
-      "Any nutrition plan will only be suggested after the medical review.",
+      "Once the payment is approved, the doctor will send you your plan and nutrition program.",
     note:
       "A copy of your assessment is stored on this device (reference above). It can no longer be edited after submission.",
     home: "Back to home page",
-    createAccount: "Create my account",
+    createAccount: "Create account & choose a package",
   },
   errors: {
     required: "Please answer this question to continue.",

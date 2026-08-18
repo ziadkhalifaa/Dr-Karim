@@ -131,10 +131,10 @@ export function getWarnings(state) {
 
   if (!Number.isFinite(target)) return warnings;
 
-  if (goal === "weight_loss" && current && target >= current) {
+  if (goal === "lose" && current && target >= current) {
     warnings.push({ id: "goal-target-loss", refs: ["Q03_01", "Q02_02", "Q02_06"], key: "lossTarget" });
   }
-  if (goal === "weight_gain" && current && target <= current) {
+  if (goal === "gain" && current && target <= current) {
     warnings.push({ id: "goal-target-gain", refs: ["Q03_01", "Q02_02", "Q02_06"], key: "gainTarget" });
   }
   return warnings;

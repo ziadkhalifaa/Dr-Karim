@@ -32,6 +32,7 @@ const [{ QUESTIONS_RAW, QUESTIONS }, { FLAG_RULES }, { assessmentAr }, { assessm
   ]);
 
 import { sequelize } from "../src/config/database.js";
+import { Op } from "sequelize";
 import { models } from "../src/models/index.js";
 import { canonicalizeEgyptianPhone, preserveDisplay } from "../src/config/phone.js";
 import { conditionalForQuestion } from "../src/config/assessment-rules.js";
@@ -277,22 +278,52 @@ function normalizeQuestion(q) {
   };
 }
 
+// Q01_01 (subject) is required by the backend for every submission but is not
+// rendered in the 5-step intake — it is injected by the UI at submit time.
+function buildHiddenSubject() {
+  return [
+    {
+      id: "Q01_01",
+      section: 1,
+      type: "single",
+      required: "*",
+      labelAr: "هل التقييم ده ليك أنت ولا لشخص تاني؟",
+      labelEn: "Is this assessment for yourself or for someone else?",
+      options: [
+        { value: "self", ar: "لنفسي", en: "For myself" },
+        { value: "someone_else", ar: "لشخص آخر", en: "For someone else" },
+      ],
+      validation: { type: "choice" },
+      dataPath: "subject",
+      conditional: null,
+    },
+  ];
+}
+
 async function seedAssessmentDefinition(tenant) {
   const { row: def } = await upsert(
     AssessmentDefinition,
-    { code: "nutrition-assessment" },
+    { code: "nutrition-assessment-v2" },
     {
-      version: "1.0",
-      title_ar: "التقييم الغذائي",
-      title_en: "Nutrition Assessment",
+      version: "1.1",
+      title_ar: "التقييم الغذائي (الاستمارة الخماسية)",
+      title_en: "Nutrition Assessment (5-step intake)",
       status: "published",
       is_active: true,
       published_at: NOW,
     }
   );
 
+  // Exactly one active definition is permitted — deactivate any other active
+  // one (legacy rows are never deleted; old sessions keep their definition).
+  await AssessmentDefinition.update(
+    { is_active: false },
+    { where: { is_active: true, id: { [Op.ne]: def.id } } }
+  );
+
   const contactQuestions = QUESTIONS.filter((q) => q.section === 0);
   const allQuestions = [
+    ...buildHiddenSubject(),
     ...QUESTIONS_RAW,
     ...buildQ10Snippets(),
     ...contactQuestions,

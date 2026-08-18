@@ -19,9 +19,9 @@ export function createSessionId() {
 
 export function getInitialState(lang = "ar") {
   return {
-    meta: {
+meta: {
       sessionId: createSessionId(),
-      assessmentVersion: "1.0",
+      assessmentVersion: "1.1",
       language: lang,
       startedAt: new Date().toISOString(),
       lastSavedAt: null,

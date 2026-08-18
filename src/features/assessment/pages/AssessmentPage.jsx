@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAssessment } from "../hooks/useAssessment";
 import { SECTIONS } from "../data/sections";
+import { SUBJECT_DEFAULT } from "../data/questions";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import Intro from "../components/Intro";
@@ -10,15 +11,14 @@ import ResumeBanner from "../components/ResumeBanner";
 import ProgressBar from "../components/ProgressBar";
 import SectionView from "../components/SectionView";
 import StepActions from "../components/StepActions";
-import SafetyScreen from "../components/SafetyScreen";
-import ContactScreen from "../components/ContactScreen";
+import ReviewStep from "../components/ReviewStep";
 import SuccessScreen from "../components/SuccessScreen";
 import { isRequired } from "../logic/conditions";
 import { validateQuestion, getWarnings } from "../validation/validate";
 import { submitAssessment } from "../api/assessmentApi.js";
 import { clearDraft } from "../utils/storage";
 
-const LAST_SECTION = SECTIONS.length - 1; // 8 → 9th (last question) section
+const LAST_SECTION = SECTIONS.length - 1; // 4 → 5th (last) step
 const EMPTY_QUESTIONS = [];
 
 const STEP_MOTION = {
@@ -34,7 +34,6 @@ export default function AssessmentPage() {
     state,
     dispatch,
     lang,
-    flags,
     tier,
     visibleBySection,
     progress,
@@ -52,7 +51,6 @@ export default function AssessmentPage() {
     () => visibleBySection[sectionIndex] || EMPTY_QUESTIONS,
     [visibleBySection, sectionIndex]
   );
-  const currentQuestion = questions[Math.min(questionIndex, Math.max(0, questions.length - 1))];
 
   const langMeta = state.meta.language || lang || "ar";
 
@@ -79,12 +77,12 @@ export default function AssessmentPage() {
       }
       if (homeGoal) {
         const map = {
-          "خسارة الوزن": "weight_loss",
-          "Lose weight": "weight_loss",
-          "زيادة الوزن": "weight_gain",
-          "Gain weight": "weight_gain",
-          "الحفاظ على الوزن": "maintain_weight",
-          "Maintain weight": "maintain_weight",
+          "خسارة الوزن": "lose",
+          "Lose weight": "lose",
+          "زيادة الوزن": "gain",
+          "Gain weight": "gain",
+          "الحفاظ على الوزن": "maintain",
+          "Maintain weight": "maintain",
         };
         const value = map[homeGoal];
         if (value) actions.setAnswer("Q03_01", value);
@@ -94,19 +92,6 @@ export default function AssessmentPage() {
     } catch { /* ignore storage errors */ }
   }, [actions]);
 
-  // Bug fix: prefill contact.patientName from Q01_03 once when entering the
-  // Contact step, only if it is still empty. One-shot (ref) — user edits are
-  // never overwritten and there is no continuous force-sync afterwards.
-  const namePrefilled = useRef(false);
-  useEffect(() => {
-    if (step !== "contact" || namePrefilled.current) return;
-    namePrefilled.current = true;
-    const fromQ01 = (state.answers.Q01_03 || "").trim();
-    if (!fromQ01) return;
-    if ((state.contact.patientName || "").trim() !== "") return;
-    actions.setContact({ patientName: fromQ01 });
-  }, [step, state.answers.Q01_03, state.contact.patientName, actions]);
-
   const goTo = (s, si = 0, qi = 0) =>
     actions.setPosition({ step: s, sectionIndex: si, questionIndex: qi });
 
@@ -115,28 +100,26 @@ export default function AssessmentPage() {
     if (attempted[id]) setAttempted((p) => ({ ...p, [id]: false }));
   };
 
-  // One question per step on every screen size — focused, fast to answer.
-  const currentQuestionValid = useMemo(() => {
-    if (!currentQuestion) return true;
-    if (!isRequired(currentQuestion.id, state)) return true;
-    return !validateQuestion(currentQuestion.id, state.answers[currentQuestion.id], state);
-  }, [currentQuestion, state]);
+  // One step per section — every required question in the section must be valid.
+  const sectionValid = useMemo(() => {
+    if (questions.length === 0) return true;
+    return questions.every(
+      (q) => !isRequired(q.id, state) || !validateQuestion(q.id, state.answers[q.id], state)
+    );
+  }, [questions, state]);
 
-  const canNext = currentQuestionValid;
+  const canNext = sectionValid;
 
   const handleBack = () => {
     if (step === "section") {
-      if (questionIndex > 0) {
-        goTo("section", sectionIndex, questionIndex - 1);
-      } else if (sectionIndex > 0) {
+      if (sectionIndex > 0) {
         goTo("section", sectionIndex - 1, 0);
       } else {
         goTo("intro");
       }
       return;
     }
-    if (step === "safety") goTo("section", LAST_SECTION, 0);
-    if (step === "contact") goTo("safety");
+    if (step === "review") goTo("section", LAST_SECTION, 0);
   };
 
   const handleNext = () => {
@@ -145,23 +128,22 @@ export default function AssessmentPage() {
       return;
     }
     if (step === "section") {
-      if (!currentQuestionValid) {
-        if (currentQuestion) setAttempted((p) => ({ ...p, [currentQuestion.id]: true }));
-        return;
-      }
-      if (questionIndex < questions.length - 1) {
-        goTo("section", sectionIndex, questionIndex + 1);
+      if (!sectionValid) {
+        const next = { ...attempted };
+        for (const q of questions) {
+          if (isRequired(q.id, state)) next[q.id] = true;
+        }
+        setAttempted(next);
         return;
       }
       if (sectionIndex < LAST_SECTION) {
         goTo("section", sectionIndex + 1, 0);
       } else {
-        goTo("safety", 0, 0);
+        goTo("review", 0, 0);
       }
       return;
     }
-    if (step === "safety") goTo("contact", 0, 0);
-    // contact → submit handled by ContactScreen's onSubmit
+    // review → handled by ReviewStep onSubmit
   };
 
   const handleSubmit = async (contactPatch) => {
@@ -169,6 +151,7 @@ export default function AssessmentPage() {
     try {
       const result = await submitAssessment({
         ...state,
+        answers: { ...state.answers, Q01_01: SUBJECT_DEFAULT },
         contact: { ...state.contact, ...(contactPatch || {}) },
       });
       const data = result.data || result;
@@ -208,7 +191,7 @@ export default function AssessmentPage() {
     );
   }
 
-  const stepKey = step === "section" ? `section-${sectionIndex}-${questionIndex}` : step;
+  const stepKey = step === "section" ? `section-${sectionIndex}` : step;
 
   return (
     <div className="aq">
@@ -227,13 +210,12 @@ export default function AssessmentPage() {
                   progress={progress}
                   tier={tier}
                   lang={langMeta}
-                  ariaLive={t("ui.step", { n: sectionNo })}
+                  ariaLive={t("ui.step", { n: sectionNo, total: 5 })}
                 />
                 <SectionView
                   sectionNo={sectionNo}
                   questions={questions}
                   state={state}
-                  mobileIndex={questionIndex}
                   onAnswer={onAnswer}
                   errors={attempted}
                   warnings={warnings}
@@ -242,20 +224,11 @@ export default function AssessmentPage() {
               </>
             )}
 
-            {step === "safety" && (
-              <SafetyScreen
-                state={state}
-                flags={flags}
-                onAck={actions.setAck}
-                onNext={() => goTo("contact", 0, 0)}
-                onBack={handleBack}
-              />
-            )}
-
-            {step === "contact" && (
-              <ContactScreen
+            {step === "review" && (
+              <ReviewStep
                 state={state}
                 setContact={actions.setContact}
+                setAck={actions.setAck}
                 onSubmit={handleSubmit}
                 submitError={submitError}
                 onBack={handleBack}

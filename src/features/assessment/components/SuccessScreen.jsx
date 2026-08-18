@@ -48,14 +48,14 @@ export default function SuccessScreen({ referenceNumber, overallTier, reviewStat
 
         <p className="aq-success__note">{t("success.note")}</p>
 
-<div className="aq-success__actions">
+        <div className="aq-success__actions">
           <button
             type="button"
             className="aq-btn aq-btn--accent"
-            onClick={() => navigate("/packages")}
+            onClick={createAccount}
             style={{ padding: "16px 24px", fontSize: "18px", borderRadius: "12px", background: "var(--primary)", color: "#fff", border: "none", fontWeight: "800", cursor: "pointer", width: "100%" }}
           >
-            {t("success.choosePackage", "الخطوة التالية: اختيار الباقة والدفع")}
+            {t("success.createAccount")}
           </button>
         </div>
       </div>

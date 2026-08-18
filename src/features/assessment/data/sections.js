@@ -1,71 +1,41 @@
-// 9 question-bearing sections (docs/assessment-spec.md §2). Section titles are
-// display labels; questions are partitioned by their `section` field.
-// "Safety / Doctor Review" is NOT a question section — it is a dedicated flow
-// step rendered by SafetyScreen after Section 09 (see AssessmentPage).
+// 5-step intake (mirrors the reference nutrition-intake form).
+// Each section is rendered as a single step showing all of its questions.
 
 export const SECTIONS = [
   {
     no: 1,
-    titleAr: "معلومات أساسية",
+    titleAr: "البيانات الأساسية",
     titleEn: "Basic Information",
-    subtitleAr: "خلينا نتعرف عليك",
-    subtitleEn: "Let's get to know you",
+    subtitleAr: "عشان نحسب احتياجك اليومي من السعرات بدقة.",
+    subtitleEn: "So we can calculate your daily calorie needs accurately.",
   },
   {
     no: 2,
-    titleAr: "قياسات الجسم",
-    titleEn: "Body Measurements",
-    subtitleAr: "أرقام بسيطة — ٤٠ ثانية",
-    subtitleEn: "A few simple numbers",
+    titleAr: "الهدف من النظام",
+    titleEn: "Your Goal",
+    subtitleAr: "اختر الهدف الأساسي — ده هيوجّه كل تفاصيل النظام.",
+    subtitleEn: "Choose your primary goal — it will guide every detail of your plan.",
   },
   {
     no: 3,
-    titleAr: "الأهداف",
-    titleEn: "Goals",
-    subtitleAr: "مفيش خطة من غير هدف واضح",
-    subtitleEn: "No plan without a clear goal",
+    titleAr: "الحالة الصحية",
+    titleEn: "Health Status",
+    subtitleAr: "أي معلومة هنا بتخلي النظام آمن أكتر — راجعها مع طبيبك المعالج لو محتاج.",
+    subtitleEn: "Anything here makes your plan safer — review it with your doctor if needed.",
   },
   {
     no: 4,
-    titleAr: "التاريخ الطبي والصحي",
-    titleEn: "Medical & Health History",
-    subtitleAr: "مهم جدًا لسلامتك",
-    subtitleEn: "Important for your safety",
+    titleAr: "النشاط والعادات",
+    titleEn: "Lifestyle & Habits",
+    subtitleAr: "طبيعة يومك بتحدد احتياجك الفعلي من الطاقة.",
+    subtitleEn: "Your everyday routine determines your actual energy needs.",
   },
   {
     no: 5,
-    titleAr: "الأدوية",
-    titleEn: "Medications",
-    subtitleAr: "أي أدوية أو مكملات بتاخدها",
-    subtitleEn: "Any medications you take",
-  },
-  {
-    no: 6,
-    titleAr: "نمط الحياة والنشاط البدني",
-    titleEn: "Lifestyle & Physical Activity",
-    subtitleAr: "روتينك اليومي بيوضح كتير",
-    subtitleEn: "Your daily routine says a lot",
-  },
-  {
-    no: 7,
-    titleAr: "العادات الغذائية",
-    titleEn: "Eating Habits",
-    subtitleAr: "عاداتك الغذائية الأساسية",
-    subtitleEn: "Your core eating habits",
-  },
-  {
-    no: 8,
-    titleAr: "تفضيلات الطعام والقيود",
-    titleEn: "Food Preferences & Restrictions",
-    subtitleAr: "عشان الخطة تبقى مناسبة ليك",
-    subtitleEn: "So your plan fits your life",
-  },
-  {
-    no: 9,
-    titleAr: "التحديات والالتزام",
-    titleEn: "Challenges & Adherence",
-    subtitleAr: "خطوة واحدة بس وتبقى خلصت",
-    subtitleEn: "One more step and you're done",
+    titleAr: "التفضيلات الغذائية",
+    titleEn: "Food Preferences",
+    subtitleAr: "آخر خطوة — عشان النظام يكون قابل للتنفيذ فعلًا مش بس نظري.",
+    subtitleEn: "Last step — so your plan is actually doable, not just theoretical.",
   },
 ];
 

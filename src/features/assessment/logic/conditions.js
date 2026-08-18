@@ -111,44 +111,10 @@ export function hasAcuteSymptoms(state) {
   return ANY_NON_NONE(state.answers.Q04_06);
 }
 
-// ---- visibility rules keyed by question id (order: spec §3/§4) ----
-const RULES = {
-  Q01_02: (s) => isSomeoneElse(s),
-  Q01_04b: (s) => {
-    const age = getAgeYears(s);
-    return age !== null && age < 2;
-  },
-  Q02_04: (s) => isAdult(s) !== false,
-  Q02_07: (s) => isMinor(s) === true,
-
-  Q04_02: (s) => {
-    const v = s.answers.Q04_01;
-    return v === "yes" || v === "prefer_not_to_say";
-  },
-  Q04_02o: (s) => hasCondition(s, "other"),
-  Q04_D1: (s) => hasCondition(s, "diabetes"),
-  Q04_D2: (s) => hasCondition(s, "diabetes"),
-  Q04_D3: (s) => hasCondition(s, "diabetes"),
-  Q04_T1: (s) => hasCondition(s, "thyroid"),
-  Q04_C1: (s) => hasCondition(s, "cancer"),
-  Q04_03: (s) => pregnancyRelevant(s),
-
-  Q04_04b: (s) => {
-    const v = s.answers.Q04_04;
-    return v === "lost" || v === "gained";
-  },
-
-  Q05_02: (s) => s.answers.Q05_01 === "yes",
-  Q05_04: (s) => hasCondition(s, "diabetes"),
-
-  Q06_05: (s) => isAdult(s) !== false,
-  Q06_08: (s) => isAdult(s) !== false,
-  Q06_09: (s) => isAdult(s) !== false,
-
-  Q07_03b: (s) => s.answers.Q07_03 === "yes",
-
-  Q08_02: (s) => s.answers.Q08_01 === "yes",
-};
+// ---- visibility rules keyed by question id ----
+// The approved 5-step intake has no conditional questions: every question in
+// the catalog is always visible. Kept as an empty registry for future use.
+const RULES = {};
 
 export function isVisible(id, state) {
   const rule = RULES[id];
