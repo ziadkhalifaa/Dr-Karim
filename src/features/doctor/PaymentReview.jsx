@@ -268,17 +268,30 @@ export default function PaymentReview() {
                 </div>
 
                 {/* Receipt */}
-                {p.receipts?.length > 0 && (
+                {p.receipt ? (
                   <div>
-                    <a
-                      href={`/api/v1/payments/${p.id}/receipt`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: "700", color: "var(--dash-info)", textDecoration: "none" }}
-                    >
-                      <Image size={14} /> عرض الإيصال
-                    </a>
+                    {p.receipt.mimeType?.startsWith("image/") ? (
+                      <a href={`/api/v1/payments/${p.id}/receipt`} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={`/api/v1/payments/${p.id}/receipt`}
+                          alt="إيصال الدفع"
+                          style={{ width: 64, height: 64, objectFit: "cover", borderRadius: "10px", border: "2px solid var(--dash-border)", cursor: "pointer", display: "block" }}
+                          onError={(e) => { e.target.style.display = "none"; }}
+                        />
+                      </a>
+                    ) : (
+                      <a
+                        href={`/api/v1/payments/${p.id}/receipt`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: "700", color: "var(--dash-info)", textDecoration: "none", background: "var(--dash-primary-soft)", padding: "6px 12px", borderRadius: "8px" }}
+                      >
+                        <Image size={14} /> عرض الإيصال
+                      </a>
+                    )}
                   </div>
+                ) : (
+                  <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", fontStyle: "italic" }}>لا يوجد إيصال</div>
                 )}
 
                 {/* Status */}
