@@ -1,19 +1,12 @@
 import { Router } from "express";
 import multer from "multer";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
+import path from "node:path";
 import { authenticateOptional, requireAuth, requireRole } from "../middleware/auth.js";
 import * as contentController from "../controllers/content.controller.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// Ensure uploads dir exists
-const uploadsDir = path.join(__dirname, "../../uploads/covers");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+import { coversDir } from "../config/uploads.js";
 
 const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadsDir),
+  destination: (_req, _file, cb) => cb(null, coversDir),
   filename: (_req, file, cb) => {
     const ext = path.extname(file.originalname);
     cb(null, `cover-${Date.now()}${ext}`);

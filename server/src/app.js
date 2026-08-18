@@ -8,6 +8,7 @@ import { routes } from "./routes/index.js";
 import { notFound } from "./middleware/not-found.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import env from "./config/env.js";
+import { uploadsRoot } from "./config/uploads.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // dist/ is built at project root → two levels up from server/src/
@@ -22,9 +23,8 @@ export function createApp() {
   // Tenant resolution is applied to /api/v1/* inside routes (health first, then tenant)
   routes(app);
 
-  // Serve uploaded files (article covers, etc.)
-  const UPLOADS_PATH = path.resolve(__dirname, "../uploads");
-  app.use("/uploads", express.static(UPLOADS_PATH, { maxAge: "7d" }));
+  // Serve uploaded files (article covers, etc.) from the persistent uploads dir
+  app.use("/uploads", express.static(uploadsRoot, { maxAge: "7d" }));
 
 
   if (env.IS_PRODUCTION) {
