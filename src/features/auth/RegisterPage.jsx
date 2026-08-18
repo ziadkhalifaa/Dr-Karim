@@ -10,7 +10,7 @@ function readPrefill(key) {
 
 export default function RegisterPage() {
   const { t } = useTranslation();
-  const { register, authError } = useAuth();
+  const { register, authError, user, loading } = useAuth();
   const [form, setForm] = useState({
     fullName: readPrefill("drke-register-name"),
     phone: readPrefill("drke-register-phone"),
@@ -22,10 +22,13 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!loading && user) {
+      navigate(user.role === "patient" ? "/patient" : "/doctor");
+    }
     return () => {
       try { sessionStorage.removeItem("drke-register-name"); sessionStorage.removeItem("drke-register-phone"); sessionStorage.removeItem("drke-register-assessment"); } catch { /* noop */ }
     };
-  }, []);
+  }, [user, loading]);
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
@@ -48,8 +51,8 @@ export default function RegisterPage() {
         password: form.password,
         email: form.email || undefined,
       });
-      // Route patient to assessment immediately after registration
-      navigate(session.user.role === "patient" ? "/assessment" : "/login");
+      // Route patient to packages immediately after registration to choose their plan
+      navigate(session.user.role === "patient" ? "/packages" : "/login");
     } catch (err) {
       setError(err.message);
     } finally {

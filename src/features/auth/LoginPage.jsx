@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
 import { useTranslation } from "react-i18next";
@@ -6,10 +6,16 @@ import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const { t } = useTranslation();
-  const { login, authError } = useAuth();
+  const { login, authError, user, loading } = useAuth();
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate(user.role === "patient" ? "/patient" : "/doctor");
+    }
+  }, [user, loading]);
 
   const submit = async (e) => {
     e.preventDefault();
