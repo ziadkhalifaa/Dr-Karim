@@ -93,8 +93,12 @@ export default function Hero() {
           transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
         >
           <div className="hero__photo-wrap">
-            <div className="hero__ring" aria-hidden="true" />
-            <div className="hero__ring-2" aria-hidden="true" />
+            <div className="hero__frame" aria-hidden="true" />
+            <div className="hero__dumbbell" aria-hidden="true">
+              <span className="hero__dumbbell-plate" />
+              <span className="hero__dumbbell-bar" />
+              <span className="hero__dumbbell-plate" />
+            </div>
 
             <div className="hero__photo hero-slider">
               <AnimatePresence mode="wait">
