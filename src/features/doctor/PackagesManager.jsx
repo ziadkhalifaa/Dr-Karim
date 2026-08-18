@@ -174,7 +174,7 @@ function PackageModal({ pkg, onClose, onSave }) {
     price: pkg?.price || "",
     durationValue: pkg?.durationValue || 1,
     durationUnit: pkg?.durationUnit || "month",
-    active: pkg !== undefined ? pkg.active : true,
+    active: pkg ? pkg.active : true,
     features: pkg?.features?.map(f => (typeof f === "object" ? f.code : f)) || [""],
   });
 
