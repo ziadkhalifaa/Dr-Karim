@@ -94,11 +94,6 @@ export default function Hero() {
         >
           <div className="hero__photo-wrap">
             <div className="hero__frame" aria-hidden="true" />
-            <div className="hero__dumbbell" aria-hidden="true">
-              <span className="hero__dumbbell-plate" />
-              <span className="hero__dumbbell-bar" />
-              <span className="hero__dumbbell-plate" />
-            </div>
 
             <div className="hero__photo hero-slider">
               <AnimatePresence mode="wait">
