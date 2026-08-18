@@ -91,7 +91,7 @@ export default function PackagesPage() {
     <div style={pageStyle}>
       {/* Topbar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 32px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <img src="/assets/logo.png" alt="د. كريم الليثي" style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover" }} />
+        <img src="/assets/logo.png" alt="د. كريم الليثي" style={{ height: 48, width: "auto", objectFit: "contain" }} />
         <button
           onClick={() => navigate("/patient")}
           style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "#fff", padding: "10px 18px", borderRadius: "12px", cursor: "pointer", fontSize: "14px", fontWeight: "700", fontFamily: "inherit" }}

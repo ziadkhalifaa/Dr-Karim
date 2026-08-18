@@ -18,7 +18,7 @@ export default function AssessmentHeader() {
       <div className="aq-header__bar">
         <a href="/" onClick={goHome} className="aq-header__logo" aria-label={t("brand.name")}>
           <span className="aq-header__mark">
-            <img src="/assets/logo.png" alt={t("brand.name")} style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover" }} />
+            <img src="/assets/logo.png" alt={t("brand.name")} style={{ height: 44, width: "auto", objectFit: "contain" }} />
           </span>
           <span className="aq-header__brand">
             <span className="aq-header__name">{t("brand.name")}</span>
