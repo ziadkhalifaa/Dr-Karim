@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { paymentApi } from "../../api/client";
+import { paymentApi, patientApi } from "../../api/client";
+import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
 
 function usePackageId(path) {
@@ -28,7 +29,9 @@ export default function PaymentPage({ path }) {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [upgradeInfo, setUpgradeInfo] = useState(null);
   const fileRef = useRef();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!packageId) { setLoading(false); return; }
@@ -43,13 +46,39 @@ export default function PaymentPage({ path }) {
         // Auto-select first available method
         const available = METHODS.filter((m) => cfg?.[m.fieldKey]);
         if (available.length > 0) setMethod(available[0].key);
+
+        // Compute prorated upgrade amount (server-authoritative on submit)
+        if (user?.patientId && p?.slug) {
+          try {
+            const home = await patientApi.home();
+            const sub = home?.subscription;
+            if (sub?.package?.slug && sub.startsAt && sub.package.slug !== p.slug) {
+              const all = (await paymentApi.packages()) || [];
+              const current = all.find((x) => x.slug === sub.package.slug);
+              if (current && Number(p.price) > Number(current.price)) {
+                const starts = new Date(sub.startsAt).getTime();
+                const ends = sub.endsAt ? new Date(sub.endsAt).getTime() : null;
+                if (!Number.isNaN(starts)) {
+                  const totalDays = ends && !Number.isNaN(ends)
+                    ? Math.max(1, Math.round((ends - starts) / 86400000))
+                    : (current.durationValue || 1) * 30;
+                  const usedDays = Math.max(0, Math.round((Date.now() - starts) / 86400000));
+                  const frac = Math.max(0, Math.min(1, (totalDays - usedDays) / totalDays));
+                  const remainingValue = Math.round(Number(current.price) * frac);
+                  const upgraded = Math.max(0, Math.round(Number(p.price) - remainingValue));
+                  setUpgradeInfo({ currentName: current.name, remainingValue, upgraded, originalAmount: Number(p.price) });
+                }
+              }
+            }
+          } catch { /* e.g. no active subscription */ }
+        }
       } catch (e) {
         setError(e.message || "فشل تحميل تفاصيل الباقة");
       } finally {
         setLoading(false);
       }
     })();
-  }, [packageId]);
+  }, [packageId, user?.patientId]);
 
   const handleFile = (e) => {
     const f = e.target.files?.[0];
@@ -64,14 +93,15 @@ export default function PaymentPage({ path }) {
     e.preventDefault();
     if (!method) { setError("اختر طريقة الدفع"); return; }
     if (!senderPhone.trim()) { setError("أدخل رقم الهاتف المُرسِل"); return; }
+    if (upgradeInfo?.upgraded <= 0) { setError("قيمة رصيد باقتك الحالية تغطي هذه الباقة بالكامل — لا تحتاج للدفع."); return; }
     setError("");
     setSubmitting(true);
     try {
       const payment = await paymentApi.create({
-        package_id: Number(packageId),
+        packageId: Number(packageId),
         method,
-        sender_phone: senderPhone.trim(),
-        transaction_reference: txRef.trim() || undefined,
+        senderPhone: senderPhone.trim(),
+        transactionReference: txRef.trim() || undefined,
       });
       if (receiptFile) {
         const form = new FormData();
@@ -176,15 +206,29 @@ export default function PaymentPage({ path }) {
         {/* Package Summary */}
         {pkg && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            style={{ background: "linear-gradient(135deg, var(--primary) 0%, #3ca503 100%)", borderRadius: "20px", padding: "24px", color: "#fff", marginBottom: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
+            style={{ background: "linear-gradient(135deg, var(--primary) 0%, #3ca503 100%)", borderRadius: "20px", padding: "24px", color: "#fff", marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
             <div>
-              <div style={{ fontSize: "12px", fontWeight: "800", letterSpacing: "0.1em", opacity: 0.8, textTransform: "uppercase", marginBottom: "6px" }}>الباقة المختارة</div>
+              <div style={{ fontSize: "12px", fontWeight: "800", letterSpacing: "0.1em", opacity: 0.8, textTransform: "uppercase", marginBottom: "6px" }}>{upgradeInfo ? "ترقية الباقة" : "الباقة المختارة"}</div>
               <div style={{ fontSize: "22px", fontWeight: "900" }}>{pkg.name}</div>
+              {upgradeInfo && (
+                <div style={{ fontSize: "13px", fontWeight: "700", opacity: 0.9, marginTop: "4px" }}>ترقية من: {upgradeInfo.currentName}</div>
+              )}
             </div>
             <div style={{ textAlign: "left" }}>
-              <div style={{ fontSize: "36px", fontWeight: "900", lineHeight: "1" }}>{Number(pkg.price).toLocaleString("ar-EG")}</div>
+              <div style={{ fontSize: "36px", fontWeight: "900", lineHeight: "1" }}>{(upgradeInfo ? upgradeInfo.upgraded : Number(pkg.price)).toLocaleString("ar-EG")}</div>
               <div style={{ fontSize: "14px", opacity: 0.8, fontWeight: "700" }}>{pkg.currency || "EGP"}</div>
+              {upgradeInfo && (
+                <div style={{ fontSize: "12px", opacity: 0.85, textDecoration: "line-through", marginTop: "4px" }}>السعر الأصلي: {upgradeInfo.originalAmount.toLocaleString("ar-EG")}</div>
+              )}
             </div>
+          </motion.div>
+        )}
+
+        {/* Prorated upgrade note */}
+        {upgradeInfo && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            style={{ background: "#e6fbc2", border: "1.5px solid #c2f753", color: "#2e7d00", borderRadius: "14px", padding: "14px 18px", marginBottom: "28px", fontSize: "13.5px", fontWeight: "700", lineHeight: "1.8" }}>
+            ✓ هذا المبلغ هو <strong>فرق الترقية فقط</strong> — خُصمت قيمة رصيدك المتبقي من باقتك الحالية (<strong>{upgradeInfo.remainingValue.toLocaleString("ar-EG")} {pkg?.currency || "EGP"}</strong>).
           </motion.div>
         )}
 
@@ -229,7 +273,7 @@ export default function PaymentPage({ path }) {
                 style={{ background: "#e6fbc2", border: "1px solid #c2f753", borderRadius: "14px", padding: "16px 18px", marginBottom: "20px" }}>
                 <p style={{ fontSize: "14px", fontWeight: "700", color: "#2e7d00", lineHeight: "1.7" }}>
                   📋 <strong>خطوات الدفع:</strong><br />
-                  1. افتح تطبيق {currentMethod?.label} وابعت {pkg ? Number(pkg.price).toLocaleString("ar-EG") + " " + (pkg.currency || "EGP") : ""} على الرقم/الحساب:<br />
+                  1. افتح تطبيق {currentMethod?.label} وابعت {pkg ? (upgradeInfo ? upgradeInfo.upgraded : Number(pkg.price)).toLocaleString("ar-EG") + " " + (pkg.currency || "EGP") : ""} على الرقم/الحساب:<br />
                   <strong style={{ direction: "ltr", display: "inline-block", fontSize: "16px", marginTop: "4px" }}>{currentMethodAccount}</strong><br />
                   2. صوّر الإيصال وارفعه في الخانة أدناه<br />
                   3. اضغط "إرسال الدفع"
@@ -299,10 +343,10 @@ export default function PaymentPage({ path }) {
           </AnimatePresence>
 
           {/* Submit */}
-          <motion.button type="submit" disabled={submitting}
-            whileHover={submitting ? {} : { scale: 1.02 }}
-            whileTap={submitting ? {} : { scale: 0.98 }}
-            style={{ width: "100%", padding: "18px", borderRadius: "16px", border: "none", background: submitting ? "#94a3b8" : "var(--primary)", color: "#fff", fontSize: "17px", fontWeight: "800", cursor: submitting ? "not-allowed" : "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+          <motion.button type="submit" disabled={submitting || (upgradeInfo?.upgraded ?? 1) <= 0}
+            whileHover={submitting || (upgradeInfo?.upgraded ?? 1) <= 0 ? {} : { scale: 1.02 }}
+            whileTap={submitting || (upgradeInfo?.upgraded ?? 1) <= 0 ? {} : { scale: 0.98 }}
+            style={{ width: "100%", padding: "18px", borderRadius: "16px", border: "none", background: submitting || (upgradeInfo?.upgraded ?? 1) <= 0 ? "#94a3b8" : "var(--primary)", color: "#fff", fontSize: "17px", fontWeight: "800", cursor: submitting || (upgradeInfo?.upgraded ?? 1) <= 0 ? "not-allowed" : "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
             {submitting ? (
               <>
                 <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}

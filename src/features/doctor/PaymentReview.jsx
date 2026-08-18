@@ -241,6 +241,13 @@ export default function PaymentReview() {
                   <div style={{ fontSize: "15px", fontWeight: "900", color: "var(--dash-primary)", marginTop: "2px" }}>
                     {Number(p.amount).toLocaleString("ar-EG")} {p.currency}
                   </div>
+                  {p.upgrade && (
+                    <div style={{ marginTop: "6px", background: "var(--dash-primary-soft)", border: "1px solid var(--dash-primary)", borderRadius: "10px", padding: "8px 10px", fontSize: "12px", color: "var(--dash-primary)", fontWeight: "700", lineHeight: "1.6" }}>
+                      <div>ترقية من: {p.upgrade.sourcePackageName || "باقة سابقة"}</div>
+                      <div style={{ textDecoration: "line-through", opacity: 0.75 }}>السعر الأصلي: {Number(p.upgrade.originalAmount).toLocaleString("ar-EG")} {p.currency}</div>
+                      <div>خصم رصيد الباقة: {Number(p.upgrade.remainingValue).toLocaleString("ar-EG")} {p.currency}</div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Method */}
