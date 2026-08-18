@@ -4,11 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpLeft } from "lucide-react";
 
 const images = [
-  "/assets/slider_1.png",
-  "/assets/slider_2.png",
-  "/assets/slider_3.png",
-  "/assets/special_programs.png",
-  "/assets/salad_plate.png",
+  "/uploads/covers/value-personalization.jpg",
+  "/uploads/covers/value-empowerment.jpg",
+  "/uploads/covers/value-support.jpg",
+  "/uploads/covers/value-accuracy.jpg",
+  "/uploads/covers/value-special-care.jpg",
 ];
 
 function renderHighlighted(text) {
