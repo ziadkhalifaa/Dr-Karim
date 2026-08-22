@@ -29,6 +29,7 @@ import CareTemplates from "./CareTemplates";
 import DoctorProgress from "./ProgressManager";
 import PatientsList from "./PatientsList";
 import PatientProfile from "./PatientProfile";
+import ReviewDetail from "./ReviewDetail";
 import NutritionBuilder from "./NutritionBuilder";
 import ArticleManager from "./ArticleManager";
 import ServicesManager from "./ServicesManager";
@@ -37,6 +38,7 @@ import PackagesManager from "./PackagesManager";
 import SlotManager from "./SlotManager";
 import DoctorOverview from "./DoctorOverview";
 import { reviewApi, appointmentApi, liveSessionApi, patientApi } from "../../api/client";
+import { navigate } from "../../lib/router";
 import { useAuth } from "../../context/AuthProvider";
 
 function Empty({ text }) {
@@ -94,7 +96,11 @@ function Reviews({ rows, reload }) {
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.id}>
+                  <tr
+                    key={r.id}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate(`/doctor/reviews/${r.id}`)}
+                  >
                     <td>
                       <span className="dash-cell-main">{r.patientName || r.referenceNumber}</span>
                       {r.referenceNumber && <span className="dash-cell-sub">{r.referenceNumber}</span>}
@@ -112,8 +118,14 @@ function Reviews({ rows, reload }) {
                     <td>
                       <StatusBadge status={r.status} />
                     </td>
-                    <td>
+                    <td onClick={(e) => e.stopPropagation()}>
                       <div className="dash-row-actions">
+                        <button
+                          className="dash-btn dash-btn--ghost dash-btn--sm"
+                          onClick={() => navigate(`/doctor/reviews/${r.id}`)}
+                        >
+                          {t("dashboard.reviews.view", "عرض البيانات")}
+                        </button>
                         {r.status === "queued" && (
                           <button
                             className="dash-btn dash-btn--ghost dash-btn--sm"
@@ -415,10 +427,12 @@ export default function DoctorDashboard({ path }) {
 
   const patientProfileMatch = path.match(/^\/doctor\/patients\/(\d+)$/);
   const nutritionBuilderMatch = path.match(/^\/doctor\/patients\/(\d+)\/nutrition-builder$/);
+  const reviewDetailMatch = path.match(/^\/doctor\/reviews\/(\d+)$/);
 
   let page;
   if (nutritionBuilderMatch) page = <NutritionBuilder patientId={nutritionBuilderMatch[1]} />;
   else if (patientProfileMatch) page = <PatientProfile patientId={patientProfileMatch[1]} />;
+  else if (reviewDetailMatch) page = <ReviewDetail reviewId={reviewDetailMatch[1]} />;
   else if (path === "/doctor/patients") page = <PatientsList />;
   else if (path === "/doctor/payments") page = <PaymentReview />;
   else if (path === "/doctor/configuration") page = <AdminConfiguration />;

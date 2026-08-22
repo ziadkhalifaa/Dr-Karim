@@ -41,11 +41,17 @@ export function useAssessment() {
 
   // Debounced persistence on every state change. Empty fresh drafts are not
   // written, so a first-time reload does not show a phantom resume banner.
+  // Submitted assessments are never persisted: the server owns them now, and
+  // re-saving would replay the success screen (with the same reference
+  // number) on every future visit instead of offering a fresh start.
   useEffect(() => {
     const s = stateRef.current;
+    if (s.status === "submitted") {
+      clearDraft();
+      return;
+    }
     const hasContent =
       Object.keys(s.answers).length > 0 ||
-      s.status === "submitted" ||
       s.position.step !== "intro" ||
       s.contact.handoffPhone !== "" ||
       s.acknowledgements.accurate;

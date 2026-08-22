@@ -413,6 +413,7 @@ export const ar = {
       open: "فتح",
       approve: "اعتماد",
       reject: "رفض",
+      view: "عرض البيانات",
       empty: "لا توجد مراجعات في القائمة.",
     },
     appointments: {

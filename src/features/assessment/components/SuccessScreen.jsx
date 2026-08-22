@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { navigate } from "../../../lib/router";
 
-export default function SuccessScreen({ referenceNumber, overallTier, reviewState }) {
+export default function SuccessScreen({ referenceNumber, overallTier, reviewState, onStartOver }) {
   const { t } = useTranslation("assessment");
   const nextItems = [
     "next1",
@@ -57,6 +57,16 @@ export default function SuccessScreen({ referenceNumber, overallTier, reviewStat
           >
             {t("success.createAccount")}
           </button>
+          {onStartOver && (
+            <button
+              type="button"
+              className="aq-btn aq-btn--ghost"
+              onClick={onStartOver}
+              style={{ padding: "13px 24px", fontSize: "15px", borderRadius: "12px", background: "transparent", color: "var(--primary)", border: "2px solid var(--primary)", fontWeight: "800", cursor: "pointer", width: "100%" }}
+            >
+              {t("success.startNew", "ابدأ تقييمًا جديدًا")}
+            </button>
+          )}
         </div>
       </div>
     </div>

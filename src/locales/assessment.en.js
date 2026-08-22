@@ -127,6 +127,7 @@ export const assessmentEn = {
       "A copy of your assessment is stored on this device (reference above). It can no longer be edited after submission.",
     home: "Back to home page",
     createAccount: "Create account & choose a package",
+    startNew: "Start a new assessment",
   },
   errors: {
     required: "Please answer this question to continue.",

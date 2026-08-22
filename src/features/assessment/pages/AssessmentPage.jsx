@@ -184,7 +184,12 @@ export default function AssessmentPage() {
       <div className="aq">
         <Header />
         <main className="aq-main">
-          <SuccessScreen referenceNumber={state.referenceNumber} overallTier={state.overallTier} reviewState={state.reviewState} />
+          <SuccessScreen
+            referenceNumber={state.referenceNumber}
+            overallTier={state.overallTier}
+            reviewState={state.reviewState}
+            onStartOver={onStartOver}
+          />
         </main>
         <Footer />
       </div>

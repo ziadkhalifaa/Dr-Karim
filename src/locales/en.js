@@ -414,6 +414,7 @@ export const en = {
       open: "Open",
       approve: "Approve",
       reject: "Reject",
+      view: "View details",
       empty: "No reviews in the queue.",
     },
     appointments: {
