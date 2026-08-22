@@ -20,7 +20,18 @@ export function security(app) {
   app.disable("x-powered-by");
   if (env.TRUST_PROXY) app.set("trust proxy", 1);
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+          // Receipt previews are fetched with Authorization and rendered from
+          // object URLs (<img src="blob:...">), which CSP must allow.
+          "img-src": ["'self'", "data:", "blob:"],
+        },
+      },
+    })
+  );
   app.use(
     cors({
       origin: originFn,

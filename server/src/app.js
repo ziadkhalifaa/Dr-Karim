@@ -23,6 +23,9 @@ export function createApp() {
   // Tenant resolution is applied to /api/v1/* inside routes (health first, then tenant)
   routes(app);
 
+  // Private uploads (payment receipts) must only be served through the
+  // authenticated GET /payments/:id/receipt endpoint — never as static files.
+  app.use("/uploads/private", (_req, res) => res.status(404).end());
   // Serve uploaded files (article covers, etc.) from the persistent uploads dir
   app.use("/uploads", express.static(uploadsRoot, { maxAge: "7d" }));
 
