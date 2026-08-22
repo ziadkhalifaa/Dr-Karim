@@ -104,9 +104,19 @@ export default function PaymentPage({ path }) {
         transactionReference: txRef.trim() || undefined,
       });
       if (receiptFile) {
-        const form = new FormData();
-        form.append("receipt", receiptFile);
-        await paymentApi.receipt(payment.id, form);
+        // The API expects JSON { mimeType, data } with a base64 data URL —
+        // not multipart FormData.
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error("تعذر قراءة ملف الإيصال"));
+          reader.readAsDataURL(receiptFile);
+        });
+        await paymentApi.receipt(payment.id, {
+          mimeType: receiptFile.type,
+          originalName: receiptFile.name,
+          data: dataUrl,
+        });
       }
       setSuccess(true);
     } catch (e) {

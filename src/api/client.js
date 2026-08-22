@@ -94,6 +94,15 @@ export const appointmentApi = { get: (id) => api.get(`/appointments/${id}`), pat
 export const slotApi = { list: (query = "") => api.get(`/appointments/slots${query}`), create: (body) => api.post("/appointments/slots", body), book: (id, body = {}) => api.post(`/appointments/slots/${id}/book`, body), cancel: (id) => api.post(`/appointments/slots/${id}/cancel`, {}) };
 export const liveSessionApi = { get: (id) => api.get(`/live-sessions/${id}`), create: (appointmentId) => api.post(`/appointments/${appointmentId}/live-session`, {}), join: (id) => api.post(`/live-sessions/${id}/join`, {}), end: (id) => api.post(`/live-sessions/${id}/end`, {}), notes: (id) => api.get(`/live-sessions/${id}/notes`), addNote: (id, body) => api.post(`/live-sessions/${id}/notes`, body) };
 export const paymentApi = { packages: () => api.get("/packages"), package: (id) => api.get(`/packages/${id}`), settings: () => api.get("/payment-settings"), create: (body) => api.post("/payments", body), list: () => api.get("/patient/payments"), get: (id) => api.get(`/patient/payments/${id}`), receipt: (id, body) => api.post(`/payments/${id}/receipt`, body), entitlements: () => api.get("/patient/entitlements"), doctorList: () => api.get("/doctor/payments"), doctorGet: (id) => api.get(`/doctor/payments/${id}`), approve: (id) => api.post(`/doctor/payments/${id}/approve`, {}), reject: (id, reason) => api.post(`/doctor/payments/${id}/reject`, { reason }) };
+/** Fetch a payment receipt with the auth header and return an object URL
+ *  (<img>/<a> tags cannot send Authorization headers, so direct URLs fail). */
+export async function paymentReceiptBlobUrl(id) {
+  const response = await fetch(`${API_BASE}/payments/${id}/receipt`, {
+    headers: tokenStore.access ? { Authorization: `Bearer ${tokenStore.access}` } : {},
+  });
+  if (!response.ok) throw new ApiError("Receipt unavailable", { status: response.status });
+  return URL.createObjectURL(await response.blob());
+}
 export const notificationApi = { list: () => api.get("/notifications"), read: (id) => api.post(`/notifications/${id}/read`, {}), readAll: () => api.post("/notifications/read-all", {}) };
 export const adminApi = { packages: () => api.get("/admin/packages"), updatePackage: (id, body) => api.patch(`/admin/packages/${id}`, body), settings: () => api.get("/admin/payment-settings"), updateSettings: (body) => api.patch("/admin/payment-settings", body) };
 export const careApi = {

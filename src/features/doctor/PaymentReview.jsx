@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, CheckCircle2, XCircle, Inbox, Image, Clock, User, CreditCard } from "lucide-react";
-import { paymentApi } from "../../api/client";
+import { Wallet, CheckCircle2, XCircle, Inbox, Clock, User, CreditCard, FileText } from "lucide-react";
+import { paymentApi, paymentReceiptBlobUrl } from "../../api/client";
 
 const METHOD_ICONS = {
   vodafone_cash: "📱",
@@ -72,6 +72,67 @@ function RejectModal({ payment, onConfirm, onClose }) {
         </div>
       </motion.div>
     </motion.div>
+  );
+}
+
+/** Loads the receipt through an authenticated fetch and renders it as a
+ *  thumbnail (images) or an open link (PDF). Direct <img src> URLs fail with
+ *  401 because browsers do not attach the Authorization header to them. */
+function ReceiptView({ payment }) {
+  const [url, setUrl] = useState(null);
+  const [failed, setFailed] = useState(false);
+  const isImage = payment.receipt?.mimeType?.startsWith("image/");
+
+  useEffect(() => {
+    let objectUrl = null;
+    let active = true;
+    paymentReceiptBlobUrl(payment.id)
+      .then((u) => {
+        if (!active) {
+          URL.revokeObjectURL(u);
+          return;
+        }
+        objectUrl = u;
+        setUrl(u);
+      })
+      .catch(() => active && setFailed(true));
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [payment.id]);
+
+  if (failed)
+    return <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", fontStyle: "italic" }}>الإيصال غير متاح</div>;
+
+  if (!url)
+    return (
+      <div style={{ width: 64, height: 64, borderRadius: "10px", border: "2px dashed var(--dash-border)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          style={{ width: 18, height: 18, borderRadius: "50%", border: "2px solid var(--dash-border)", borderTopColor: "var(--dash-primary)" }} />
+      </div>
+    );
+
+  if (isImage)
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer">
+        <img
+          src={url}
+          alt="إيصال الدفع"
+          style={{ width: 64, height: 64, objectFit: "cover", borderRadius: "10px", border: "2px solid var(--dash-border)", cursor: "pointer", display: "block" }}
+        />
+      </a>
+    );
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: "700", color: "var(--dash-info)", textDecoration: "none", background: "var(--dash-primary-soft)", padding: "6px 12px", borderRadius: "8px" }}
+    >
+      <FileText size={14} /> عرض الإيصال
+    </a>
   );
 }
 
@@ -269,27 +330,7 @@ export default function PaymentReview() {
 
                 {/* Receipt */}
                 {p.receipt ? (
-                  <div>
-                    {p.receipt.mimeType?.startsWith("image/") ? (
-                      <a href={`/api/v1/payments/${p.id}/receipt`} target="_blank" rel="noopener noreferrer">
-                        <img
-                          src={`/api/v1/payments/${p.id}/receipt`}
-                          alt="إيصال الدفع"
-                          style={{ width: 64, height: 64, objectFit: "cover", borderRadius: "10px", border: "2px solid var(--dash-border)", cursor: "pointer", display: "block" }}
-                          onError={(e) => { e.target.style.display = "none"; }}
-                        />
-                      </a>
-                    ) : (
-                      <a
-                        href={`/api/v1/payments/${p.id}/receipt`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: "700", color: "var(--dash-info)", textDecoration: "none", background: "var(--dash-primary-soft)", padding: "6px 12px", borderRadius: "8px" }}
-                      >
-                        <Image size={14} /> عرض الإيصال
-                      </a>
-                    )}
-                  </div>
+                  <ReceiptView payment={p} />
                 ) : (
                   <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", fontStyle: "italic" }}>لا يوجد إيصال</div>
                 )}

@@ -30,7 +30,14 @@ export function security(app) {
       maxAge: 600,
     })
   );
-  app.use(express.json({ limit: env.JSON_BODY_LIMIT }));
+
+  // The payment-receipt upload carries a base64 data URL far larger than the
+  // default JSON limit; that route applies its own dedicated limit.
+  const RECEIPT_UPLOAD = /^\/api\/v1\/payments\/[^/]+\/receipt\/?$/u;
+  app.use((req, res, next) => {
+    if (req.method === "POST" && RECEIPT_UPLOAD.test(req.path)) return next();
+    return express.json({ limit: env.JSON_BODY_LIMIT })(req, res, next);
+  });
 
   app.use("/api", (_req, res, next) => {
     res.setHeader("Cache-Control", "no-store");
