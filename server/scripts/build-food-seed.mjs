@@ -62,6 +62,29 @@ const num = (v) => {
   return Number.isFinite(n) ? n : 0;
 };
 
+// Source CSV contains entry errors (e.g. Basterma meat carb_g=1500). Any
+// macro expressed in grams cannot exceed 100 per 100 g of food.
+const GRAM_KEYS = ["water_g", "protein_g", "fat_g", "ash_g", "fiber_g", "carb_g"];
+const sanitizeMacros = (macros, nameEn) => {
+  for (const key of GRAM_KEYS) {
+    if (macros[key] > 100) {
+      console.warn(`[food-build] implausible ${key}=${macros[key]} for "${nameEn}" -> 0`);
+      macros[key] = 0;
+    }
+  }
+  return macros;
+};
+
+// Names in the CSV contain corrupted bytes (\uFFFD), stray spaces and mixed
+// spacing around punctuation. Clean once and reuse everywhere so code
+// matching stays stable across rebuilds even when the CSV encoding shifts.
+const cleanName = (s) =>
+  String(s)
+    .replace(/[\uFFFD]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\s+,/g, ",")
+    .trim();
+
 const csv = fs.readFileSync(path.join(ROOT, "Egyptian Food.csv"), "utf8");
 const lines = csv.split(/\r?\n/).filter((l) => l.trim().length > 0);
 const header = parseCsvLine(lines[0]).map((h) => h.trim());
@@ -72,17 +95,18 @@ const dict = {};
 for (const [k, v] of Object.entries(dictRaw)) dict[norm(k)] = v;
 
 const existing = JSON.parse(fs.readFileSync(path.join(__dirname, "food_seed.json"), "utf8"));
-const codeByNameEn = new Map(existing.map((item) => [item.name_en, item.code]));
+const codeByNormName = new Map(existing.map((item) => [norm(item.name_en), item.code]));
 let nextCode = existing.length;
 let translated = 0;
 const missing = [];
 const seen = new Set();
+const usedCodes = new Set();
 const items = [];
 
 for (const cells of rows) {
   const row = {};
   header.forEach((h, i) => { row[h] = cells[i] ?? ""; });
-  const nameEn = String(row.FOOD ?? "").trim();
+  const nameEn = cleanName(row.FOOD);
   if (!nameEn || seen.has(nameEn)) continue;
   seen.add(nameEn);
   const nameAr = dict[norm(nameEn)];
@@ -90,11 +114,14 @@ for (const cells of rows) {
   else missing.push(nameEn);
   const macros = {};
   for (const [col, key] of Object.entries(COLUMN_MAP)) macros[key] = num(row[col]);
-  let code = codeByNameEn.get(nameEn);
+  sanitizeMacros(macros, nameEn);
+  let code = codeByNormName.get(norm(nameEn));
   if (!code) code = `food_${String(nextCode++).padStart(4, "0")}`;
+  usedCodes.add(code);
   items.push({ code, name_ar: nameAr || nameEn, name_en: nameEn, category_code: "general", unit: "100g", macros });
 }
 
 fs.writeFileSync(path.join(__dirname, "food_seed.json"), JSON.stringify(items, null, 2));
+
 console.log(`items=${items.length} translated=${translated}/${items.length}`);
 if (missing.length) console.log("MISSING AR:\n" + missing.join("\n"));

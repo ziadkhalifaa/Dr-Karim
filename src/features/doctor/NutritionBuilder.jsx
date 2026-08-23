@@ -28,7 +28,7 @@ function FoodSearchModal({ onClose, onSelect }) {
     const delay = setTimeout(async () => {
       setLoading(true);
       try {
-        const res = await foodApi.list(trimmed ? `?q=${encodeURIComponent(trimmed)}&limit=20` : "?limit=50");
+        const res = await foodApi.list(trimmed ? `?q=${encodeURIComponent(trimmed)}&limit=50` : "?limit=200");
         setResults(res.items || []);
       } catch (err) {
         console.error(err);

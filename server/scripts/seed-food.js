@@ -30,7 +30,20 @@ export async function runFoodSeed() {
     });
   }
 
-  console.log(`Food seed complete (${data.length} items).`);
+  // Deactivate seeded rows (code format food_NNNN) that no longer exist in
+  // the current seed. Earlier seed versions left stale English-named rows
+  // behind after the food database was rebuilt; deactivation keeps any FK
+  // references intact while hiding them from search.
+  const validCodes = new Set(data.map((item) => item.code));
+  const existingRows = await FoodItem.findAll({ attributes: ["id", "code"], raw: true });
+  const staleIds = existingRows
+    .filter((r) => r.code && /^food_\d{4}$/.test(r.code) && !validCodes.has(r.code))
+    .map((r) => r.id);
+  if (staleIds.length) {
+    await FoodItem.update({ active: false }, { where: { id: staleIds } });
+  }
+
+  console.log(`Food seed complete (${data.length} items, ${staleIds.length} stale rows deactivated).`);
 }
 
 const isCli = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);

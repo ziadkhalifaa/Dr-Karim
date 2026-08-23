@@ -377,7 +377,7 @@ export const careProgramService = {
   async activate({ tenantId, programId, auth, versionNo }) {
     const current = needDoctor(auth);
     const tenant = await loadTenant(tenantId);
-    return sequelize.transaction(async (transaction) => {
+    await sequelize.transaction(async (transaction) => {
       const program = await loadProgram(programId, tenantId, transaction, true);
       assertOwner(program, current.doctorId);
       if (["completed", "cancelled", "expired"].includes(program.status)) {

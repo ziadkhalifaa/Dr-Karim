@@ -2,7 +2,7 @@
   {
     "code": "food_0000",
     "name_ar": "شعير (حبوب)",
-    "name_en": "barlcy , grains",
+    "name_en": "barlcy, grains",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -30,7 +30,7 @@
   {
     "code": "food_0001",
     "name_ar": "ذرة بيضاء (حبوب)",
-    "name_en": "corn , grains (white)",
+    "name_en": "corn, grains (white)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -58,7 +58,7 @@
   {
     "code": "food_0002",
     "name_ar": "ذرة صفراء (حبوب)",
-    "name_en": "corn , grains (yellow)",
+    "name_en": "corn, grains (yellow)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -86,7 +86,7 @@
   {
     "code": "food_0003",
     "name_ar": "كورن فلكس",
-    "name_en": "corn , flakes",
+    "name_en": "corn, flakes",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -114,7 +114,7 @@
   {
     "code": "food_0004",
     "name_ar": "دقيق ذرة",
-    "name_en": "corn , flour",
+    "name_en": "corn, flour",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -142,7 +142,7 @@
   {
     "code": "food_0005",
     "name_ar": "ذرة معلبة",
-    "name_en": "corn ,kernels , canned",
+    "name_en": "corn,kernels, canned",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -170,7 +170,7 @@
   {
     "code": "food_0006",
     "name_ar": "ذرة مشوية",
-    "name_en": "corn ,kernels  on cob , grilled",
+    "name_en": "corn,kernels on cob, grilled",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -198,7 +198,7 @@
   {
     "code": "food_0007",
     "name_ar": "ذرة منفوشة",
-    "name_en": "corn , popped",
+    "name_en": "corn, popped",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -226,7 +226,7 @@
   {
     "code": "food_0008",
     "name_ar": "ذرة منفوخة",
-    "name_en": "corn , puffed",
+    "name_en": "corn, puffed",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -254,7 +254,7 @@
   {
     "code": "food_0009",
     "name_ar": "نشا ذرة",
-    "name_en": "corn , starch",
+    "name_en": "corn, starch",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -310,7 +310,7 @@
   {
     "code": "food_0011",
     "name_ar": "مكرونة بالصلصة",
-    "name_en": "macaroni/tomato , cooked",
+    "name_en": "macaroni/tomato, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -338,7 +338,7 @@
   {
     "code": "food_0012",
     "name_ar": "مكرونة بالصلصة واللحمة",
-    "name_en": "macaroni/tomato/meat , cooked",
+    "name_en": "macaroni/tomato/meat, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -366,7 +366,7 @@
   {
     "code": "food_0013",
     "name_ar": "شعرية مقلية",
-    "name_en": "noodles , fried",
+    "name_en": "noodles, fried",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -394,7 +394,7 @@
   {
     "code": "food_0014",
     "name_ar": "أرز حبة طويلة",
-    "name_en": "rice , grains (long)",
+    "name_en": "rice, grains (long)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -422,7 +422,7 @@
   {
     "code": "food_0015",
     "name_ar": "أرز حبة قصيرة",
-    "name_en": "rice , grains (short)",
+    "name_en": "rice, grains (short)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -450,7 +450,7 @@
   {
     "code": "food_0016",
     "name_ar": "دقيق أرز",
-    "name_en": "rice , flour",
+    "name_en": "rice, flour",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -478,7 +478,7 @@
   {
     "code": "food_0017",
     "name_ar": "أرز مقلي",
-    "name_en": "rice , fried",
+    "name_en": "rice, fried",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -506,7 +506,7 @@
   {
     "code": "food_0018",
     "name_ar": "أرز بالشعرية",
-    "name_en": "rice , fried with noodles",
+    "name_en": "rice, fried with noodles",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -534,7 +534,7 @@
   {
     "code": "food_0019",
     "name_ar": "أرز بالبصل",
-    "name_en": "rice , fried with onions",
+    "name_en": "rice, fried with onions",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -562,7 +562,7 @@
   {
     "code": "food_0020",
     "name_ar": "أرز مدعم للأطفال",
-    "name_en": "rice , fortified-baby food",
+    "name_en": "rice, fortified-baby food",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -618,7 +618,7 @@
   {
     "code": "food_0022",
     "name_ar": "أرز كشري تجاري",
-    "name_en": "rice (koshari) , market",
+    "name_en": "rice (koshari), market",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -646,7 +646,7 @@
   {
     "code": "food_0023",
     "name_ar": "رز بلبن",
-    "name_en": "rice , pudding with milk",
+    "name_en": "rice, pudding with milk",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -674,7 +674,7 @@
   {
     "code": "food_0024",
     "name_ar": "أرز منفوش",
-    "name_en": "rice , puffed/crisp",
+    "name_en": "rice, puffed/crisp",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -730,7 +730,7 @@
   {
     "code": "food_0026",
     "name_ar": "درة (ذرة رفيعة)",
-    "name_en": "sorghum , grains",
+    "name_en": "sorghum, grains",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -758,7 +758,7 @@
   {
     "code": "food_0027",
     "name_ar": "نخالة قمح",
-    "name_en": "wheat , bran",
+    "name_en": "wheat, bran",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -786,7 +786,7 @@
   {
     "code": "food_0028",
     "name_ar": "قمح (حبوب)",
-    "name_en": "wheat , grains",
+    "name_en": "wheat, grains",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -814,7 +814,7 @@
   {
     "code": "food_0029",
     "name_ar": "بليلة معلبة",
-    "name_en": "wheat , grains (bolila , canned)",
+    "name_en": "wheat, grains (bolila, canned)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -842,7 +842,7 @@
   {
     "code": "food_0030",
     "name_ar": "دقيق أسمر",
-    "name_en": "wheat , flour (brown)",
+    "name_en": "wheat, flour (brown)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -870,7 +870,7 @@
   {
     "code": "food_0031",
     "name_ar": "دقيق أبيض",
-    "name_en": "wheat , flour (white)",
+    "name_en": "wheat, flour (white)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -898,7 +898,7 @@
   {
     "code": "food_0032",
     "name_ar": "قمح مدعم للأطفال",
-    "name_en": "wheat , fortified-baby food",
+    "name_en": "wheat, fortified-baby food",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -926,7 +926,7 @@
   {
     "code": "food_0033",
     "name_ar": "كسكس سادة",
-    "name_en": "wheat , koskos plain",
+    "name_en": "wheat, koskos plain",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -954,7 +954,7 @@
   {
     "code": "food_0034",
     "name_ar": "كسكس محلى",
-    "name_en": "wheat , koskos sweet",
+    "name_en": "wheat, koskos sweet",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -982,7 +982,7 @@
   {
     "code": "food_0035",
     "name_ar": "برغل",
-    "name_en": "wheat , parboiled (burghul)",
+    "name_en": "wheat, parboiled (burghul)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1010,7 +1010,7 @@
   {
     "code": "food_0036",
     "name_ar": "فريك",
-    "name_en": "wheat , rubbed (fereek)",
+    "name_en": "wheat, rubbed (fereek)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1038,7 +1038,7 @@
   {
     "code": "food_0037",
     "name_ar": "فريك مطبوخ",
-    "name_en": "wheat , rubbed , cooked",
+    "name_en": "wheat, rubbed, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1066,7 +1066,7 @@
   {
     "code": "food_0038",
     "name_ar": "فريك باللحمة",
-    "name_en": "wheat , rubbed/meat , cooked",
+    "name_en": "wheat, rubbed/meat, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1094,7 +1094,7 @@
   {
     "code": "food_0039",
     "name_ar": "بسكويت مغلف بالشوكولاتة",
-    "name_en": "biscuit , chocolate coat",
+    "name_en": "biscuit, chocolate coat",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1122,7 +1122,7 @@
   {
     "code": "food_0040",
     "name_ar": "بسكويت محشي كريمة",
-    "name_en": "biscuit , cream fill",
+    "name_en": "biscuit, cream fill",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1150,7 +1150,7 @@
   {
     "code": "food_0041",
     "name_ar": "بسكويت محشي عجوة",
-    "name_en": "biscuit , date fill",
+    "name_en": "biscuit, date fill",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1178,7 +1178,7 @@
   {
     "code": "food_0042",
     "name_ar": "بسكويت دايجستيف",
-    "name_en": "biscuit , digestive",
+    "name_en": "biscuit, digestive",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1206,7 +1206,7 @@
   {
     "code": "food_0043",
     "name_ar": "بسكويت نايس",
-    "name_en": "biscuit , nice",
+    "name_en": "biscuit, nice",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1234,7 +1234,7 @@
   {
     "code": "food_0044",
     "name_ar": "بسكويت سادة",
-    "name_en": "biscuit , plain",
+    "name_en": "biscuit, plain",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1262,7 +1262,7 @@
   {
     "code": "food_0045",
     "name_ar": "بسكويت سادة مدعم بالحديد",
-    "name_en": "biscuit , plain (fe-fortified)",
+    "name_en": "biscuit, plain (fe-fortified)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1290,7 +1290,7 @@
   {
     "code": "food_0046",
     "name_ar": "بسكويت مملح",
-    "name_en": "biscuit , salted",
+    "name_en": "biscuit, salted",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1318,7 +1318,7 @@
   {
     "code": "food_0047",
     "name_ar": "بريتزل",
-    "name_en": "biscuit , salted (preizel)",
+    "name_en": "biscuit, salted (preizel)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1346,7 +1346,7 @@
   {
     "code": "food_0048",
     "name_ar": "ويفر مغلف بالشوكولاتة",
-    "name_en": "biscuit , wafers chocolate coat",
+    "name_en": "biscuit, wafers chocolate coat",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1374,7 +1374,7 @@
   {
     "code": "food_0049",
     "name_ar": "ويفر محشي كريمة",
-    "name_en": "biscuit , wafers cream fill",
+    "name_en": "biscuit, wafers cream fill",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1402,7 +1402,7 @@
   {
     "code": "food_0050",
     "name_ar": "عيش بلدي",
-    "name_en": "bread , baladi",
+    "name_en": "bread, baladi",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1430,7 +1430,7 @@
   {
     "code": "food_0051",
     "name_ar": "عيش بلدي (قمح/ذرة)",
-    "name_en": "bread , baladi (wheat/corn)",
+    "name_en": "bread, baladi (wheat/corn)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1458,7 +1458,7 @@
   {
     "code": "food_0052",
     "name_ar": "عيش نخالة جاف",
-    "name_en": "bread , brans dry (sin)",
+    "name_en": "bread, brans dry (sin)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1486,7 +1486,7 @@
   {
     "code": "food_0053",
     "name_ar": "عيش سمسم (عروسة)",
-    "name_en": "bread , buns with sesame",
+    "name_en": "bread, buns with sesame",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1514,7 +1514,7 @@
   {
     "code": "food_0054",
     "name_ar": "عيش ذرة/قمح (1:1)",
-    "name_en": "bread ,corn / wheat (1:1)",
+    "name_en": "bread,corn / wheat (1:1)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1542,7 +1542,7 @@
   {
     "code": "food_0055",
     "name_ar": "عيش ذرة/قمح (1:2)",
-    "name_en": "bread ,corn / wheat (1:2)",
+    "name_en": "bread,corn / wheat (1:2)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1570,7 +1570,7 @@
   {
     "code": "food_0056",
     "name_ar": "عيش ذرة/قمح (2:1)",
-    "name_en": "bread ,corn / wheat (2:1)",
+    "name_en": "bread,corn / wheat (2:1)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1598,7 +1598,7 @@
   {
     "code": "food_0057",
     "name_ar": "بقسماط ناعم",
-    "name_en": "bread , crumb",
+    "name_en": "bread, crumb",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1626,7 +1626,7 @@
   {
     "code": "food_0058",
     "name_ar": "عيش فرنسي",
-    "name_en": "bread , french",
+    "name_en": "bread, french",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1654,7 +1654,7 @@
   {
     "code": "food_0059",
     "name_ar": "عيش لبناني",
-    "name_en": "bread , lebanese",
+    "name_en": "bread, lebanese",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1682,7 +1682,7 @@
   {
     "code": "food_0060",
     "name_ar": "عيش لبناني أسمر",
-    "name_en": "bread , lebanese (brown)",
+    "name_en": "bread, lebanese (brown)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1710,7 +1710,7 @@
   {
     "code": "food_0061",
     "name_ar": "عيش شامي",
-    "name_en": "bread , shami",
+    "name_en": "bread, shami",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1738,7 +1738,7 @@
   {
     "code": "food_0062",
     "name_ar": "عيش شمسي",
-    "name_en": "bread , shamsy",
+    "name_en": "bread, shamsy",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1766,7 +1766,7 @@
   {
     "code": "food_0063",
     "name_ar": "توست أسمر",
-    "name_en": "bread , slised (brown toast)",
+    "name_en": "bread, slised (brown toast)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1794,7 +1794,7 @@
   {
     "code": "food_0064",
     "name_ar": "توست أبيض",
-    "name_en": "bread , slised (white toast)",
+    "name_en": "bread, slised (white toast)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1822,7 +1822,7 @@
   {
     "code": "food_0065",
     "name_ar": "أصابع عيش بالسمسم",
-    "name_en": "bread , sticks with sesame",
+    "name_en": "bread, sticks with sesame",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1850,7 +1850,7 @@
   {
     "code": "food_0066",
     "name_ar": "عيش فيش (فايش)",
-    "name_en": "bread , sticks (fayesh)",
+    "name_en": "bread, sticks (fayesh)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1878,7 +1878,7 @@
   {
     "code": "food_0067",
     "name_ar": "كيك أكواب",
-    "name_en": "cakes , cup",
+    "name_en": "cakes, cup",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1906,7 +1906,7 @@
   {
     "code": "food_0068",
     "name_ar": "كيك إسفنجي",
-    "name_en": "cakes , sponge",
+    "name_en": "cakes, sponge",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -1990,7 +1990,7 @@
   {
     "code": "food_0071",
     "name_ar": "فطير مشلتت",
-    "name_en": "pie ,fiteer , meshaltet",
+    "name_en": "pie,fiteer, meshaltet",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2018,7 +2018,7 @@
   {
     "code": "food_0072",
     "name_ar": "فطير تجاري",
-    "name_en": "pie , fiteer , market",
+    "name_en": "pie, fiteer, market",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2046,7 +2046,7 @@
   {
     "code": "food_0073",
     "name_ar": "رقاق باللحمة",
-    "name_en": "pie , rucak with meat",
+    "name_en": "pie, rucak with meat",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2074,7 +2074,7 @@
   {
     "code": "food_0074",
     "name_ar": "بيتزا بالجبن",
-    "name_en": "pizza , cheese topping",
+    "name_en": "pizza, cheese topping",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2102,7 +2102,7 @@
   {
     "code": "food_0075",
     "name_ar": "بيتزا باللحمة والسجق",
-    "name_en": "pizza , meat / sausage topping",
+    "name_en": "pizza, meat / sausage topping",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2130,7 +2130,7 @@
   {
     "code": "food_0076",
     "name_ar": "بيتزا سي فوود",
-    "name_en": "pizza , seafood topping",
+    "name_en": "pizza, seafood topping",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2158,7 +2158,7 @@
   {
     "code": "food_0077",
     "name_ar": "بيتزا خضار",
-    "name_en": "pizza , vegetarian",
+    "name_en": "pizza, vegetarian",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2186,7 +2186,7 @@
   {
     "code": "food_0078",
     "name_ar": "ساندوتش جبن أبيض",
-    "name_en": "sandwiches ,cheese white",
+    "name_en": "sandwiches,cheese white",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2214,7 +2214,7 @@
   {
     "code": "food_0079",
     "name_ar": "ساندوتش جبن أصفر",
-    "name_en": "sandwiches ,cheese yellow",
+    "name_en": "sandwiches,cheese yellow",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2242,7 +2242,7 @@
   {
     "code": "food_0080",
     "name_ar": "ساندوتش مخ مقلي",
-    "name_en": "sandwiches , fried brain",
+    "name_en": "sandwiches, fried brain",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2270,7 +2270,7 @@
   {
     "code": "food_0081",
     "name_ar": "ساندوتش دجاج مقلي",
-    "name_en": "sandwiches , fried chicken",
+    "name_en": "sandwiches, fried chicken",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2298,7 +2298,7 @@
   {
     "code": "food_0082",
     "name_ar": "ساندوتش باذنجان مقلي",
-    "name_en": "sandwiches , fried eggplant",
+    "name_en": "sandwiches, fried eggplant",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2326,7 +2326,7 @@
   {
     "code": "food_0083",
     "name_ar": "ساندوتش كبدة مقلية",
-    "name_en": "sandwiches , fried liver",
+    "name_en": "sandwiches, fried liver",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2354,7 +2354,7 @@
   {
     "code": "food_0084",
     "name_ar": "ساندوتش جمبري مقلي",
-    "name_en": "sandwiches , fried shrimp",
+    "name_en": "sandwiches, fried shrimp",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2382,7 +2382,7 @@
   {
     "code": "food_0085",
     "name_ar": "ساندوتش طعمية",
-    "name_en": "sandwiches , fried taamin",
+    "name_en": "sandwiches, fried taamin",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2410,7 +2410,7 @@
   {
     "code": "food_0086",
     "name_ar": "ساندوتش دجاج مشوي",
-    "name_en": "sandwiches , grilled checken",
+    "name_en": "sandwiches, grilled checken",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2438,7 +2438,7 @@
   {
     "code": "food_0087",
     "name_ar": "ساندوتش كفتة مشوية",
-    "name_en": "sandwiches , grilled kofta",
+    "name_en": "sandwiches, grilled kofta",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2466,7 +2466,7 @@
   {
     "code": "food_0088",
     "name_ar": "ساندوتش همبرجر",
-    "name_en": "sandwiches , hamburger",
+    "name_en": "sandwiches, hamburger",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2494,7 +2494,7 @@
   {
     "code": "food_0089",
     "name_ar": "ساندوتش هوت دوغ",
-    "name_en": "sandwiches , hotdog",
+    "name_en": "sandwiches, hotdog",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2522,7 +2522,7 @@
   {
     "code": "food_0090",
     "name_ar": "ساندوتش شاورما",
-    "name_en": "sandwiches ,shawerma meat",
+    "name_en": "sandwiches,shawerma meat",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2550,7 +2550,7 @@
   {
     "code": "food_0091",
     "name_ar": "ساندوتش فول",
-    "name_en": "sandwiches , stewed foul",
+    "name_en": "sandwiches, stewed foul",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2606,7 +2606,7 @@
   {
     "code": "food_0093",
     "name_ar": "حب العزيز طري",
-    "name_en": "chufa tuber , wet",
+    "name_en": "chufa tuber, wet",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2662,7 +2662,7 @@
   {
     "code": "food_0095",
     "name_ar": "قلقاس مطبوخ",
-    "name_en": "colocasia , cooked",
+    "name_en": "colocasia, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2718,7 +2718,7 @@
   {
     "code": "food_0097",
     "name_ar": "شيبسي",
-    "name_en": "potatoes , chips",
+    "name_en": "potatoes, chips",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2746,7 +2746,7 @@
   {
     "code": "food_0098",
     "name_ar": "بطاطس مقلية",
-    "name_en": "potatoes , fried",
+    "name_en": "potatoes, fried",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2774,7 +2774,7 @@
   {
     "code": "food_0099",
     "name_ar": "بطاطس بالطماطم",
-    "name_en": "potatoes , cooked with tomato",
+    "name_en": "potatoes, cooked with tomato",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2802,7 +2802,7 @@
   {
     "code": "food_0100",
     "name_ar": "بطاطس مهروسة بالحليب",
-    "name_en": "potatoes , mashed with milk",
+    "name_en": "potatoes, mashed with milk",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2830,7 +2830,7 @@
   {
     "code": "food_0101",
     "name_ar": "بطاطس مهروسة باللحمة والبيض",
-    "name_en": "potatoes , mashed /meat/egg",
+    "name_en": "potatoes, mashed /meat/egg",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2858,7 +2858,7 @@
   {
     "code": "food_0102",
     "name_ar": "بطاطس محشية باللحمة",
-    "name_en": "potatoes , meat stuff",
+    "name_en": "potatoes, meat stuff",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2914,7 +2914,7 @@
   {
     "code": "food_0104",
     "name_ar": "فول بلدي",
-    "name_en": "beans , broad",
+    "name_en": "beans, broad",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2942,7 +2942,7 @@
   {
     "code": "food_0105",
     "name_ar": "بصارة",
-    "name_en": "beans , broad (bisara)",
+    "name_en": "beans, broad (bisara)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2970,7 +2970,7 @@
   {
     "code": "food_0106",
     "name_ar": "فول مقشور",
-    "name_en": "beans , broad , decorticated",
+    "name_en": "beans, broad, decorticated",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -2998,7 +2998,7 @@
   {
     "code": "food_0107",
     "name_ar": "فول معلب",
-    "name_en": "beans , broad (foul) , canned",
+    "name_en": "beans, broad (foul), canned",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3026,7 +3026,7 @@
   {
     "code": "food_0108",
     "name_ar": "فول مدمس",
-    "name_en": "beans , broad (foulmedames)",
+    "name_en": "beans, broad (foulmedames)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3054,7 +3054,7 @@
   {
     "code": "food_0109",
     "name_ar": "فول منابت",
-    "name_en": "beans , broad (menabet)",
+    "name_en": "beans, broad (menabet)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3082,7 +3082,7 @@
   {
     "code": "food_0110",
     "name_ar": "نبتة الفول مطبوخة",
-    "name_en": "beans , broad (nabet)cooked",
+    "name_en": "beans, broad (nabet)cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3110,7 +3110,7 @@
   {
     "code": "food_0111",
     "name_ar": "طعمية مقلية",
-    "name_en": "beans , broad (taamia), fride",
+    "name_en": "beans, broad (taamia), fride",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3138,7 +3138,7 @@
   {
     "code": "food_0112",
     "name_ar": "فاصوليا حمراء",
-    "name_en": "beans , kidey (red)",
+    "name_en": "beans, kidey (red)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3166,7 +3166,7 @@
   {
     "code": "food_0113",
     "name_ar": "فاصوليا بيضاء",
-    "name_en": "beans , kidey (white)",
+    "name_en": "beans, kidey (white)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3194,7 +3194,7 @@
   {
     "code": "food_0114",
     "name_ar": "فاصوليا بيضاء مطبوخة",
-    "name_en": "beans , kidey white , cooked",
+    "name_en": "beans, kidey white, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3222,7 +3222,7 @@
   {
     "code": "food_0115",
     "name_ar": "فاصوليا بيضاء باللحمة",
-    "name_en": "beans , kidey white / meat",
+    "name_en": "beans, kidey white / meat",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3250,7 +3250,7 @@
   {
     "code": "food_0116",
     "name_ar": "فول مونج",
-    "name_en": "beans , mung",
+    "name_en": "beans, mung",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3306,7 +3306,7 @@
   {
     "code": "food_0118",
     "name_ar": "حمص الشام",
-    "name_en": "chickpeas , (homos sham)",
+    "name_en": "chickpeas, (homos sham)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3334,7 +3334,7 @@
   {
     "code": "food_0119",
     "name_ar": "حمص أصفر",
-    "name_en": "chickpeas , yellow",
+    "name_en": "chickpeas, yellow",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3390,7 +3390,7 @@
   {
     "code": "food_0121",
     "name_ar": "لوبيا مطبوخة",
-    "name_en": "cowpeas , cooked",
+    "name_en": "cowpeas, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3418,7 +3418,7 @@
   {
     "code": "food_0122",
     "name_ar": "لوبيا باللحمة",
-    "name_en": "cowpeas , cooked with meat",
+    "name_en": "cowpeas, cooked with meat",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3474,7 +3474,7 @@
   {
     "code": "food_0124",
     "name_ar": "عدس غير مقشور",
-    "name_en": "lentils , un-peeld",
+    "name_en": "lentils, un-peeld",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3502,7 +3502,7 @@
   {
     "code": "food_0125",
     "name_ar": "عدس غير مقشور مطبوخ",
-    "name_en": "lentils , un-peeld , cooked",
+    "name_en": "lentils, un-peeld, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3530,7 +3530,7 @@
   {
     "code": "food_0126",
     "name_ar": "عدس مقشور (أصفر)",
-    "name_en": "lentils , peeled (yellow)",
+    "name_en": "lentils, peeled (yellow)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3558,7 +3558,7 @@
   {
     "code": "food_0127",
     "name_ar": "عدس بالأرز مطبوخ",
-    "name_en": "lentils , peeled / rice cooked",
+    "name_en": "lentils, peeled / rice cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3586,7 +3586,7 @@
   {
     "code": "food_0128",
     "name_ar": "شوربة عدس",
-    "name_en": "lentils , peeled soup",
+    "name_en": "lentils, peeled soup",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3726,7 +3726,7 @@
   {
     "code": "food_0133",
     "name_ar": "دقيق صويا",
-    "name_en": "soybeans , flour",
+    "name_en": "soybeans, flour",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -3782,7 +3782,7 @@
   {
     "code": "food_0135",
     "name_ar": "جوز هند مجفف",
-    "name_en": "coconuls , dry",
+    "name_en": "coconuls, dry",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4090,7 +4090,7 @@
   {
     "code": "food_0146",
     "name_ar": "سلطة خرشوف",
-    "name_en": "artichokes , salad",
+    "name_en": "artichokes, salad",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4118,7 +4118,7 @@
   {
     "code": "food_0147",
     "name_ar": "فول أخضر",
-    "name_en": "beans , broad (green)",
+    "name_en": "beans, broad (green)",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4146,7 +4146,7 @@
   {
     "code": "food_0148",
     "name_ar": "لوبيا خضراء",
-    "name_en": "beans , green",
+    "name_en": "beans, green",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4174,7 +4174,7 @@
   {
     "code": "food_0149",
     "name_ar": "لوبيا خضراء مطبوخة",
-    "name_en": "beans , green , cooked",
+    "name_en": "beans, green, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4286,7 +4286,7 @@
   {
     "code": "food_0153",
     "name_ar": "كرنب أحمر",
-    "name_en": "cabbage , red",
+    "name_en": "cabbage, red",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4314,7 +4314,7 @@
   {
     "code": "food_0154",
     "name_ar": "كرنب أبيض",
-    "name_en": "cabbage , white",
+    "name_en": "cabbage, white",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4342,7 +4342,7 @@
   {
     "code": "food_0155",
     "name_ar": "كرنب محشي أرز",
-    "name_en": "cabbage , rice stuff",
+    "name_en": "cabbage, rice stuff",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4370,7 +4370,7 @@
   {
     "code": "food_0156",
     "name_ar": "كرنب محشي أرز ولحمة",
-    "name_en": "cabbage , rice / meat stuff",
+    "name_en": "cabbage, rice / meat stuff",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4454,7 +4454,7 @@
   {
     "code": "food_0159",
     "name_ar": "قرنبيط مطبوخ",
-    "name_en": "cauliflower , cooked",
+    "name_en": "cauliflower, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4482,7 +4482,7 @@
   {
     "code": "food_0160",
     "name_ar": "قرنبيط باللحمة مطبوخ",
-    "name_en": "cauliflower / meat , cooked",
+    "name_en": "cauliflower / meat, cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4620,7 +4620,7 @@
     }
   },
   {
-    "code": "food_0165",
+    "code": "food_0449",
     "name_ar": "كزبرة",
     "name_en": "coriander",
     "category_code": "general",
@@ -4762,7 +4762,7 @@
   {
     "code": "food_0171",
     "name_ar": "باذنجان دائري",
-    "name_en": "eggplant ,round",
+    "name_en": "eggplant,round",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -4790,7 +4790,7 @@
   {
     "code": "food_0172",
     "name_ar": "باذنجان مطبوخ",
-    "name_en": "eggplant ,cooked",
+    "name_en": "eggplant,cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -5126,7 +5126,7 @@
   {
     "code": "food_0470",
     "name_ar": "ملوخية مطبوخة",
-    "name_en": "Jew's mallow,�cooked�",
+    "name_en": "Jew's mallow,cooked",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -5602,7 +5602,7 @@
   {
     "code": "food_0201",
     "name_ar": "بصل",
-    "name_en": "onions , mature bulb",
+    "name_en": "onions, mature bulb",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -5630,7 +5630,7 @@
   {
     "code": "food_0202",
     "name_ar": "مخلل بصل",
-    "name_en": "onions , pickled",
+    "name_en": "onions, pickled",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -8206,7 +8206,7 @@
   {
     "code": "food_0471",
     "name_ar": "قطايت",
-    "name_en": "Oriental Katait�",
+    "name_en": "Oriental Katait",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -8234,7 +8234,7 @@
   {
     "code": "food_0296",
     "name_ar": "كنافة بالكريمة",
-    "name_en": "Oriental Kunafa , cream",
+    "name_en": "Oriental Kunafa, cream",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -8318,7 +8318,7 @@
   {
     "code": "food_0472",
     "name_ar": "معمول",
-    "name_en": "Oriental Maamout�",
+    "name_en": "Oriental Maamout",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -8496,7 +8496,7 @@
       "fat_g": 7.5,
       "ash_g": 0,
       "fiber_g": 0,
-      "carb_g": 1500,
+      "carb_g": 0,
       "sodium_mg": 212,
       "potassium_mg": 45,
       "calcium_mg": 0,
@@ -8635,8 +8635,8 @@
       "protein_g": 16.1,
       "fat_g": 3.1,
       "ash_g": 14.6,
-      "fiber_g": 1052,
-      "carb_g": 230,
+      "fiber_g": 0,
+      "carb_g": 0,
       "sodium_mg": 68,
       "potassium_mg": 127,
       "calcium_mg": 74,
@@ -8912,7 +8912,7 @@
     "macros": {
       "water_g": 65,
       "energy_kcal": 216,
-      "protein_g": 118,
+      "protein_g": 0,
       "fat_g": 16,
       "ash_g": 1,
       "fiber_g": 0,
@@ -10474,7 +10474,7 @@
   {
     "code": "food_0376",
     "name_ar": "ماكريل معلب",
-    "name_en": "Mackerel , canned",
+    "name_en": "Mackerel, canned",
     "category_code": "general",
     "unit": "100g",
     "macros": {
@@ -12443,7 +12443,7 @@
       "protein_g": 12,
       "fat_g": 4.3,
       "ash_g": 6.4,
-      "fiber_g": 143,
+      "fiber_g": 0,
       "carb_g": 50.4,
       "sodium_mg": 3,
       "potassium_mg": 30,
@@ -12471,7 +12471,7 @@
       "protein_g": 4,
       "fat_g": 2,
       "ash_g": 4.8,
-      "fiber_g": 241,
+      "fiber_g": 0,
       "carb_g": 57.3,
       "sodium_mg": 15,
       "potassium_mg": 380,
