@@ -784,6 +784,7 @@ export const ar = {
     tabHistory: "السجل",
     currentWeight: "الوزن الحالي",
     startWeight: "الوزن البداية",
+    baselineFromAssessment: "هذا الوزن مأخوذ من تقييم المريض الأولي — سجّل قياسًا جديدًا لبدء تتبع التقدم.",
     change: "التغيّر",
     measurements: "القياسات",
     unitWeight: "كجم",

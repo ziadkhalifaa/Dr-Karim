@@ -785,6 +785,7 @@ export const en = {
     tabHistory: "History",
     currentWeight: "Current weight",
     startWeight: "Starting weight",
+    baselineFromAssessment: "This weight comes from the patient's initial assessment — record a new measurement to start tracking progress.",
     change: "Change",
     measurements: "Measurements",
     unitWeight: "kg",

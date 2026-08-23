@@ -55,11 +55,11 @@ function RecordMeasurement({ patientId, onSaved }) {
       <div className="dash-form--grid">
         <label className="dash-field">
           <span>{t("doctorProgress.recordValue")} (kg)</span>
-          <input type="number" name="value" min="20" max="400" step="any" required />
+          <input className="dash-input" type="number" name="value" min="20" max="400" step="any" required placeholder="مثال: 78.5" />
         </label>
         <label className="dash-field">
           <span>{t("doctorProgress.recordDate")}</span>
-          <input type="date" name="measuredOn" />
+          <input className="dash-input" type="date" name="measuredOn" />
         </label>
       </div>
       {error && <p className="dash-muted" style={{ color: "var(--dash-danger)" }}>{error}</p>}
@@ -92,15 +92,15 @@ function CreateGoal({ patientId, onSaved }) {
       <div className="dash-form--grid">
         <label className="dash-field">
           <span>{t("doctorProgress.targetValue")} (kg)</span>
-          <input type="number" name="targetValue" min="20" max="400" step="any" required />
+          <input className="dash-input" type="number" name="targetValue" min="20" max="400" step="any" required placeholder="مثال: 70" />
         </label>
         <label className="dash-field">
           <span>{t("doctorProgress.startDate")}</span>
-          <input type="date" name="startDate" />
+          <input className="dash-input" type="date" name="startDate" />
         </label>
         <label className="dash-field">
           <span>{t("doctorProgress.targetDate")}</span>
-          <input type="date" name="targetDate" />
+          <input className="dash-input" type="date" name="targetDate" />
         </label>
       </div>
       {error && <p className="dash-muted" style={{ color: "var(--dash-danger)" }}>{error}</p>}
@@ -259,6 +259,11 @@ export default function DoctorProgress({ patientId, patientLabel }) {
                 <Kpi icon={<Minus className="dash-inline-icon" />} label={t("doctorProgress.change")} value={delta == null ? "—" : `${delta > 0 ? "+" : ""}${fmt(delta)} ${t("doctorProgress.unitWeight")}`} />
                 <Kpi icon={<Minus className="dash-inline-icon" />} label={t("doctorProgress.measurements")} value={weight?.count ?? 0} />
               </div>
+              {weight?.baselineSource === "assessment" && (
+                <p className="dash-care-instructions" style={{ marginBottom: "16px" }}>
+                  {t("doctorProgress.baselineFromAssessment")}
+                </p>
+              )}
 
               <section className="dash-panel">
                 <div className="dash-panel__head">

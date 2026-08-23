@@ -15,7 +15,7 @@ import {
   goalProgressPercent, projectedReachDate, ratePerDay,
 } from "./progress-analytics.js";
 
-const { Tenant, Patient, ProgressMeasurement, PatientProgressGoal, PatientProgressGoalVersion } = models;
+const { Tenant, Patient, ProgressMeasurement, PatientProgressGoal, PatientProgressGoalVersion, PatientMeasurement } = models;
 
 function actor(auth) {
   if (!auth) throw new AppError(401, "AUTH_REQUIRED", "Authentication required");
@@ -99,6 +99,30 @@ export const progressService = {
         ratePerDay: rate,
         unit: ENUM.PROGRESS_UNIT_BY_TYPE[type],
       };
+    }
+
+    // Baseline fallback: when no progress timeline exists yet, surface the
+    // weight captured in the confirmed assessment (patient_measurement) so the
+    // dashboard is not empty on day one. Clearly labeled as an assessment
+    // baseline — it never enters the progress_measurement history.
+    if (!byType.weight || byType.weight.count === 0) {
+      const baseline = await PatientMeasurement.findOne({
+        where: { tenant_id: tenantId, patient_id: patientId, measure_code: "weight_kg", is_current: true },
+        order: [["id", "DESC"]], raw: true,
+      });
+      if (baseline) {
+        const value = Number(baseline.value);
+        const measuredOn = baseline.measured_on || null;
+        byType.weight = {
+          count: 0,
+          starting: { value, measuredOn, source: "assessment" },
+          current: { value, measuredOn, source: "assessment" },
+          delta: 0,
+          ratePerDay: null,
+          unit: ENUM.PROGRESS_UNIT_BY_TYPE.weight,
+          baselineSource: "assessment",
+        };
+      }
     }
 
     const goal = await activeGoal(patientId, tenantId);
