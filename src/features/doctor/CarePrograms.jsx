@@ -468,6 +468,59 @@ function ProgramDetail({ id, patientLabel, onBack, onChanged }) {
   );
 }
 
+const PLAN_STATUS_AR = { draft: "مسودة", doctor_review: "قيد المراجعة", approved: "معتمدة", active: "منشطة", archived: "مؤرشفة" };
+
+function SavedPlans({ patientId, reloadKey }) {
+  const [plans, setPlans] = useState(null);
+  useEffect(() => {
+    if (!patientId) { setPlans(null); return; }
+    let cancelled = false;
+    patientApi.planVersions(patientId)
+      .then((res) => { if (!cancelled) setPlans(res); })
+      .catch(() => { if (!cancelled) setPlans({ nutrition: [], exercise: [] }); });
+    return () => { cancelled = true; };
+  }, [patientId, reloadKey]);
+  if (!plans) return null;
+  const rows = [
+    ...plans.nutrition.map((v) => ({ ...v, icon: "🥗", label: "تغذية" })),
+    ...plans.exercise.map((v) => ({ ...v, icon: "🏋️", label: "رياضة" })),
+  ];
+  return (
+    <section className="dash-panel">
+      <div className="dash-panel__head">
+        <h3 className="dash-panel__title">الخطط المحفوظة</h3>
+        <span className="dash-badge dash-badge--primary">{rows.length}</span>
+      </div>
+      {rows.length ? (
+        <div className="dash-table-wrap dash-panel__body--flush">
+          <table className="dash-table">
+            <thead>
+              <tr>
+                <th>النوع</th>
+                <th>النسخة</th>
+                <th>الحالة</th>
+                <th>مفعّلة من</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((v) => (
+                <tr key={`${v.label}-${v.id}`}>
+                  <td>{v.icon} {v.label}</td>
+                  <td>#{v.versionNo}</td>
+                  <td><span className={`dash-badge ${statusTone(v.status)}`}>{PLAN_STATUS_AR[v.status] || v.status}</span></td>
+                  <td className="dash-cell-muted">{v.effectiveFrom || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="dash-empty"><Inbox /><p>لا توجد خطط محفوظة بعد — اضغط "إضافة وتعديل النظام الغذائي" لإنشاء خطة.</p></div>
+      )}
+    </section>
+  );
+}
+
 export default function CarePrograms({ patientId, patientLabel }) {
   const { t } = useTranslation();
   const [rows, setRows] = useState([]);
@@ -507,6 +560,8 @@ export default function CarePrograms({ patientId, patientLabel }) {
         setSelected(String(p.program.id));
         return p;
       }} onCancel={() => setShowCreate(false)} />}
+
+      <SavedPlans patientId={patientId} reloadKey={rows.length} />
 
       <section className="dash-panel">
         <div className="dash-panel__head">
