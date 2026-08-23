@@ -13,6 +13,7 @@
 import { logger } from "./utils/logger.js";
 import { runMigration } from "../scripts/migrate.js";
 import { runSeed } from "../scripts/seed.js";
+import { runFoodSeed } from "../scripts/seed-food.js";
 
 export async function ensureDatabaseSync() {
   try {
@@ -23,6 +24,10 @@ export async function ensureDatabaseSync() {
     logger.info("db sync starting", { step: "scripts/seed.js" });
     await runSeed();
     logger.info("db sync done", { step: "scripts/seed.js" });
+
+    logger.info("db sync starting", { step: "scripts/seed-food.js" });
+    await runFoodSeed();
+    logger.info("db sync done", { step: "scripts/seed-food.js" });
   } catch (err) {
     logger.error("db sync failed", { errorMessage: err.message, stack: err.stack });
     throw err;

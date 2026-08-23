@@ -24,18 +24,18 @@ function FoodSearchModal({ onClose, onSelect }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!query.trim()) { setResults([]); return; }
+    const trimmed = query.trim();
     const delay = setTimeout(async () => {
       setLoading(true);
       try {
-        const res = await foodApi.list(`?q=${encodeURIComponent(query)}&limit=20`);
+        const res = await foodApi.list(trimmed ? `?q=${encodeURIComponent(trimmed)}&limit=20` : "?limit=50");
         setResults(res.items || []);
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
-    }, 400);
+    }, trimmed ? 400 : 0);
     return () => clearTimeout(delay);
   }, [query]);
 

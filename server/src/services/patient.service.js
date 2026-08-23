@@ -164,7 +164,8 @@ export const patientService = {
     if (!["doctor", "staff"].includes(current.role)) throw new AppError(403, "PATIENT_LIST_FORBIDDEN", "Only doctor or staff may list patients");
 
     const where = { tenant_id: tenantId };
-    const status = Array.isArray(query.status) ? query.status.filter(Boolean) : (query.status ? [query.status] : []);
+    const rawStatus = Array.isArray(query.status) ? query.status : String(query.status ?? "").split(",");
+    const status = rawStatus.map((value) => String(value).trim()).filter(Boolean);
     if (status.length) where.status = { [Op.in]: status };
     if (query.q && String(query.q).trim()) {
       const like = { [Op.like]: `%${escapeLike(query.q)}%` };

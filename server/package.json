@@ -10,6 +10,8 @@
     "db:migrate": "node scripts/migrate.js",
     "db:seed": "node scripts/seed.js",
     "db:sync": "node scripts/migrate.js && node scripts/seed.js",
+    "food:seed": "node scripts/seed-food.js",
+    "food:build": "node scripts/build-food-seed.mjs",
     "db:verify": "node scripts/verify-assessment-consistency.js",
     "test": "node --test \"test/unit/*.test.js\" \"test/integration/*.test.js\"",
     "test:unit": "node --test \"test/unit/*.test.js\"",
