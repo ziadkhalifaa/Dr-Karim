@@ -1,4 +1,8 @@
 export const assessmentEn = {
+  brand: {
+    name: "Dr. Kareem Eliethy",
+    title: "Nutrition Assessment",
+  },
   ui: {
     back: "Back",
     next: "Next",

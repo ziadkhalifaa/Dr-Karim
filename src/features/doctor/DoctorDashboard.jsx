@@ -68,7 +68,7 @@ function Reviews({ rows, reload }) {
       <div className="dash-page-head">
         <span className="dash-eyebrow">
           <ListChecks />
-          {t("dashboard.reviewQueue")}
+          {t("dashboard.nav.reviewQueue")}
         </span>
         <h2>{t("dashboard.reviews.title")}</h2>
         <p>{t("dashboard.reviews.subtitle")}</p>

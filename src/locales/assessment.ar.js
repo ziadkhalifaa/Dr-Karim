@@ -1,4 +1,8 @@
 export const assessmentAr = {
+  brand: {
+    name: "د. كريم الليثي",
+    title: "تقييم الحالة الغذائية",
+  },
   ui: {
     back: "رجوع",
     next: "التالي",
