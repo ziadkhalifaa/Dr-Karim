@@ -136,7 +136,9 @@ export default function ReviewStep({ state, setContact, setAck, onSubmit, onBack
               checked={consent}
               onChange={(e) => update("C09", e.target.checked)}
             />
-            <span className="aq-consent__box" aria-hidden="true">✓</span>
+            <span className="aq-consent__box" aria-hidden="true">
+              {consent ? "✓" : ""}
+            </span>
             <span>{lang === "ar" ? "أوافق على التواصل بخصوص التقييم." : "I agree to be contacted about my assessment."}</span>
           </label>
         </div>
@@ -154,7 +156,9 @@ export default function ReviewStep({ state, setContact, setAck, onSubmit, onBack
                 if (errors.ACK_ACCURATE) setErrors((prev) => ({ ...prev, ACK_ACCURATE: undefined }));
               }}
             />
-            <span className="aq-consent__box" aria-hidden="true">✓</span>
+            <span className="aq-consent__box" aria-hidden="true">
+              {ackAccurate ? "✓" : ""}
+            </span>
             <span>{lang === "ar" ? "أؤكد إن المعلومات اللي فوق صحيحة." : "I confirm the information above is accurate."}</span>
           </label>
           <label
@@ -169,7 +173,9 @@ export default function ReviewStep({ state, setContact, setAck, onSubmit, onBack
                 if (errors.ACK_NO_DIAGNOSIS) setErrors((prev) => ({ ...prev, ACK_NO_DIAGNOSIS: undefined }));
               }}
             />
-            <span className="aq-consent__box" aria-hidden="true">✓</span>
+            <span className="aq-consent__box" aria-hidden="true">
+              {ackNoDiagnosis ? "✓" : ""}
+            </span>
             <span>
               {lang === "ar"
                 ? "فاهم إن الاستمارة أداة لجمع البيانات — مش تشخيص طبي، وهيتراجع من الدكتور قبل أي خطة."

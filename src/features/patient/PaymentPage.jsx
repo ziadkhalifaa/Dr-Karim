@@ -42,7 +42,17 @@ export default function PaymentPage({ path }) {
           paymentApi.settings().catch(() => null),
         ]);
         setPkg(p);
-        setSettings(cfg);
+        // Server shape: { vodafone_cash: { enabled, destination }, instapay: { enabled, username, destination } }
+        // Normalize into the flat field keys this page reads.
+        const flat = cfg
+          ? {
+              vodafone_cash_number:
+                cfg.vodafone_cash?.enabled === false ? "" : cfg.vodafone_cash?.destination || "",
+              instapay_username:
+                cfg.instapay?.enabled === false ? "" : cfg.instapay?.username || cfg.instapay?.destination || "",
+            }
+          : null;
+        setSettings(flat);
         // Auto-select first available method
         const available = METHODS.filter((m) => cfg?.[m.fieldKey]);
         if (available.length > 0) setMethod(available[0].key);

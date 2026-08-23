@@ -57,7 +57,18 @@ export default function PackagesPage() {
           paymentApi.settings().catch(() => null),
         ]);
         const list = Array.isArray(pkgs) ? pkgs : (pkgs?.packages || []);
-        setPackages(list.filter((p) => p.active));
+        // Server returns raw entitlement rows; normalize them to feature labels.
+        setPackages(
+          list.filter((p) => p.active).map((p) => ({
+            ...p,
+            features:
+              p.features && p.features.length > 0
+                ? p.features
+                : (p.entitlements || [])
+                    .filter((e) => e.allowed !== 0 && e.allowed !== false)
+                    .map((e) => ({ code: e.code })),
+          }))
+        );
         setSettings(cfg);
       } catch (e) {
         setError(e.message || "فشل تحميل الباقات");
@@ -242,24 +253,24 @@ export default function PackagesPage() {
           <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "20px", padding: "28px", color: "#fff", backdropFilter: "blur(16px)" }}>
             <div style={{ fontSize: "16px", fontWeight: "800", marginBottom: "18px", color: "#c2f753" }}>💳 طرق الدفع المتاحة</div>
             <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-              {settings.vodafone_cash_number && (
+              {settings.vodafone_cash?.destination && (
                 <div style={{ flex: 1, minWidth: "160px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "14px", padding: "18px", textAlign: "center" }}>
                   <div style={{ fontSize: "24px", marginBottom: "8px" }}>📱</div>
                   <div style={{ fontWeight: "800", fontSize: "15px" }}>فودافون كاش</div>
-                  <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", marginTop: "6px", direction: "ltr", fontWeight: "700" }}>{settings.vodafone_cash_number}</div>
+                  <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", marginTop: "6px", direction: "ltr", fontWeight: "700" }}>{settings.vodafone_cash.destination}</div>
                 </div>
               )}
-              {settings.instapay_username && (
+              {(settings.instapay?.username || settings.instapay?.destination) && (
                 <div style={{ flex: 1, minWidth: "160px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "14px", padding: "18px", textAlign: "center" }}>
                   <div style={{ fontSize: "24px", marginBottom: "8px" }}>🏦</div>
                   <div style={{ fontWeight: "800", fontSize: "15px" }}>إنستاباي</div>
-                  <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", marginTop: "6px", direction: "ltr", fontWeight: "700" }}>{settings.instapay_username}</div>
+                  <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", marginTop: "6px", direction: "ltr", fontWeight: "700" }}>{settings.instapay.username || settings.instapay.destination}</div>
                 </div>
               )}
             </div>
-            {settings.instructions && (
+            {settings.instructions?.ar && (
               <p style={{ marginTop: "18px", fontSize: "13px", color: "rgba(255,255,255,0.6)", lineHeight: "1.7", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "16px" }}>
-                {settings.instructions}
+                {settings.instructions.ar}
               </p>
             )}
           </div>
