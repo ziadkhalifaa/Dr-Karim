@@ -47,6 +47,14 @@ export default function PatientProfile({ patientId }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientId]);
 
+  // Reflect the patient's name in the browser tab while their file is open.
+  const patientName = data?.patient?.fullName;
+  useEffect(() => {
+    if (!patientName) return undefined;
+    document.title = `${patientName} | لوحة التحكم`;
+    return () => { document.title = "د. كريم الليثي | استشاري التغذية العلاجية والسمنة"; };
+  }, [patientName]);
+
   // Derive charts and summaries from progress history
   const chartData = useMemo(() => {
     const progress = data?.progress;
