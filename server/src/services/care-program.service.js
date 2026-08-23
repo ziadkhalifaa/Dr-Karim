@@ -223,7 +223,9 @@ export const careProgramService = {
   // ---- Doctor authoring API ----
   async create({ tenantId, auth, body }) {
     const current = needDoctor(auth);
-    return sequelize.transaction(async (transaction) => {
+    // Read-back happens AFTER commit: get() uses its own connection and cannot
+    // see rows created inside this transaction.
+    const programId = await sequelize.transaction(async (transaction) => {
       const patient = await loadPatient(body.patientId, tenantId, transaction);
       const startDate = validDate(body.startDate, "startDate");
       const endDate = validDate(body.endDate, "endDate");
@@ -253,8 +255,9 @@ export const careProgramService = {
         created_by_type: "doctor", created_by: current.userId, previous_version_id: null,
       }, { transaction });
       await auditService.record({ tenantId, action: "care_program.created", entity: "care_program", entityRef: String(program.id), metadata: programStatusMessage(program), actorType: "doctor", actorId: current.userId, transaction });
-      return this.get({ tenantId, programId: program.id, auth });
+      return String(program.id);
     });
+    return this.get({ tenantId, programId, auth });
   },
 
   async list({ tenantId, auth, query = {} }) {
@@ -289,7 +292,8 @@ export const careProgramService = {
 
   async createVersion({ tenantId, programId, auth, body }) {
     const current = needDoctor(auth);
-    return sequelize.transaction(async (transaction) => {
+    const tenant = await loadTenant(tenantId);
+    await sequelize.transaction(async (transaction) => {
       const program = await loadProgram(programId, tenantId, transaction, true);
       assertOwner(program, current.doctorId);
       if (["completed", "cancelled", "expired"].includes(program.status)) {
@@ -321,8 +325,8 @@ export const careProgramService = {
         created_by_type: "doctor", created_by: current.userId, previous_version_id: latest?.id || null,
       }, { transaction });
       await auditService.record({ tenantId, action: "care_program.version_created", entity: "care_program_version", entityRef: String(version.id), metadata: { programId, versionNo: version.version_no, effectiveFrom }, actorType: "doctor", actorId: current.userId, transaction });
-      return this.get({ tenantId, programId, auth });
     });
+    return this.get({ tenantId, programId, auth });
   },
 
   async addDefinitions({ tenantId, programId, auth, body }) {
@@ -424,8 +428,9 @@ export const careProgramService = {
 
       await auditService.record({ tenantId, action: "care_program.activated", entity: "care_program", entityRef: String(program.id), metadata: programStatusMessage(p), actorType: "doctor", actorId: current.userId, transaction });
       await notificationService.emitForPatient({ tenantId, patientId: program.patient_id, type: "care_program_activated", relatedEntity: "care_program", relatedRef: String(program.id), transaction });
-      return this.get({ tenantId, programId, auth });
     });
+    // Read-back after commit so the response reflects the activated version.
+    return this.get({ tenantId, programId, auth });
   },
 };
 
