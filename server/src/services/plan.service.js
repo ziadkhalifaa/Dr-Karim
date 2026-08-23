@@ -92,7 +92,15 @@ async function createVersionContents(domain, body, version, tenantId, transactio
 
 async function validatePlanContext({ body, tenantId, transaction }) {
   const patient = await loadPatient(body.patientId, tenantId, transaction);
-  const review = await loadReview(body.doctorReviewId, patient.id, tenantId, transaction);
+      // Clients may not send an explicit review id; fall back to the
+      // patient's most recent approved review so first-time plan creation
+      // does not fail after a completed assessment.
+      const reviewId = body.doctorReviewId
+        ?? (await DoctorReview.findOne({
+          where: { patient_id: patient.id, tenant_id: tenantId, status: "approved" },
+          order: [["id", "DESC"]], transaction, raw: true,
+        }))?.id;
+      const review = await loadReview(reviewId, patient.id, tenantId, transaction);
   const session = await AssessmentSession.findOne({ where: { id: review.assessment_session_id, tenant_id: tenantId }, transaction, raw: true });
   if (!session) throw new AppError(409, "ASSESSMENT_NOT_FOUND", "Review source assessment is missing");
   return { patient, review, session };
