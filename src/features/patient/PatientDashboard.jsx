@@ -43,7 +43,7 @@ function PlanCard({ title, plan, icon: Icon, status }) {
           <Icon />
           {title}
         </h3>
-        <span className="dash-badge dash-badge--primary">{status}</span>
+        <span className={`dash-badge ${plan ? "dash-badge--primary" : ""}`}>{plan ? status : t("dashboard.patient.noPlan", "لا توجد خطة")}</span>
       </div>
       <div className="dash-panel__body">
         <p className="dash-muted">{t("dashboard.patient.planVersion")}</p>
@@ -320,13 +320,15 @@ export default function PatientDashboard({ path }) {
 
   const load = async () => {
     if (!user.patientId) return;
+    // One failing endpoint (e.g. a 403) must not blank the whole dashboard.
+    const safe = (p) => p.catch(() => null);
     const [nutrition, exercise, checkins, appointments, entitlements, homeData] = await Promise.all([
-      nutritionApi.patient(user.patientId),
-      exerciseApi.patient(user.patientId),
-      checkinApi.list(user.patientId),
-      appointmentApi.patientList(user.patientId),
-      paymentApi.entitlements(),
-      patientApi.home().catch(() => null),
+      safe(nutritionApi.patient(user.patientId)),
+      safe(exerciseApi.patient(user.patientId)),
+      safe(checkinApi.list(user.patientId)),
+      safe(appointmentApi.patientList(user.patientId)),
+      safe(paymentApi.entitlements()),
+      safe(patientApi.home()),
     ]);
     setData({
       nutrition,
