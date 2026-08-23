@@ -72,11 +72,28 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
     setError(null);
     try {
       const f = new FormData(e.currentTarget);
+      // Template activities may carry non-ASCII codes (auto-generated from
+      // Arabic names in the template editor). The API only accepts
+      // [a-z0-9_-], so derive a safe unique code per activity here.
+      const seen = new Set();
+      const safeCode = (a, idx) => {
+        let base = String(a.code || a.nameEn || a.activityType || "activity")
+          .toLowerCase()
+          .replace(/[^a-z0-9_-]+/g, "_")
+          .replace(/^_+|_+$/g, "")
+          .slice(0, 30);
+        if (!base) base = `${a.activityType || "activity"}_${idx}`;
+        let code = base;
+        let n = 2;
+        while (seen.has(code)) code = `${base}_${n++}`;
+        seen.add(code);
+        return code;
+      };
       const templateActivities = chosenTemplate?.activities?.length
-        ? chosenTemplate.activities.map((a) => ({
+        ? chosenTemplate.activities.map((a, idx) => ({
             activityType: a.activityType,
             measure: a.measure,
-            code: a.code,
+            code: safeCode(a, idx),
             nameAr: a.nameAr || null,
             nameEn: a.nameEn || null,
             plannedTarget: a.plannedTarget || {},
@@ -279,10 +296,12 @@ function AddDefinitions({ onAdd }) {
       const target = {};
       if (f.get("targetValue") !== "") target.value = Number(f.get("targetValue"));
       if (f.get("targetUnit")) target.unit = f.get("targetUnit");
+      const rawCode = String(f.get("code") || "").trim();
+      const code = rawCode.toLowerCase().replace(/[^a-z0-9_-]+/g, "_").replace(/^_+|_+$/g, "") || `act_${Date.now().toString(36)}`;
       await onAdd([{
         activityType: f.get("activityType"),
         measure: f.get("measure"),
-        code: f.get("code"),
+        code,
         nameAr: f.get("nameAr") || null,
         nameEn: f.get("nameEn") || null,
         plannedTarget: target,

@@ -394,7 +394,7 @@ export default function PatientProfile({ patientId }) {
 
           {activeTab === "care" && (
             <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}>
-              <CarePrograms patientId={patientId} />
+              <CarePrograms patientId={patientId} patientLabel={patient.fullName} />
             </div>
           )}
           
