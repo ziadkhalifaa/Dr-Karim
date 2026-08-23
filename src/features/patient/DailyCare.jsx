@@ -13,11 +13,11 @@ import {
 import { careApi } from "../../api/client";
 
 const statusMeta = {
-  planned: "care.status.planned",
-  completed: "care.status.completed",
-  partial: "care.status.partial",
-  skipped: "care.status.skipped",
-  not_recorded: "care.status.notRecorded",
+  planned: "dailyCare.status.planned",
+  completed: "dailyCare.status.completed",
+  partial: "dailyCare.status.partial",
+  skipped: "dailyCare.status.skipped",
+  not_recorded: "dailyCare.status.notRecorded",
 };
 
 function StatusBadge({ status }) {
@@ -226,24 +226,24 @@ function DailyCheckin({ onCheckin }) {
         <div className="dash-form--grid">
           <label className="dash-field">
             <span>{t("dailyCare.energy")}</span>
-            <input type="number" name="energy" min="0" max="10" step="1" />
+            <input className="dash-input" type="number" name="energy" min="0" max="10" step="1" placeholder="مثال: 7" />
           </label>
           <label className="dash-field">
             <span>{t("dailyCare.hunger")}</span>
-            <input type="number" name="hunger" min="0" max="10" step="1" />
+            <input className="dash-input" type="number" name="hunger" min="0" max="10" step="1" placeholder="مثال: 4" />
           </label>
           <label className="dash-field">
             <span>{t("dailyCare.selfAdherence")}</span>
-            <input type="number" name="adherenceSelfReport" min="0" max="100" step="1" />
+            <input className="dash-input" type="number" name="adherenceSelfReport" min="0" max="100" step="1" placeholder="مثال: 80" />
           </label>
           <label className="dash-field">
             <span>{t("dailyCare.weightKg")}</span>
-            <input type="number" name="weightKg" min="20" max="400" step="0.1" />
+            <input className="dash-input" type="number" name="weightKg" min="20" max="400" step="0.1" placeholder="مثال: 78.5" />
           </label>
         </div>
         <label className="dash-field">
           <span>{t("dailyCare.note")}</span>
-          <textarea name="notes" rows="3" />
+          <textarea className="dash-textarea" name="notes" rows="3" placeholder="اكتب أي ملاحظات عن يومك..." />
         </label>
         <button className="dash-btn dash-btn--primary" disabled={busy}>
           <Send />
