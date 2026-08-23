@@ -213,12 +213,18 @@ export default function NutritionBuilder({ planId, patientId }) {
         effectiveFrom: new Date().toISOString(),
       };
 
+      const STATUS_AR = { draft: "مسودة", doctor_review: "قيد المراجعة", approved: "معتمدة", active: "منشطة" };
+      let res;
       if (planId) {
-        await nutritionApi.version(planId, body);
+        res = await nutritionApi.version(planId, body);
       } else {
-        await nutritionApi.create({ patientId, primaryGoalCode: "weight_loss", version: body });
+        res = await nutritionApi.create({ patientId, primaryGoalCode: "weight_loss", version: body });
       }
-      
+      const pub = res?.publish;
+      if (pub && !pub.published) {
+        alert(`تم حفظ الخطة (${STATUS_AR[pub.status] || pub.status}) لكن لم يتم تنشيطها.\nالسبب: ${pub.reason || "غير معروف"}\nغالبًا المريض ليس لديه اشتراك فعال — يمكن تنشيط الخطة بعد الاشتراك.`);
+      }
+
       navigate(`/doctor/patients/${patientId}`);
     } catch (err) {
       alert("Error saving: " + err.message);

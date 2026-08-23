@@ -133,9 +133,27 @@ async function planDetails(domain, plan, tenantId, viewer) {
 }
 
 export const planService = {
+  // Walk a freshly saved draft version through submit -> approve -> activate
+  // so the doctor's save produces a usable plan in one step. Each transition
+  // keeps its own audited transaction; if any step fails (e.g. missing
+  // subscription entitlement for activation) the version stays at the last
+  // successful status instead of losing the saved work.
+  async publishVersion(domain, { versionId, tenantId, auth }) {
+    let status = "draft";
+    for (const step of ["submitReview", "approve", "activate"]) {
+      try {
+        const result = await this[step](domain, { versionId, tenantId, auth });
+        status = result?.status || status;
+      } catch (error) {
+        return { published: false, status, reason: error.code || error.message };
+      }
+    }
+    return { published: true, status };
+  },
+
   async create(domain, { tenantId, auth, body }) {
     const actor = doctorActor(auth, true); const config = configFor(domain);
-    return sequelize.transaction(async (transaction) => {
+    const result = await sequelize.transaction(async (transaction) => {
       const { patient, review, session } = await validatePlanContext({ body, tenantId, transaction });
       const plan = await config.plan.create({ tenant_id: tenantId, patient_id: patient.id, doctor_id: actor.doctorId, doctor_review_id: review.id, primary_goal_code: body.primaryGoalCode || null, status: "draft", effective_from: body.effectiveFrom || null, effective_to: body.effectiveTo || null }, { transaction });
       const version = await config.version.create({ tenant_id: tenantId, plan_id: plan.id, version_no: 1, status: "draft", ...(domain === "nutrition" ? { targets_json: body.version?.targets || null } : { sets: body.version?.sets || null, reps: body.version?.reps || null, duration: body.version?.duration || null, frequency: body.version?.frequency || null, rest: body.version?.rest || null }), notes: body.version?.notes || null, source_review_id: review.id, source_session_id: session.id, reviewer_id: null, created_by: actor.userId, effective_from: body.version?.effectiveFrom || body.effectiveFrom || null, effective_to: body.version?.effectiveTo || body.effectiveTo || null }, { transaction });
@@ -143,6 +161,9 @@ export const planService = {
       await writeAudit({ domain, action: "created", plan: { ...plan.toJSON(), status: "draft", version_id: version.id }, actor, transaction });
       return { plan: plan.toJSON(), version: version.toJSON() };
     });
+    if (body.publish === false) return { ...result, publish: { published: false, status: result.version.status } };
+    const publish = await this.publishVersion(domain, { versionId: result.version.id, tenantId, auth });
+    return { ...result, publish };
   },
 
   async get(domain, { planId, tenantId, auth }) {
@@ -162,16 +183,19 @@ export const planService = {
 
   async createVersion(domain, { planId, tenantId, auth, body }) {
     const actor = doctorActor(auth, true); const config = configFor(domain);
-    return sequelize.transaction(async (transaction) => {
+    const version = await sequelize.transaction(async (transaction) => {
       const plan = await loadPlan(domain, planId, tenantId, transaction, true);
       if (plan.status === "archived") throw new AppError(409, "PLAN_INVALID_TRANSITION", "Archived plans cannot receive new versions");
       const review = await loadReview(body.doctorReviewId || plan.doctor_review_id, plan.patient_id, tenantId, transaction);
       const latest = await config.version.findOne({ where: { plan_id: plan.id, tenant_id: tenantId }, order: [["version_no", "DESC"]], transaction, lock: transaction.LOCK.UPDATE, raw: true });
-      const version = await config.version.create({ tenant_id: tenantId, plan_id: plan.id, version_no: (latest?.version_no || 0) + 1, status: "draft", ...(domain === "nutrition" ? { targets_json: body.targets || null } : { sets: body.sets || null, reps: body.reps || null, duration: body.duration || null, frequency: body.frequency || null, rest: body.rest || null }), notes: body.notes || null, source_review_id: review.id, source_session_id: review.assessment_session_id, created_by: actor.userId, previous_version_id: latest?.id || null, effective_from: body.effectiveFrom || null, effective_to: body.effectiveTo || null }, { transaction });
-      await createVersionContents(domain, body, version, tenantId, transaction);
-      await writeAudit({ domain, action: "version_created", plan: { ...plan, version_id: version.id }, actor, transaction });
-      return version.toJSON();
+      const created = await config.version.create({ tenant_id: tenantId, plan_id: plan.id, version_no: (latest?.version_no || 0) + 1, status: "draft", ...(domain === "nutrition" ? { targets_json: body.targets || null } : { sets: body.sets || null, reps: body.reps || null, duration: body.duration || null, frequency: body.frequency || null, rest: body.rest || null }), notes: body.notes || null, source_review_id: review.id, source_session_id: review.assessment_session_id, created_by: actor.userId, previous_version_id: latest?.id || null, effective_from: body.effectiveFrom || null, effective_to: body.effectiveTo || null }, { transaction });
+      await createVersionContents(domain, body, created, tenantId, transaction);
+      await writeAudit({ domain, action: "version_created", plan: { ...plan, version_id: created.id }, actor, transaction });
+      return created.toJSON();
     });
+    if (body.publish === false) return { version, publish: { published: false, status: version.status } };
+    const publish = await this.publishVersion(domain, { versionId: version.id, tenantId, auth });
+    return { version, publish };
   },
 
   async submitReview(domain, { versionId, tenantId, auth }) {
