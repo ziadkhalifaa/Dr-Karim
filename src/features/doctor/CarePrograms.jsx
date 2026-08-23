@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox, UserRound, BookTemplate, Check,
@@ -44,7 +44,6 @@ function PlanVersionSelect({ options, label, value, onChange, busy }) {
 }
 
 function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
-  const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [selected, setSelected] = useState(patientId ? { id: patientId, fullName: patientLabel || "…" } : null);
@@ -73,20 +72,8 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
     setError(null);
     try {
       const f = new FormData(e.currentTarget);
-      const program = await onCreate({
-        patientId: selected?.id,
-        startDate: f.get("startDate"),
-        endDate: f.get("endDate"),
-        status: f.get("status") || "draft",
-        nutritionPlanVersionId: nutritionVersionId || null,
-        exercisePlanVersionId: exerciseVersionId || null,
-        programInstructions: f.get("programInstructions") || null,
-      });
-      // If a template was chosen, add all its activities automatically
-      if (chosenTemplate && program?.program?.id && chosenTemplate.activities.length > 0) {
-        await careApi.addDefinitions(
-          String(program.program.id),
-          chosenTemplate.activities.map((a) => ({
+      const templateActivities = chosenTemplate?.activities?.length
+        ? chosenTemplate.activities.map((a) => ({
             activityType: a.activityType,
             measure: a.measure,
             code: a.code,
@@ -94,8 +81,17 @@ function CreateProgram({ onCreate, onCancel, patientId, patientLabel }) {
             nameEn: a.nameEn || null,
             plannedTarget: a.plannedTarget || {},
           }))
-        );
-      }
+        : null;
+      await onCreate({
+        patientId: selected?.id,
+        startDate: f.get("startDate"),
+        endDate: f.get("endDate"),
+        status: f.get("status") || "draft",
+        nutritionPlanVersionId: nutritionVersionId || null,
+        exercisePlanVersionId: exerciseVersionId || null,
+        programInstructions: f.get("programInstructions") || null,
+        templateActivities,
+      });
     } catch (err) {
       setError(err.message || String(err));
     } finally {
@@ -501,7 +497,16 @@ export default function CarePrograms({ patientId, patientLabel }) {
         <p>{t("doctorCare.subtitle")}</p>
       </div>
 
-      {showCreate && <CreateProgram patientId={patientId} patientLabel={patientLabel} onCreate={async (body) => { const p = await careApi.createProgram(body); setShowCreate(false); await load(); setSelected(String(p.program.id)); }} onCancel={() => setShowCreate(false)} />}
+      {showCreate && <CreateProgram patientId={patientId} patientLabel={patientLabel} onCreate={async (body) => {
+        const p = await careApi.createProgram(body);
+        if (body.templateActivities?.length && p?.program?.id) {
+          await careApi.addDefinitions(String(p.program.id), body.templateActivities);
+        }
+        setShowCreate(false);
+        await load();
+        setSelected(String(p.program.id));
+        return p;
+      }} onCancel={() => setShowCreate(false)} />}
 
       <section className="dash-panel">
         <div className="dash-panel__head">
