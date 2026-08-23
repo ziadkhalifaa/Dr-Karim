@@ -7,8 +7,23 @@ import { AppError } from "../utils/errors.js";
 import { hashPassword, verifyPassword, randomToken, hashToken, signAccessToken, verifyAccessToken } from "../utils/auth-crypto.js";
 import { tenantService } from "./tenant.service.js";
 
-const { AuthUser, AuthUserTenant, AuthRefreshToken, AuthPasswordReset, Tenant, AssessmentSession, DoctorReview, Patient } = models;
+const { AuthUser, AuthUserTenant, AuthRefreshToken, AuthPasswordReset, Tenant, AssessmentSession, DoctorReview, Patient, Doctor } = models;
 const AUTH_INVALID = "AUTH_INVALID_CREDENTIALS";
+
+// Resolve a human-readable identity for dashboards (sidebar chip, greetings).
+export async function resolveIdentity(user, tenantId) {
+  let name = null;
+  try {
+    if (user.patient_id) {
+      const row = await Patient.findOne({ where: { id: user.patient_id, tenant_id: tenantId }, attributes: ["full_name"], raw: true });
+      name = row?.full_name || null;
+    } else if (user.doctor_id) {
+      const row = await Doctor.findOne({ where: { id: user.doctor_id }, attributes: ["name"], raw: true });
+      name = row?.name || null;
+    }
+  } catch { name = null; }
+  return { email: user.email || null, name };
+}
 
 function canonicalPhoneOrThrow(value) {
   try { return canonicalizeEgyptianPhone(value); } catch { throw new AppError(422, "REGISTRATION_PHONE_INVALID", "A valid Egyptian phone number is required"); }

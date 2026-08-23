@@ -51,7 +51,8 @@ export default function DashboardShell({ title, nav, navLabel, children }) {
   }, [open]);
 
   const roleKey = ROLE_LABEL[user?.role] || "dashboard.shell.roleStaff";
-  const initial = (user?.email || user?.role || "?").charAt(0).toUpperCase();
+  const displayName = user?.name || user?.email || null;
+  const initial = (displayName || user?.role || "?").charAt(0).toUpperCase();
   const isActive = (p) => (p === "/doctor" || p === "/patient" ? path === p : path.startsWith(p));
 
   const NavList = () => (
@@ -96,7 +97,7 @@ export default function DashboardShell({ title, nav, navLabel, children }) {
         <div className="dash-user">
           <span className="dash-avatar">{initial}</span>
           <div className="dash-user__meta">
-            <div className="dash-user__name">{user?.email || t("dashboard.shell.brandName")}</div>
+            <div className="dash-user__name">{displayName || t("dashboard.shell.brandName")}</div>
             <div className="dash-user__role">{t(roleKey)}</div>
           </div>
         </div>
