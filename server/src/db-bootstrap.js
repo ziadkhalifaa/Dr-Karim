@@ -26,8 +26,12 @@ export async function ensureDatabaseSync() {
     logger.info("db sync done", { step: "scripts/seed.js" });
 
     logger.info("db sync starting", { step: "scripts/seed-food.js" });
-    await runFoodSeed();
-    logger.info("db sync done", { step: "scripts/seed-food.js" });
+    try {
+      await runFoodSeed();
+      logger.info("db sync done", { step: "scripts/seed-food.js" });
+    } catch (foodErr) {
+      logger.error("food seed failed — continuing startup", { errorMessage: foodErr.message, stack: foodErr.stack });
+    }
   } catch (err) {
     logger.error("db sync failed", { errorMessage: err.message, stack: err.stack });
     throw err;

@@ -5,12 +5,13 @@ import { sequelize } from "../src/config/database.js";
 import { models } from "../src/models/index.js";
 
 const { FoodItem } = models;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function runFoodSeed() {
   await sequelize.authenticate();
   await FoodItem.sync({ alter: true });
 
-  const data = JSON.parse(fs.readFileSync(path.resolve("./scripts/food_seed.json"), "utf8"));
+  const data = JSON.parse(fs.readFileSync(path.join(__dirname, "food_seed.json"), "utf8"));
 
   const BATCH_SIZE = 50;
   for (let i = 0; i < data.length; i += BATCH_SIZE) {
