@@ -13,8 +13,8 @@ export const SECTIONS = [
     no: 2,
     titleAr: "الهدف من النظام",
     titleEn: "Your Goal",
-    subtitleAr: "اختر الهدف الأساسي — ده هيوجّه كل تفاصيل النظام.",
-    subtitleEn: "Choose your primary goal — it will guide every detail of your plan.",
+    subtitleAr: "اختر هدف أو أكتر — دي هتوجّه كل تفاصيل النظام.",
+    subtitleEn: "Choose one or more goals — they will guide every detail of your plan.",
   },
   {
     no: 3,

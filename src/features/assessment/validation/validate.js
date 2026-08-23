@@ -125,16 +125,17 @@ export function validateSection(sectionNo, state, visibleIds) {
 // Non-blocking cross-field warnings (spec §5 "warnings only, never blocking").
 export function getWarnings(state) {
   const warnings = [];
-  const goal = state.answers.Q03_01;
+  const raw = state.answers.Q03_01;
+  const goals = Array.isArray(raw) ? raw : raw ? [raw] : [];
   const current = getWeightKg(state);
   const target = Number(state.answers.Q02_06);
 
   if (!Number.isFinite(target)) return warnings;
 
-  if (goal === "lose" && current && target >= current) {
+  if (goals.includes("lose") && current && target >= current) {
     warnings.push({ id: "goal-target-loss", refs: ["Q03_01", "Q02_02", "Q02_06"], key: "lossTarget" });
   }
-  if (goal === "gain" && current && target <= current) {
+  if (goals.includes("gain") && current && target <= current) {
     warnings.push({ id: "goal-target-gain", refs: ["Q03_01", "Q02_02", "Q02_06"], key: "gainTarget" });
   }
   return warnings;

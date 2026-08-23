@@ -51,24 +51,27 @@ export function SingleField({ q, value, onChange, error, required, lang, help })
   );
 }
 
-export function MultiField({ q, value = [], onChange, error, required, lang, help }) {
+export function MultiField({ q, value, onChange, error, required, lang, help }) {
   const errorId = error ? `aq-err-${q.id}` : undefined;
+  // Older drafts may hold a single string (question was single-choice before);
+  // coerce so toggle/filter always operate on an array.
+  const selected = Array.isArray(value) ? value : value ? [value] : [];
   const toggle = (opt) => {
-    const has = value.includes(opt.value);
+    const has = selected.includes(opt.value);
     const isNone = opt.value === "none";
     if (isNone) {
       onChange(has ? [] : ["none"]);
       return;
     }
     const next = has
-      ? value.filter((v) => v !== opt.value)
-      : [...value.filter((v) => v !== "none"), opt.value];
+      ? selected.filter((v) => v !== opt.value)
+      : [...selected.filter((v) => v !== "none"), opt.value];
     onChange(next);
   };
   return (
     <ChoiceShell q={q} lang={lang} required={required} help={help} errorId={errorId}>
       {(q.options || []).map((opt) => {
-        const checked = value.includes(opt.value);
+        const checked = selected.includes(opt.value);
         const optId = fieldId(q.id, opt.value);
         return (
           <label key={opt.value} className={`aq-choice ${checked ? "is-checked" : ""}`}>

@@ -108,7 +108,7 @@ export const QUESTIONS_RAW = [
   {
     id: "Q03_01",
     section: 2,
-    type: "single",
+    type: "multi",
     required: "*",
     labelAr: "هدفك الأساسي؟",
     labelEn: "What is your primary goal?",
