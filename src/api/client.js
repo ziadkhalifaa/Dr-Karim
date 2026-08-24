@@ -110,6 +110,7 @@ export const careApi = {
   program: (id) => api.get(`/care/programs/${id}`),
   programList: (query = "") => api.get(`/care/programs${query}`),
   createProgram: (body) => api.post("/care/programs", body),
+  deleteProgram: (id) => api.delete(`/care/programs/${id}`),
   createVersion: (id, body) => api.post(`/care/programs/${id}/versions`, body),
   addDefinitions: (id, body) => api.post(`/care/programs/${id}/definitions`, body),
   activate: (id, versionNo) => api.post(`/care/programs/${id}/activate${versionNo ? `?versionNo=${versionNo}` : ""}`, {}),

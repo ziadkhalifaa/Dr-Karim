@@ -83,6 +83,13 @@ function ActivityRow({ act, onRemove, index }) {
   );
 }
 
+const Field = ({ label, children }) => (
+  <div>
+    <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--dash-text-muted)", display: "block", marginBottom: "4px" }}>{label}</label>
+    {children}
+  </div>
+);
+
 // ── Activity Builder Form ──────────────────────────────────────────────────
 function ActivityBuilder({ onAdd }) {
   const [form, setForm] = useState({ activityType: "nutrition", measure: "boolean", code: "", nameAr: "", nameEn: "", targetValue: "", targetUnit: "" });
@@ -95,13 +102,6 @@ function ActivityBuilder({ onAdd }) {
     onAdd({ activityType: form.activityType, measure: form.measure, code: form.code || form.nameAr.replace(/\s+/g, "_").toLowerCase(), nameAr: form.nameAr, nameEn: form.nameEn || null, plannedTarget: target });
     setForm((f) => ({ ...f, nameAr: "", nameEn: "", code: "", targetValue: "", targetUnit: "" }));
   };
-
-  const Field = ({ label, children }) => (
-    <div>
-      <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--dash-text-muted)", display: "block", marginBottom: "4px" }}>{label}</label>
-      {children}
-    </div>
-  );
 
   const inputStyle = { width: "100%", padding: "8px 12px", borderRadius: "10px", border: "1.5px solid var(--dash-border)", background: "var(--dash-card-bg)", color: "var(--dash-text)", fontSize: "13px", fontFamily: "inherit", outline: "none" };
 

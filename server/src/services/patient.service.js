@@ -17,6 +17,7 @@ const {
   CareProgram, NutritionPlan, ExercisePlan, Appointment,
   NutritionPlanVersion, ExercisePlanVersion,
   PatientProgress, ProgressMeasurement,
+  AssessmentSession, AssessmentAnswer
 } = models;
 
 function actor(auth) {
@@ -158,6 +159,19 @@ async function hasAssessment(patient, tenantId) {
   return Boolean(patient.source_session_id || viaLink || viaReview);
 }
 
+async function loadAssessment(patientId, tenantId) {
+  const pSession = await PatientSession.findOne({
+    where: { patient_id: patientId, tenant_id: tenantId },
+    order: [["id", "DESC"]], raw: true
+  });
+  if (!pSession || !pSession.assessment_session_id) return null;
+  const session = await AssessmentSession.findByPk(pSession.assessment_session_id, { raw: true });
+  const answers = await AssessmentAnswer.findAll({
+    where: { session_id: pSession.assessment_session_id }, raw: true
+  });
+  return { session, answers };
+}
+
 export const patientService = {
   async list({ tenantId, auth, query = {} }) {
     const current = actor(auth);
@@ -247,7 +261,7 @@ export const patientService = {
     if (!["doctor", "staff", "patient"].includes(current.role)) throw new AppError(403, "PATIENT_ACCESS_FORBIDDEN", "Not allowed to read patient data");
     const patient = await requirePatientInTenant(patientId, tenantId);
 
-    const [profile, sub, payments, program, plans, appointments, progress, review] = await Promise.all([
+    const [profile, sub, payments, program, plans, appointments, progress, review, assessment] = await Promise.all([
       loadProfile(patient.id, tenantId),
       subscriptionWith(patient.id, tenantId),
       recentPayments(patient.id, tenantId),
@@ -256,6 +270,7 @@ export const patientService = {
       upcomingAppointments(patient.id, tenantId),
       progressSummary(patient.id, tenantId),
       latestReview(patient.id, tenantId),
+      loadAssessment(patient.id, tenantId),
     ]);
 
     await auditService.record({ tenantId, action: "patient.viewed", entity: "patient", entityRef: String(patient.id), actorType: current.role, actorId: current.userId });
@@ -281,6 +296,7 @@ export const patientService = {
       upcomingAppointments: appointments,
       progress,
       review,
+      assessment,
     };
   },
 

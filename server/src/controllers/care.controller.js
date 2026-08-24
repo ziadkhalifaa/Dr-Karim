@@ -11,6 +11,7 @@ export const careController = {
   async createVersion(req, res, next) { try { return ok(res, 201, await careProgramService.createVersion({ tenantId: req.tenant.id, programId: req.params.id, auth: req.auth, body: req.body || {} })); } catch (err) { return next(err); } },
   async addDefinitions(req, res, next) { try { return ok(res, 201, await careProgramService.addDefinitions({ tenantId: req.tenant.id, programId: req.params.id, auth: req.auth, body: req.body || {} })); } catch (err) { return next(err); } },
   async activate(req, res, next) { try { return ok(res, 200, await careProgramService.activate({ tenantId: req.tenant.id, programId: req.params.id, auth: req.auth, versionNo: req.query.versionNo })); } catch (err) { return next(err); } },
+  async delete(req, res, next) { try { return ok(res, 200, await careProgramService.delete({ tenantId: req.tenant.id, programId: req.params.id, auth: req.auth })); } catch (err) { return next(err); } },
 
   // Patient dashboard / summaries
   async dashboard(req, res, next) { try { return ok(res, 200, await careService.dashboard({ tenantId: req.tenant.id, auth: req.auth })); } catch (err) { return next(err); } },

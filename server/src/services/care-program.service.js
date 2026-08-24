@@ -432,6 +432,30 @@ export const careProgramService = {
     // Read-back after commit so the response reflects the activated version.
     return this.get({ tenantId, programId, auth });
   },
+
+  async delete({ tenantId, programId, auth }) {
+    const current = needDoctor(auth);
+    await sequelize.transaction(async (transaction) => {
+      const program = await loadProgram(programId, tenantId, transaction, true);
+      assertOwner(program, current.doctorId);
+      
+      const p = await CareProgram.findByPk(program.id, { transaction });
+      p.deleted_at = new Date();
+      await p.save({ transaction });
+
+      await auditService.record({ 
+        tenantId, 
+        action: "care_program.deleted", 
+        entity: "care_program", 
+        entityRef: String(program.id), 
+        metadata: { programId: String(program.id) }, 
+        actorType: "doctor", 
+        actorId: current.userId, 
+        transaction 
+      });
+    });
+    return { success: true };
+  },
 };
 
 export default careProgramService;

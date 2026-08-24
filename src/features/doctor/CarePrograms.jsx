@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox, UserRound, BookTemplate, Check,
+  ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox, UserRound, BookTemplate, Check, Trash2
 } from "lucide-react";
 import { careApi, patientApi } from "../../api/client";
 import { navigate } from "../../lib/router";
@@ -415,6 +415,19 @@ function ProgramDetail({ id, patientLabel, onBack, onChanged }) {
     }
   };
 
+  const deleteThis = async () => {
+    if (!window.confirm("هل أنت متأكد من حذف هذا البرنامج؟")) return;
+    setBusy(true);
+    try {
+      await careApi.deleteProgram(id);
+      await onChanged();
+      onBack();
+    } catch (err) {
+      setError(err.message || String(err));
+      setBusy(false);
+    }
+  };
+
   if (!data && !error) return <p className="dash-muted">{t("dashboard.common.loading")}</p>;
   if (error && !data)
     return (
@@ -435,6 +448,9 @@ function ProgramDetail({ id, patientLabel, onBack, onChanged }) {
         <div className="dash-row-actions">
           <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={onBack}>
             <ArrowLeft />{t("doctorCare.back")}
+          </button>
+          <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={deleteThis} disabled={busy} style={{ color: "var(--dash-danger)" }}>
+            <Trash2 size={16} /> حذف
           </button>
           <span className={`dash-badge ${statusTone(program.status)}`}>{program.status}</span>
         </div>
@@ -469,7 +485,7 @@ function ProgramDetail({ id, patientLabel, onBack, onChanged }) {
                   <ul className="dash-list">
                     {version.definitions.map((d) => (
                       <li key={d.id}>
-                        <strong>{d.nameAr || d.nameEn}</strong>
+                        <strong>{d.name_ar || d.name_en}</strong>
                         <span className="dash-muted"> · {d.measure}{d.planned_target_json?.value != null ? ` (${d.planned_target_json.value}${d.planned_target_json.unit ? ` ${d.planned_target_json.unit}` : ""})` : ""}</span>
                       </li>
                     ))}
@@ -551,6 +567,17 @@ export default function CarePrograms({ patientId, patientLabel }) {
     setRows(list || []);
   };
 
+  const removeProgram = async (id, e) => {
+    e.stopPropagation();
+    if (!window.confirm("هل أنت متأكد من حذف هذا البرنامج؟")) return;
+    try {
+      await careApi.deleteProgram(id);
+      await load();
+    } catch (err) {
+      alert(err.message || String(err));
+    }
+  };
+
   useEffect(() => {
     load().catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -619,12 +646,17 @@ export default function CarePrograms({ patientId, patientLabel }) {
               <tbody>
                 {rows.map((p) => (
                   <tr key={p.id}>
-                    <td className="dash-cell-muted">{p.start_date} → {p.end_date}</td>
+                    <td className="dash-cell-muted" style={{ fontWeight: 700 }}>{p.start_date} → {p.end_date}</td>
                     <td><span className={`dash-badge ${statusTone(p.status)}`}>{p.status}</span></td>
                     <td>
-                      <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={() => setSelected(String(p.id))}>
-                        {t("doctorCare.open")}
-                      </button>
+                      <div className="dash-row-actions" style={{ justifyContent: "flex-end" }}>
+                        <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={() => setSelected(String(p.id))}>
+                          {t("doctorCare.open")}
+                        </button>
+                        <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={(e) => removeProgram(String(p.id), e)} style={{ padding: "8px", color: "var(--dash-danger)" }} title="حذف البرنامج">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -13,6 +13,7 @@ export function careRouter() {
   router.post("/care/programs", careController.create);
   router.get("/care/programs", careController.list);
   router.get("/care/programs/:id", careController.get);
+  router.delete("/care/programs/:id", careController.delete);
   router.post("/care/programs/:id/versions", careController.createVersion);
   router.post("/care/programs/:id/definitions", careController.addDefinitions);
   router.post("/care/programs/:id/activate", careController.activate);

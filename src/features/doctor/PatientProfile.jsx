@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, UserRound, CreditCard, ClipboardList, Scale, Wallet, Inbox, Phone, Calendar, Mail, TrendingDown, Activity, ShieldAlert, Ban, HeartPulse } from "lucide-react";
+import { ArrowLeft, UserRound, CreditCard, ClipboardList, Scale, Wallet, Inbox, Phone, Calendar, Mail, TrendingDown, Activity, ShieldAlert, Ban, HeartPulse, FileText } from "lucide-react";
 import { patientApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 import CarePrograms from "./CarePrograms";
@@ -112,6 +112,7 @@ export default function PatientProfile({ patientId }) {
 
   const TABS = [
     { key: "overview", label: "لوحة تحكم المريض", icon: UserRound },
+    { key: "assessment", label: "التقييم الشامل", icon: FileText },
     { key: "care", label: "برامج التغذية والرعاية", icon: ClipboardList },
     { key: "progress", label: "القياسات والمتابعة", icon: Scale },
     { key: "payments", label: "المدفوعات", icon: Wallet },
@@ -389,6 +390,36 @@ export default function PatientProfile({ patientId }) {
                 )}
               </div>
 
+            </div>
+          )}
+
+          {activeTab === "assessment" && (
+            <div style={{ background: "var(--dash-card-bg)", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px" }}>
+              <h3 style={{ fontSize: "18px", fontWeight: "800", display: "flex", alignItems: "center", gap: "8px", margin: "0 0 20px" }}>
+                <FileText size={20} /> تفاصيل التقييم الشامل (الإجابات)
+              </h3>
+              {data.assessment?.answers?.length ? (
+                <div style={{ display: "grid", gap: "12px", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
+                  {data.assessment.answers.map((ans) => {
+                    const value = ans.stored_value || (ans.stored_array_json ? (Array.isArray(ans.stored_array_json) ? ans.stored_array_json.join("، ") : JSON.stringify(ans.stored_array_json)) : "—");
+                    return (
+                      <div key={ans.id} style={{ padding: "16px", background: "var(--dash-bg)", borderRadius: "16px", border: "1px solid var(--dash-border)" }}>
+                        <div style={{ fontSize: "12px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "8px" }}>
+                          الكود: {ans.question_code}
+                        </div>
+                        <div style={{ fontSize: "15px", fontWeight: "800", color: "var(--dash-text)" }}>
+                          {value}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--dash-text-soft)" }}>
+                  <Inbox size={48} style={{ opacity: 0.5, margin: "0 auto 16px" }} />
+                  <p style={{ margin: 0, fontWeight: "600", fontSize: "15px" }}>لا توجد إجابات مسجلة للتقييم</p>
+                </div>
+              )}
             </div>
           )}
 
