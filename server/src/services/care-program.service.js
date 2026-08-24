@@ -202,18 +202,21 @@ export const careProgramService = {
   },
 
   async programForPatient(patientId, tenantId, transaction) {
-    const program = await CareProgram.findOne({
+    // Try to find an active/paused/scheduled program first, then fall back to draft.
+    const priority = await CareProgram.findOne({
       where: {
         patient_id: patientId, tenant_id: tenantId, deleted_at: null,
-        status: { [Op.in]: ["active", "scheduled", "paused", "draft"] },
+        status: { [Op.in]: ["active", "paused", "scheduled"] },
       },
-      order: [
-        [sequelize.literal("FIELD(status, 'active', 'paused', 'scheduled', 'draft')"), "ASC"],
-        ["id", "DESC"]
-      ],
+      order: [["id", "DESC"]],
       transaction, raw: true,
     });
-    return program || null;
+    if (priority) return priority;
+    return CareProgram.findOne({
+      where: { patient_id: patientId, tenant_id: tenantId, deleted_at: null, status: "draft" },
+      order: [["id", "DESC"]],
+      transaction, raw: true,
+    });
   },
 
   async effectiveVersion(program, date, transaction) {

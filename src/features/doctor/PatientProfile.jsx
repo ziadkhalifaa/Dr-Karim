@@ -10,7 +10,10 @@ import { QUESTIONS_BY_ID } from "../assessment/data/questions";
 
 const STATUS_STYLES = {
   active: { bg: "#e6fbc2", color: "#2e7d00", border: "#c2f753", dot: "#6fd005", label: "نشط" },
+  approved: { bg: "#e6fbc2", color: "#2e7d00", border: "#c2f753", dot: "#6fd005", label: "معتمد" },
   pending_payment: { bg: "#e6f2ff", color: "#022466", border: "#48d6f9", dot: "#024fab", label: "في انتظار الدفع" },
+  pending: { bg: "#fef9c3", color: "#854d0e", border: "#fde047", dot: "#eab308", label: "معلق" },
+  rejected: { bg: "#fee2e2", color: "#b91c1c", border: "#fca5a5", dot: "#ef4444", label: "مرفوض" },
   inactive: { bg: "#f1f5f9", color: "#475569", border: "#cbd5e1", dot: "#94a3b8", label: "غير نشط" },
   archived: { bg: "#f1f5f9", color: "#475569", border: "#cbd5e1", dot: "#94a3b8", label: "مؤرشف" },
 };
