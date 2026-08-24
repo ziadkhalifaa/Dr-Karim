@@ -32,15 +32,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     charset: DB_CHARSET,
     // MySQL 8 default auth plugin.
     authPlugins: { mysql_native_password: () => () => undefined },
-    dateStrings: true,
-    typeCast: function (field, next) {
-      if (field.type === "DATETIME" || field.type === "TIMESTAMP") {
-        return field.string() + "+03:00";
-      }
-      return next();
-    },
   },
-  timezone: "+03:00",
   pool: { max: 10, min: 0, acquire: 30000, idle: 10000 },
   // Retry: migrations/seeds run sequentially over one connection; avoid
   // transient MySQL connection loss bubbling up as hard failures.
