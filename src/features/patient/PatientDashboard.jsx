@@ -32,10 +32,27 @@ import {
   patientApi,
 } from "../../api/client";
 
-function PlanCard({ title, plan, icon: Icon, status }) {
+const MEAL_AR = {
+  breakfast: "فطار",
+  lunch: "غدا",
+  dinner: "عشا",
+  snack: "سناك",
+};
+
+function PlanCard({ title, version, icon: Icon }) {
   const { t } = useTranslation();
-  const goals = plan?.goals || [];
-  const foods = plan?.meal_plan || plan?.plan || [];
+  const targets = version?.targets_json || null;
+  const meals = Array.isArray(version?.meals) ? version.meals : [];
+  const rx = version
+    ? [
+        ["مجموعات", version.sets],
+        ["تكرارات", version.reps],
+        ["المدة", version.duration],
+        ["الأسبوعي", version.frequency],
+        ["راحة", version.rest],
+      ].filter(([, v]) => v != null && v !== "")
+    : [];
+
   return (
     <section className="dash-panel">
       <div className="dash-panel__head">
@@ -43,27 +60,73 @@ function PlanCard({ title, plan, icon: Icon, status }) {
           <Icon />
           {title}
         </h3>
-        <span className={`dash-badge ${plan ? "dash-badge--primary" : ""}`}>{plan ? status : t("dashboard.patient.noPlan", "لا توجد خطة")}</span>
+        <span className={`dash-badge ${version ? "dash-badge--primary" : ""}`}>
+          {version ? t("dashboard.status.active") : t("dashboard.patient.noPlan", "لا توجد خطة")}
+        </span>
       </div>
       <div className="dash-panel__body">
-        <p className="dash-muted">{t("dashboard.patient.planVersion")}</p>
-        {goals.length > 0 && (
-          <ul className="dash-list">
-            {goals.map((g, i) => (
-              <li key={i}>{typeof g === "string" ? g : g?.description || g?.target}</li>
-            ))}
-          </ul>
+        {!version && <p className="dash-muted">{t("dashboard.patient.noActivePlan")}</p>}
+
+        {version && targets && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: meals.length ? "14px" : "0" }}>
+            {[
+              ["سعرات", targets.calories],
+              ["بروتين", targets.protein],
+              ["كارب", targets.carbs],
+              ["دهون", targets.fat],
+            ]
+              .filter(([, v]) => v != null && v !== "")
+              .map(([label, v]) => (
+                <span key={label} className="dash-food-chip">
+                  {label}: {v}
+                </span>
+              ))}
+          </div>
         )}
-        {foods.length > 0 && (
-          <div className="dash-food-grid">
-            {foods.map((f, i) => (
-              <span key={i} className="dash-food-chip">
-                {typeof f === "string" ? f : f?.name || f?.meal || `Item ${i + 1}`}
+
+        {version && rx.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {rx.map(([label, v]) => (
+              <span key={label} className="dash-food-chip">
+                {label}: {v}
               </span>
             ))}
           </div>
         )}
-        {!goals.length && !foods.length && <p className="dash-muted">{t("dashboard.patient.noActivePlan")}</p>}
+
+        {version && meals.length > 0 && (
+          <div style={{ display: "grid", gap: "10px" }}>
+            {meals.map((meal, mi) => {
+              const label =
+                meal.name_ar ||
+                meal.name_en ||
+                MEAL_AR[meal.code] ||
+                meal.code ||
+                `وجبة ${mi + 1}`;
+              return (
+                <div key={meal.id || mi}>
+                  <div style={{ fontWeight: "800", fontSize: "13px", color: "var(--dash-text)", marginBottom: "4px" }}>{label}</div>
+                  <div className="dash-food-grid">
+                    {(meal.items || []).map((it, ii) => {
+                      const food = it.food_item || it.FoodItem || {};
+                      const qty = it.quantity ? ` × ${it.quantity}${it.unit || ""}` : "";
+                      return (
+                        <span key={it.id || ii} className="dash-food-chip">
+                          {food.name_ar || food.name_en || "صنف"}
+                          {qty}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {version && !meals.length && !rx.length && !targets && (
+          <p className="dash-muted">{t("dashboard.patient.noActivePlan")}</p>
+        )}
       </div>
     </section>
   );
@@ -390,15 +453,13 @@ export default function PatientDashboard({ path }) {
         <div className="dash-plan-grid">
           <PlanCard
             title={t("dashboard.patient.nutritionPlan")}
-            plan={activeNutrition}
+            version={activeNutrition}
             icon={Salad}
-            status={t("dashboard.status.active")}
           />
           <PlanCard
             title={t("dashboard.patient.exercisePlan")}
-            plan={activeExercise}
+            version={activeExercise}
             icon={Dumbbell}
-            status={t("dashboard.status.active")}
           />
         </div>
       </>
