@@ -6,6 +6,7 @@ import { navigate } from "../../lib/router";
 import CarePrograms from "./CarePrograms";
 import DoctorProgress from "./ProgressManager";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
+import { QUESTIONS_BY_ID } from "../assessment/data/questions";
 
 const STATUS_STYLES = {
   active: { bg: "#e6fbc2", color: "#2e7d00", border: "#c2f753", dot: "#6fd005", label: "نشط" },
@@ -401,11 +402,30 @@ export default function PatientProfile({ patientId }) {
               {data.assessment?.answers?.length ? (
                 <div style={{ display: "grid", gap: "12px", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
                   {data.assessment.answers.map((ans) => {
-                    const value = ans.stored_value || (ans.stored_array_json ? (Array.isArray(ans.stored_array_json) ? ans.stored_array_json.join("، ") : JSON.stringify(ans.stored_array_json)) : "—");
+                    const qDef = QUESTIONS_BY_ID[ans.question_code];
+                    const label = qDef?.labelAr || ans.question_code;
+                    let value = ans.stored_value || (ans.stored_array_json ? (Array.isArray(ans.stored_array_json) ? ans.stored_array_json.join("، ") : JSON.stringify(ans.stored_array_json)) : "—");
+                    
+                    if (qDef?.options) {
+                      if (ans.stored_value) {
+                        const opt = qDef.options.find((o) => o.value === ans.stored_value);
+                        if (opt) value = opt.ar;
+                      } else if (Array.isArray(ans.stored_array_json)) {
+                        value = ans.stored_array_json.map((v) => {
+                          const opt = qDef.options.find((o) => o.value === v);
+                          return opt ? opt.ar : v;
+                        }).join("، ");
+                      }
+                    }
+
+                    if (qDef?.unit?.ar && ans.stored_value) {
+                      value = `${value} ${qDef.unit.ar}`;
+                    }
+
                     return (
                       <div key={ans.id} style={{ padding: "16px", background: "var(--dash-bg)", borderRadius: "16px", border: "1px solid var(--dash-border)" }}>
                         <div style={{ fontSize: "12px", fontWeight: "700", color: "var(--dash-text-muted)", marginBottom: "8px" }}>
-                          الكود: {ans.question_code}
+                          {label}
                         </div>
                         <div style={{ fontSize: "15px", fontWeight: "800", color: "var(--dash-text)" }}>
                           {value}
