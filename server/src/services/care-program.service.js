@@ -207,7 +207,11 @@ export const careProgramService = {
         patient_id: patientId, tenant_id: tenantId, deleted_at: null,
         status: { [Op.in]: ["active", "scheduled", "paused", "draft"] },
       },
-      order: [["id", "DESC"]], transaction, raw: true,
+      order: [
+        [sequelize.literal("FIELD(status, 'active', 'paused', 'scheduled', 'draft')"), "ASC"],
+        ["id", "DESC"]
+      ],
+      transaction, raw: true,
     });
     return program || null;
   },

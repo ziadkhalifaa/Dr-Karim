@@ -646,7 +646,7 @@ export default function CarePrograms({ patientId, patientLabel }) {
               <tbody>
                 {rows.map((p) => (
                   <tr key={p.id}>
-                    <td className="dash-cell-muted" style={{ fontWeight: 700 }}>{p.start_date} → {p.end_date}</td>
+                    <td className="dash-cell-muted" style={{ fontWeight: 700 }} dir="ltr">{p.start_date} &rarr; {p.end_date}</td>
                     <td><span className={`dash-badge ${statusTone(p.status)}`}>{p.status}</span></td>
                     <td>
                       <div className="dash-row-actions" style={{ justifyContent: "flex-end" }}>

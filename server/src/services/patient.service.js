@@ -4,7 +4,7 @@
 // are only ever returned to the consuming UI; they are never typed by a user.
 
 import { Op } from "sequelize";
-import { models } from "../models/index.js";
+import { models, sequelize } from "../models/index.js";
 import { AppError } from "../utils/errors.js";
 import { auditService } from "./audit.service.js";
 import { entitlementService } from "./entitlement.service.js";
@@ -89,7 +89,11 @@ async function recentPayments(patientId, tenantId, limit = 5) {
 async function activeProgramSummary(patientId, tenantId) {
   const program = await CareProgram.findOne({
     where: { patient_id: patientId, tenant_id: tenantId, deleted_at: null, status: { [Op.in]: ["draft", "scheduled", "active", "paused"] } },
-    order: [["id", "DESC"]], raw: true,
+    order: [
+      [sequelize.literal("FIELD(status, 'active', 'paused', 'scheduled', 'draft')"), "ASC"],
+      ["id", "DESC"]
+    ],
+    raw: true,
   });
   if (!program) return null;
   return { id: String(program.id), status: program.status, startDate: program.start_date, endDate: program.end_date };
