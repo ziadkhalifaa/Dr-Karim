@@ -32,12 +32,21 @@ import {
   patientApi,
 } from "../../api/client";
 
-const MEAL_AR = {
-  breakfast: "فطار",
-  lunch: "غدا",
-  dinner: "عشا",
-  snack: "سناك",
+const MEAL_META = {
+  breakfast: { label: "فطار", icon: "🌅" },
+  snack_1: { label: "سناك ١", icon: "🍎" },
+  lunch: { label: "غدا", icon: "🍲" },
+  snack_2: { label: "سناك ٢", icon: "🍌" },
+  snack: { label: "سناك", icon: "🍎" },
+  dinner: { label: "عشا", icon: "🌙" },
 };
+
+const MACRO_TILES = [
+  ["calories", "سعرات", "pp-macro--cal"],
+  ["protein", "بروتين", "pp-macro--prot"],
+  ["carbs", "كارب", "pp-macro--carb"],
+  ["fat", "دهون", "pp-macro--fat"],
+];
 
 function PlanCard({ title, version, icon: Icon }) {
   const { t } = useTranslation();
@@ -53,10 +62,18 @@ function PlanCard({ title, version, icon: Icon }) {
       ].filter(([, v]) => v != null && v !== "")
     : [];
 
+  const dayMap = new Map();
+  meals.forEach((meal) => {
+    const d = meal.day_number ?? 1;
+    if (!dayMap.has(d)) dayMap.set(d, []);
+    dayMap.get(d).push(meal);
+  });
+  const days = [...dayMap.entries()].sort((a, b) => a[0] - b[0]);
+
   return (
-    <section className="dash-panel">
-      <div className="dash-panel__head">
-        <h3 className="dash-panel__title">
+    <section className="pp-card">
+      <div className="pp-card__head">
+        <h3 className="pp-card__title">
           <Icon />
           {title}
         </h3>
@@ -64,68 +81,78 @@ function PlanCard({ title, version, icon: Icon }) {
           {version ? t("dashboard.status.active") : t("dashboard.patient.noPlan", "لا توجد خطة")}
         </span>
       </div>
-      <div className="dash-panel__body">
-        {!version && <p className="dash-muted">{t("dashboard.patient.noActivePlan")}</p>}
+      <div className="pp-card__body">
+        {!version && (
+          <div className="pp-empty">
+            <div className="pp-empty__icon">
+              <Icon />
+            </div>
+            <p>{t("dashboard.patient.noActivePlan")}</p>
+          </div>
+        )}
 
         {version && targets && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: meals.length ? "14px" : "0" }}>
-            {[
-              ["سعرات", targets.calories],
-              ["بروتين", targets.protein],
-              ["كارب", targets.carbs],
-              ["دهون", targets.fat],
-            ]
-              .filter(([, v]) => v != null && v !== "")
-              .map(([label, v]) => (
-                <span key={label} className="dash-food-chip">
-                  {label}: {v}
-                </span>
-              ))}
+          <div className="pp-macros">
+            {MACRO_TILES.filter(([k]) => targets[k] != null && targets[k] !== "").map(
+              ([k, label, cls]) => (
+                <div key={k} className={`pp-macro ${cls}`}>
+                  <div className="pp-macro__value">{targets[k]}</div>
+                  <div className="pp-macro__label">{label}</div>
+                </div>
+              )
+            )}
           </div>
         )}
 
         {version && rx.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+          <div className="pp-rx" style={{ marginBottom: meals.length ? 18 : 0 }}>
             {rx.map(([label, v]) => (
-              <span key={label} className="dash-food-chip">
-                {label}: {v}
+              <span key={label} className="pp-rx__chip">
+                <span className="pp-rx__label">{label}</span>
+                <span className="pp-rx__value">{v}</span>
               </span>
             ))}
           </div>
         )}
 
         {version && meals.length > 0 && (
-          <div style={{ display: "grid", gap: "10px" }}>
-            {meals.map((meal, mi) => {
-              const label =
-                meal.name_ar ||
-                meal.name_en ||
-                MEAL_AR[meal.code] ||
-                meal.code ||
-                `وجبة ${mi + 1}`;
-              return (
-                <div key={meal.id || mi}>
-                  <div style={{ fontWeight: "800", fontSize: "13px", color: "var(--dash-text)", marginBottom: "4px" }}>{label}</div>
-                  <div className="dash-food-grid">
-                    {(meal.items || []).map((it, ii) => {
-                      const food = it.food_item || it.FoodItem || {};
-                      const qty = it.quantity ? ` × ${it.quantity}${it.unit || ""}` : "";
-                      return (
-                        <span key={it.id || ii} className="dash-food-chip">
-                          {food.name_ar || food.name_en || "صنف"}
-                          {qty}
+          <div className="pp-days">
+            {days.map(([dayNum, dayMeals]) => (
+              <div key={dayNum}>
+                {days.length > 1 && <div className="pp-day__label">اليوم {dayNum}</div>}
+                {dayMeals.map((meal, mi) => {
+                  const meta = MEAL_META[meal.code];
+                  const items = Array.isArray(meal.items) ? meal.items : [];
+                  return (
+                    <div key={meal.id || mi} className="pp-meal">
+                      <div className="pp-meal__head">
+                        <span className="pp-meal__emoji">{meta?.icon || "🍽️"}</span>
+                        <span className="pp-meal__name">
+                          {meta?.label || meal.name_ar || meal.name_en || meal.code || `وجبة ${mi + 1}`}
                         </span>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
+                        <span className="pp-meal__count">{items.length} صنف</span>
+                      </div>
+                      <ul className="pp-meal__items">
+                        {items.map((it, ii) => {
+                          const food = it.food_item || it.FoodItem || {};
+                          const qty = it.quantity ? `${it.quantity}${it.unit || ""}` : null;
+                          return (
+                            <li key={it.id || ii} className="pp-meal__item">
+                              <span className="pp-meal__item-dot" />
+                              <span className="pp-meal__item-name">
+                                {food.name_ar || food.name_en || "صنف"}
+                              </span>
+                              {qty && <span className="pp-meal__item-qty">× {qty}</span>}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
           </div>
-        )}
-
-        {version && !meals.length && !rx.length && !targets && (
-          <p className="dash-muted">{t("dashboard.patient.noActivePlan")}</p>
         )}
       </div>
     </section>
@@ -258,34 +285,52 @@ function Checkin({ userId, onDone }) {
     }
   };
   return (
-    <section className="dash-panel">
-      <div className="dash-panel__head">
-        <h3 className="dash-panel__title">
+    <section className="pp-card">
+      <div className="pp-card__head">
+        <h3 className="pp-card__title">
           <ClipboardCheck />
           {t("dashboard.patient.checkinTitle")}
         </h3>
       </div>
-      <form className="dash-form" onSubmit={submit}>
-        <label className="dash-field">
-          <span>{t("dashboard.patient.weight")}</span>
-          <input type="number" name="weight" min="20" max="400" step="0.1" required />
+      <form className="pp-card__body" style={{ display: "grid", gap: 16 }} onSubmit={submit}>
+        <label className="pp-field">
+          <span className="pp-field__label">
+            <Scale />
+            {t("dashboard.patient.weight")}
+          </span>
+          <input
+            className="pp-input"
+            type="number"
+            name="weight"
+            min="20"
+            max="400"
+            step="0.1"
+            required
+            placeholder="كجم"
+          />
         </label>
-        <div className="dash-form--grid">
-          <label className="dash-field">
-            <span>{t("dashboard.patient.nutritionAdherence")}</span>
-            <input type="number" name="nutritionAdherence" min="0" max="10" required />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
+          <label className="pp-field">
+            <span className="pp-field__label">
+              <Salad />
+              {t("dashboard.patient.nutritionAdherence")}
+            </span>
+            <input className="pp-input" type="number" name="nutritionAdherence" min="0" max="10" required placeholder="من ١٠" />
           </label>
-          <label className="dash-field">
-            <span>{t("dashboard.patient.exerciseAdherence")}</span>
-            <input type="number" name="exerciseAdherence" min="0" max="10" required />
+          <label className="pp-field">
+            <span className="pp-field__label">
+              <Dumbbell />
+              {t("dashboard.patient.exerciseAdherence")}
+            </span>
+            <input className="pp-input" type="number" name="exerciseAdherence" min="0" max="10" required placeholder="من ١٠" />
           </label>
         </div>
-        <label className="dash-field">
-          <span>{t("dashboard.patient.note")}</span>
-          <textarea name="note" rows="3" />
+        <label className="pp-field">
+          <span className="pp-field__label">{t("dashboard.patient.note")}</span>
+          <textarea className="pp-input" name="note" rows="3" />
         </label>
-        <button className="dash-btn dash-btn--primary" disabled={busy}>
-          <Send />
+        <button className="pp-submit" disabled={busy}>
+          <Send size={17} />
           {busy ? t("dashboard.patient.submitting") : t("dashboard.patient.submitCheckin")}
         </button>
       </form>
@@ -443,12 +488,15 @@ export default function PatientDashboard({ path }) {
   else if (path === "/patient/plan")
     page = (
       <>
-        <div className="dash-page-head">
-          <span className="dash-eyebrow">
+        <div className="pp-hero">
+          <span className="pp-hero__icon">
             <Salad />
-            {t("dashboard.nav.myPlan")}
           </span>
-          <h2>{t("dashboard.patient.myPlans")}</h2>
+          <div className="pp-hero__body">
+            <div className="pp-hero__eyebrow">برنامجك الغذائي والرياضي</div>
+            <h2 className="pp-hero__title">{t("dashboard.patient.myPlans")}</h2>
+            <p className="pp-hero__sub">خطط محدثة من فريق الدكتور كريم — التزم بيوم بخطوة</p>
+          </div>
         </div>
         <div className="dash-plan-grid">
           <PlanCard
@@ -467,12 +515,15 @@ export default function PatientDashboard({ path }) {
   else if (path === "/patient/checkin")
     page = (
       <>
-        <div className="dash-page-head">
-          <span className="dash-eyebrow">
+        <div className="pp-hero">
+          <span className="pp-hero__icon">
             <ClipboardCheck />
-            {t("dashboard.patient.checkinTitle")}
           </span>
-          <h2>{t("dashboard.patient.checkinTitle")}</h2>
+          <div className="pp-hero__body">
+            <div className="pp-hero__eyebrow">متابعتك اليومية</div>
+            <h2 className="pp-hero__title">{t("dashboard.patient.checkinTitle")}</h2>
+            <p className="pp-hero__sub">سجل وزنك ومستوى التزامك لمساعدة الفريق في متابعة تقدمك</p>
+          </div>
         </div>
         <Checkin userId={user.patientId} onDone={load} />
       </>
