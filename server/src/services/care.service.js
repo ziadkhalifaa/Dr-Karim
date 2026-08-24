@@ -140,7 +140,8 @@ export const careService = {
       for (const d of item.derived) {
         weekSummary[d.status] += 1;
         weekSummary.total += 1;
-        const t = d.instance.activity_type;
+        const t = TYPES.includes(d.instance.activity_type) ? d.instance.activity_type : null;
+        if (!t) continue;
         weekByType[t][d.status] += 1;
         weekByType[t].total += 1;
       }
@@ -149,9 +150,9 @@ export const careService = {
     for (const t of TYPES) allExec[t] = [];
     for (const exec of executions) {
       const inst = instances.find((i) => String(i.id) === String(exec.activity_instance_id));
-      if (inst) allExec[inst.activity_type].push(exec);
+      if (inst && TYPES.includes(inst.activity_type)) allExec[inst.activity_type].push(exec);
     }
-    const adherence = adherenceSummary(weekSummary, allExec);
+    const adherence = adherenceSummary({ ...weekSummary, byType: weekByType }, allExec);
     const streak = computeStreak(daily.map((d) => ({
       date: d.day.date,
       executions: d.derived.map((x) => ({ status: x.status })),
@@ -222,17 +223,19 @@ export const careService = {
       for (const d of item.derived) {
         totals[d.status] += 1;
         totals.total += 1;
-        byType[d.instance.activity_type][d.status] += 1;
-        byType[d.instance.activity_type].total += 1;
+        const t = TYPES.includes(d.instance.activity_type) ? d.instance.activity_type : null;
+        if (!t) continue;
+        byType[t][d.status] += 1;
+        byType[t].total += 1;
       }
     }
     const allExec = {};
     for (const t of TYPES) allExec[t] = [];
     for (const exec of executions) {
       const inst = instances.find((i) => String(i.id) === String(exec.activity_instance_id));
-      if (inst) allExec[inst.activity_type].push(exec);
+      if (inst && TYPES.includes(inst.activity_type)) allExec[inst.activity_type].push(exec);
     }
-    const adherence = adherenceSummary(totals, allExec);
+    const adherence = adherenceSummary({ ...totals, byType }, allExec);
 
     const dailyList = daily.map(({ day, derived }) => {
       const row = EMPTY();

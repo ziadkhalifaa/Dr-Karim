@@ -53,8 +53,9 @@ export function adherenceSummary(summary, executionsByType = {}) {
   if (recorded === 0) return { available: false, reason: "not_enough_data" };
   const completionRate = Math.round((summary.completed / recorded) * 1000) / 10;
   const category = {};
+  const byTypeMap = summary.byType || {};
   for (const type of TYPES) {
-    const row = summary.byType[type] || emptyRow();
+    const row = byTypeMap[type] || emptyRow();
     const rec = row.completed + row.partial + row.skipped;
     category[type] = rec === 0
       ? { available: false }
