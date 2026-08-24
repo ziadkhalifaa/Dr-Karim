@@ -4,7 +4,7 @@ import { Bell, CheckCheck, Inbox } from "lucide-react";
 import { notificationApi } from "../../api/client";
 
 export default function NotificationsPanel({ compact = false }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
 
@@ -72,7 +72,14 @@ export default function NotificationsPanel({ compact = false }) {
               <small>{item.message}</small>
               {(item.created_at || item.createdAt) && (
                 <small className="dash-notif__time">
-                  {new Date(item.created_at || item.createdAt).toLocaleString()}
+                  {new Date(item.created_at || item.createdAt).toLocaleString(i18n.language === 'ar' ? 'ar-EG' : 'en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
                 </small>
               )}
             </span>
