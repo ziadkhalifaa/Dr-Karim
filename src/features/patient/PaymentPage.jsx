@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { paymentApi, patientApi } from "../../api/client";
 import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
+import { VodafoneCashLogo, InstaPayLogo } from "../store/paymentLogos.jsx";
 
 function usePackageId(path) {
   const params = new URLSearchParams((path || "").split("?")[1] || "");
@@ -10,8 +11,8 @@ function usePackageId(path) {
 }
 
 const METHODS = [
-  { key: "vodafone_cash", label: "فودافون كاش", icon: "📱", fieldKey: "vodafone_cash_number" },
-  { key: "instapay", label: "إنستاباي", icon: "🏦", fieldKey: "instapay_username" },
+  { key: "vodafone_cash", label: "فودافون كاش", icon: <VodafoneCashLogo />, fieldKey: "vodafone_cash_number" },
+  { key: "instapay", label: "إنستاباي", icon: <InstaPayLogo />, fieldKey: "instapay_username" },
 ];
 
 const STEPS = ["اختيار طريقة الدفع", "تأكيد وإرسال الإيصال", "انتظار الموافقة"];

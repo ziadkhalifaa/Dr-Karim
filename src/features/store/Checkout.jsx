@@ -3,12 +3,13 @@ import { useCart } from "./CartContext";
 import { storeApi, paymentApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 import { ShoppingCart, CheckCircle2, Truck, CreditCard } from "lucide-react";
+import { VodafoneCashLogo, InstaPayLogo } from "./paymentLogos.jsx";
 
 const fmt = (n) => `${Number(n).toLocaleString("ar-EG")} ج`;
 
 const METHODS = [
-  { key: "vodafone_cash", label: "فودافون كاش", icon: "📱", fieldKey: "vodafone_cash_number" },
-  { key: "instapay", label: "إنستاباي", icon: "🏦", fieldKey: "instapay_username" },
+  { key: "vodafone_cash", label: "فودافون كاش", icon: <VodafoneCashLogo />, fieldKey: "vodafone_cash_number" },
+  { key: "instapay", label: "إنستاباي", icon: <InstaPayLogo />, fieldKey: "instapay_username" },
 ];
 
 export default function Checkout() {
