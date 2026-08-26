@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { storeApi } from "../../api/client";
 import {
   Plus, Pencil, Trash, X, Check, Save, ImagePlus, Package, Tag, ShoppingBag, CreditCard, MessageSquare,
+  DollarSign, FileText, Star,
 } from "lucide-react";
 
 const STATUS_LABEL = {
@@ -213,55 +214,90 @@ function ProductModal({ product, categories, onClose, onSave, onChanged }) {
 
   return (
     <Modal onClose={onClose} title={product ? "تعديل منتج" : "منتج جديد"} wide>
-      <form onSubmit={submit}>
-        <div className="dash-form--grid">
-          <label className="dash-field"><span>الاسم *</span>
-            <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
-          <label className="dash-field"><span>التصنيف</span>
-            <select value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}>
-              <option value="">بدون</option>
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select></label>
-          <label className="dash-field"><span>السعر (ج) *</span>
-            <input required type="number" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} /></label>
-          <label className="dash-field"><span>السعر قبل الخصم</span>
-            <input type="number" min="0" value={form.compareAtPrice} onChange={(e) => setForm({ ...form, compareAtPrice: e.target.value })} /></label>
-          <label className="dash-field"><span>الكمية</span>
-            <input type="number" min="0" value={form.stockQuantity} onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })} /></label>
-          <label className="dash-field"><span>SKU</span>
-            <input dir="ltr" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} /></label>
-          <label className="dash-field"><span>الحالة</span>
-            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-              <option value="active">متاح</option><option value="draft">مسودة</option><option value="out_of_stock">نفذ</option>
-            </select></label>
-          <label className="dash-field"><span>الوزن (جم)</span>
-            <input type="number" value={form.weightGrams} onChange={(e) => setForm({ ...form, weightGrams: e.target.value })} /></label>
-        </div>
-
-        <label className="dash-field"><span>وصف قصير</span>
-          <input value={form.shortDescription} onChange={(e) => setForm({ ...form, shortDescription: e.target.value })} placeholder="جملة جذابة تظهر في البطاقة" /></label>
-        <label className="dash-field"><span>الوصف التفصيلي</span>
-          <textarea rows="3" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></label>
-
-        <label className="dash-check" style={{ marginBottom: 12 }}>
-          <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> منتج مميز (يظهر في الواجهة)
-        </label>
-
-        <div className="st-upload">
-          <div className="st-upload__head"><ImagePlus size={16} /> صور المنتج</div>
-          <div className="st-upload__grid">
-            {images.map((img) => (
-              <div key={img.url} className="st-upload__img">
-                <img src={img.url} alt="" />
-                <button type="button" onClick={() => removeImg(img.url)}><X size={14} /></button>
-              </div>
-            ))}
-            <label className="st-upload__add">
-              {uploading ? "..." : "+"}
-              <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+      <form onSubmit={submit} className="st-prod-form">
+        <section className="st-form-section">
+          <div className="st-form-section__title"><Tag size={15} /> المعلومات الأساسية</div>
+          <div className="dash-form--grid">
+            <label className="dash-field">
+              <span>الاسم <i className="st-req">*</i></span>
+              <input className="dash-input" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="مثال: بروتين واي آيزوليت" />
+            </label>
+            <label className="dash-field">
+              <span>التصنيف</span>
+              <select className="dash-select" value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })}>
+                <option value="">بدون</option>
+                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
             </label>
           </div>
-        </div>
+        </section>
+
+        <section className="st-form-section">
+          <div className="st-form-section__title"><DollarSign size={15} /> السعر والمخزون</div>
+          <div className="dash-form--grid">
+            <label className="dash-field">
+              <span>السعر (ج) <i className="st-req">*</i></span>
+              <input className="dash-input" required type="number" min="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="0" />
+            </label>
+            <label className="dash-field">
+              <span>السعر قبل الخصم</span>
+              <input className="dash-input" type="number" min="0" value={form.compareAtPrice} onChange={(e) => setForm({ ...form, compareAtPrice: e.target.value })} placeholder="اختياري" />
+            </label>
+            <label className="dash-field">
+              <span>الكمية</span>
+              <input className="dash-input" type="number" min="0" value={form.stockQuantity} onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })} />
+            </label>
+            <label className="dash-field">
+              <span>SKU</span>
+              <input className="dash-input" dir="ltr" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="SKU-000" />
+            </label>
+            <label className="dash-field">
+              <span>الحالة</span>
+              <select className="dash-select" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+                <option value="active">متاح</option><option value="draft">مسودة</option><option value="out_of_stock">نفذ</option>
+              </select>
+            </label>
+            <label className="dash-field">
+              <span>الوزن (جم)</span>
+              <input className="dash-input" type="number" min="0" value={form.weightGrams} onChange={(e) => setForm({ ...form, weightGrams: e.target.value })} placeholder="اختياري" />
+            </label>
+          </div>
+        </section>
+
+        <section className="st-form-section">
+          <div className="st-form-section__title"><FileText size={15} /> الوصف</div>
+          <label className="dash-field dash-field--full">
+            <span>وصف قصير</span>
+            <input className="dash-input" value={form.shortDescription} onChange={(e) => setForm({ ...form, shortDescription: e.target.value })} placeholder="جملة جذابة تظهر في البطاقة" />
+          </label>
+          <label className="dash-field dash-field--full">
+            <span>الوصف التفصيلي</span>
+            <textarea className="dash-textarea" rows="4" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="تفاصيل المنتج وفوائده وطريقة الاستخدام..." />
+          </label>
+          <label className="dash-check st-featured">
+            <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
+            <span><Star size={14} style={{ color: "var(--dash-primary)" }} /> منتج مميز (يظهر في الواجهة الرئيسية)</span>
+          </label>
+        </section>
+
+        <section className="st-form-section">
+          <div className="st-form-section__title"><ImagePlus size={15} /> صور المنتج</div>
+          <div className="st-upload">
+            <div className="st-upload__grid">
+              {images.map((img) => (
+                <div key={img.url} className="st-upload__img">
+                  <img src={img.url} alt="" />
+                  <button type="button" className="st-upload__del" onClick={() => removeImg(img.url)}><X size={14} /></button>
+                </div>
+              ))}
+              <label className="st-upload__add">
+                {uploading ? <span>...</span> : <><ImagePlus size={20} /><span>إضافة صورة</span></>}
+                <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+              </label>
+            </div>
+            <p className="st-upload__hint">JPG / PNG — يُفضّل 600×600 بكسل، الصورة الأولى تظهر في البطاقة.</p>
+          </div>
+        </section>
 
         <ModalActions onClose={onClose} />
       </form>

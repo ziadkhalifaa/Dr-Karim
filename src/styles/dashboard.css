@@ -1868,6 +1868,67 @@ textarea.pp-input { resize: vertical; min-height: 84px; }
 .st-modal__body .dash-field, .st-modal__body label.dash-field { margin-bottom: 0; }
 .st-modal__actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 8px; border-top: 1px solid var(--dash-border); margin-top: 6px; }
 
+/* ---- Sectioned professional product form ---- */
+.st-prod-form { display: grid; gap: 16px; }
+
+.st-form-section {
+  background: var(--dash-bg);
+  border: 1px solid var(--dash-border);
+  border-radius: 16px;
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+}
+.st-form-section__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--dash-text);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--dash-border);
+}
+.st-form-section__title svg { color: var(--dash-primary); }
+
+.dash-field--full { grid-column: 1 / -1; }
+
+.st-req { color: var(--dash-danger); font-style: normal; margin-inline-start: 2px; }
+
+.st-featured {
+  background: var(--dash-primary-soft);
+  border: 1px solid color-mix(in srgb, var(--dash-primary) 32%, transparent);
+  padding: 11px 13px;
+  border-radius: 12px;
+  font-size: 13.5px;
+}
+.st-featured span { display: inline-flex; align-items: center; gap: 6px; }
+
+.st-upload__del {
+  position: absolute;
+  top: 5px;
+  inset-inline-end: 5px;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+.st-upload__add {
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dash-text-muted);
+}
+.st-upload__add span { font-size: 12px; }
+.st-upload__hint { margin: 12px 0 0; font-size: 12px; color: var(--dash-text-muted); }
+
 @media (max-width: 940px) {
   .st-layout { grid-template-columns: 1fr; }
   .st-side { position: static; flex-direction: row; flex-wrap: wrap; }
