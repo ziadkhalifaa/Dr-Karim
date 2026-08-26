@@ -29,6 +29,10 @@ import ContactPage from "./pages/ContactPage";
 import ContentPage from "./pages/ContentPage";
 import PackagesPage from "./features/patient/PackagesPage";
 import PaymentPage from "./features/patient/PaymentPage";
+import StoreFront from "./features/store/StoreFront";
+import ProductDetail from "./features/store/ProductDetail";
+import Checkout from "./features/store/Checkout";
+import { CartProvider } from "./features/store/CartContext";
 
 export default function App() {
   const path = useRoute();
@@ -59,6 +63,13 @@ export default function App() {
   if (path === "/privacy") return <PublicSite><ContentPage title="سياسة الخصوصية" slug="privacy-policy" /></PublicSite>;
   if (path === "/terms") return <PublicSite><ContentPage title="شروط الاستخدام" slug="terms-of-use" /></PublicSite>;
   if (path === "/faq") return <PublicSite><ContentPage title="الأسئلة الشائعة" slug="faq" /></PublicSite>;
+
+  if (path === "/store") return <PublicSite><CartProvider><StoreFront /></CartProvider></PublicSite>;
+  if (path.startsWith("/store/")) {
+    const slug = decodeURIComponent(path.replace("/store/", ""));
+    return <PublicSite><CartProvider><ProductDetail slug={slug} /></CartProvider></PublicSite>;
+  }
+  if (path === "/checkout") return <PublicSite><CartProvider><Checkout /></CartProvider></PublicSite>;
 
   return (
     <PublicSite>

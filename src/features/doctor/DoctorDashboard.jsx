@@ -18,6 +18,7 @@ import {
   Video,
   Plus,
   StopCircle,
+  ShoppingBag,
 } from "lucide-react";
 import DashboardShell from "../shared/DashboardShell";
 import NotificationsPanel from "../shared/NotificationsPanel";
@@ -36,6 +37,7 @@ import ServicesManager from "./ServicesManager";
 import ContactMessages from "./ContactMessages";
 import PackagesManager from "./PackagesManager";
 import SlotManager from "./SlotManager";
+import StoreManager from "./StoreManager";
 import DoctorOverview from "./DoctorOverview";
 import { reviewApi, appointmentApi, liveSessionApi, patientApi } from "../../api/client";
 import { navigate } from "../../lib/router";
@@ -418,6 +420,7 @@ export default function DoctorDashboard({ path }) {
     { path: "/doctor/articles", label: "نصائح طبية", icon: FileText },
     { path: "/doctor/services", label: "إدارة الخدمات", icon: ClipboardList },
     { path: "/doctor/packages", label: "إدارة الباقات", icon: Wallet },
+    { path: "/doctor/store", label: "المتجر", icon: ShoppingBag },
     { path: "/doctor/messages", label: "رسائل التواصل", icon: MessageCircle },
     { path: "/doctor/payments", label: t("dashboard.nav.payments"), icon: Wallet },
     { path: "/doctor/configuration", label: t("dashboard.nav.configuration"), icon: Settings },
@@ -435,6 +438,7 @@ export default function DoctorDashboard({ path }) {
   else if (reviewDetailMatch) page = <ReviewDetail reviewId={reviewDetailMatch[1]} />;
   else if (path === "/doctor/patients") page = <PatientsList />;
   else if (path === "/doctor/payments") page = <PaymentReview />;
+  else if (path === "/doctor/store") page = <StoreManager />;
   else if (path === "/doctor/configuration") page = <AdminConfiguration />;
   else if (path === "/doctor/notifications") page = <NotificationsPanel />;
   else if (path === "/doctor/reviews") page = <Reviews rows={reviews} reload={reload} />;

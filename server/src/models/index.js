@@ -24,6 +24,7 @@ import { GROUP_16 } from "./16_monetization.js";
 import { GROUP_17 } from "./17_notifications.js";
 import { GROUP_18 } from "./18_care_program.js";
 import { GROUP_19 } from "./19_progress.js";
+import { GROUP_20 } from "./20_store.js";
 
 const {
   Tenant, Doctor, Patient, ContactPerson, PatientContact, PatientSession,
@@ -67,6 +68,9 @@ const {
 const {
   PatientProgress, ProgressMeasurement, PatientProgressGoal, PatientProgressGoalVersion,
 } = GROUP_19;
+const {
+  ProductCategory, Product, StoreOrder, StoreOrderItem, StorePayment,
+} = GROUP_20;
 
 // ---- Tenant scope (§7) ----
 const TENANT_SCOPED = [
@@ -84,6 +88,7 @@ const TENANT_SCOPED = [
   CareProgram, CareProgramVersion, CareDay, CareActivityDefinition,
   CareActivityInstance, CareActivityExecution, CareDailyCheckin,
   PatientProgress, ProgressMeasurement, PatientProgressGoal, PatientProgressGoalVersion,
+  ProductCategory, Product, StoreOrder, StoreOrderItem, StorePayment,
 ];
 for (const m of TENANT_SCOPED) {
   m.belongsTo(Tenant, { foreignKey: "tenant_id", as: "tenant" });
@@ -347,6 +352,16 @@ Payment.hasMany(PaymentReceipt, { foreignKey: "payment_id" }); PaymentReceipt.be
 
 // Audit has no associations (generic, §23).
 
+// ---- Store / e-commerce (Phase 7) ----
+ProductCategory.hasMany(Product, { foreignKey: "category_id", as: "products" });
+Product.belongsTo(ProductCategory, { foreignKey: "category_id", as: "category" });
+StoreOrder.hasMany(StoreOrderItem, { foreignKey: "order_id", as: "items" });
+StoreOrderItem.belongsTo(StoreOrder, { foreignKey: "order_id" });
+StoreOrder.hasMany(StorePayment, { foreignKey: "order_id", as: "payments" });
+StorePayment.belongsTo(StoreOrder, { foreignKey: "order_id" });
+Product.hasMany(StoreOrderItem, { foreignKey: "product_id", as: "orderItems" });
+StoreOrderItem.belongsTo(Product, { foreignKey: "product_id", as: "product" });
+
 export const models = {
   ...sequelize.models,
   ...GROUP_01,
@@ -368,13 +383,15 @@ export const models = {
   ...GROUP_17,
   ...GROUP_18,
   ...GROUP_19,
+  ...GROUP_20,
 };
 
 export { sequelize };
 export const MODEL_GROUPS = {
   GROUP_01, GROUP_02, GROUP_03, GROUP_04, GROUP_05, GROUP_06,
   GROUP_07, GROUP_08, GROUP_09, GROUP_10, GROUP_11, GROUP_12, GROUP_13,
-  GROUP_14, GROUP_15, GROUP_16, GROUP_17, GROUP_18, GROUP_19,
+  GROUP_14, GROUP_15, GROUP_16, GROUP_17,   GROUP_18, GROUP_19,
+  GROUP_20,
 };
 
 export default models;

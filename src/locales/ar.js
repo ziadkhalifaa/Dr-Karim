@@ -8,6 +8,7 @@ export const ar = {
   nav: {
     home: "الرئيسية",
     about: "عن الطبيب",
+    store: "المتجر",
     services: "الخدمات",
     articles: "المقالات",
     contact: "تواصل معنا",

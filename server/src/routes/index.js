@@ -18,6 +18,7 @@ import { patientRouter } from "./patient.routes.js";
 import { foodRouter } from "./food.routes.js";
 import packageRouter from "./package.routes.js";
 import servicesRouter from "./services.routes.js";
+import storeRouter from "./store.routes.js";
 import { doctorStatsController } from "../controllers/doctor-stats.controller.js";
 import { authenticateOptional, requireTenantAccess, requireAuth, requireRole } from "../middleware/auth.js";
 import { tenantResolver } from "../middleware/tenant.js";
@@ -35,6 +36,9 @@ export function routes(app) {
   // Public assessment intake: tenant is resolved anonymously so visitors can
   // submit without an account; authenticated callers are still handled.
   api.use("/assessment", tenantResolver, assessmentRouter());
+  // Public storefront: tenant resolved like /assessment; doctor sub-routes
+  // enforce auth internally.
+  api.use("/store", tenantResolver, storeRouter());
   api.use(requireTenantAccess);
   api.use("/doctor/reviews", doctorReviewRouter());
   api.use("/nutrition-plans", nutritionPlanRouter());

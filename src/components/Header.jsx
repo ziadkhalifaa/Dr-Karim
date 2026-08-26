@@ -11,6 +11,7 @@ import { useAuth } from "../context/AuthProvider";
 const NAV = [
   { key: "home", href: "/" },
   { key: "about", href: "/about" },
+  { key: "store", href: "/store" },
   { key: "services", href: "/services" },
   { key: "articles", href: "/articles" },
   { key: "contact", href: "/contact" },

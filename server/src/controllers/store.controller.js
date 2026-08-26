@@ -1,0 +1,195 @@
+import { ok } from "../middleware/api-response.js";
+import { storeService } from "../services/store.service.js";
+
+function getTenantId(req) {
+  return req.tenant?.id || 1;
+}
+function requireDoctor(auth) {
+  if (!auth) throw new AppError(401, "AUTH_REQUIRED", "Authentication required");
+  if (!["doctor", "admin"].includes(auth.membership?.role)) throw new AppError(403, "FORBIDDEN", "Doctors only");
+}
+
+/* ===================== PUBLIC ===================== */
+export async function publicProducts(req, res, next) {
+  try {
+    const tenantId = getTenantId(req);
+    const q = req.query;
+    const result = await storeService.listProducts(tenantId, {
+      status: "active",
+      search: q.search || undefined,
+      categoryId: q.category ? Number(q.category) : undefined,
+      featured: q.featured === "1" || q.featured === "true" ? true : undefined,
+      sort: q.sort || undefined,
+      page: q.page ? Number(q.page) : 1,
+      limit: q.limit ? Number(q.limit) : 24,
+    });
+    return ok(res, 200, result);
+  } catch (err) { next(err); }
+}
+
+export async function publicCategories(req, res, next) {
+  try {
+    const tenantId = getTenantId(req);
+    const cats = await storeService.listCategories(tenantId, { onlyActive: true });
+    return ok(res, 200, { categories: cats });
+  } catch (err) { next(err); }
+}
+
+export async function publicProduct(req, res, next) {
+  try {
+    const tenantId = getTenantId(req);
+    const product = await storeService.getProductBySlug(tenantId, req.params.slug);
+    return ok(res, 200, { product });
+  } catch (err) { next(err); }
+}
+
+export async function checkout(req, res, next) {
+  try {
+    const tenantId = getTenantId(req);
+    // patientId is only trusted if the caller is authenticated as that patient.
+    let patientId = null;
+    if (req.auth?.membership?.role === "patient" && req.body?.patientId) {
+      patientId = req.body.patientId;
+    }
+    const order = await storeService.createOrder(tenantId, { ...req.body, patientId });
+    return ok(res, 201, { order });
+  } catch (err) { next(err); }
+}
+
+export async function submitPayment(req, res, next) {
+  try {
+    const tenantId = getTenantId(req);
+    const payment = await storeService.createPayment(tenantId, req.params.id, req.body || {});
+    return ok(res, 201, { payment });
+  } catch (err) { next(err); }
+}
+
+/* ===================== DOCTOR: CATEGORIES ===================== */
+export async function doctorCategories(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const cats = await storeService.listCategories(tenantId);
+    return ok(res, 200, { categories: cats });
+  } catch (err) { next(err); }
+}
+export async function createCategory(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const cat = await storeService.createCategory(tenantId, req.body || {});
+    return ok(res, 201, { category: cat });
+  } catch (err) { next(err); }
+}
+export async function updateCategory(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const cat = await storeService.updateCategory(tenantId, req.params.id, req.body || {});
+    return ok(res, 200, { category: cat });
+  } catch (err) { next(err); }
+}
+export async function deleteCategory(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const r = await storeService.deleteCategory(tenantId, req.params.id);
+    return ok(res, 200, r);
+  } catch (err) { next(err); }
+}
+
+/* ===================== DOCTOR: PRODUCTS ===================== */
+export async function doctorProducts(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const r = await storeService.listAllProducts(tenantId);
+    return ok(res, 200, { products: r.products, categoryCounts: r.categoryCounts });
+  } catch (err) { next(err); }
+}
+export async function createProduct(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const product = await storeService.createProduct(tenantId, req.body || {});
+    return ok(res, 201, { product });
+  } catch (err) { next(err); }
+}
+export async function updateProduct(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const product = await storeService.updateProduct(tenantId, req.params.id, req.body || {});
+    return ok(res, 200, { product });
+  } catch (err) { next(err); }
+}
+export async function deleteProduct(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const r = await storeService.deleteProduct(tenantId, req.params.id);
+    return ok(res, 200, r);
+  } catch (err) { next(err); }
+}
+export async function uploadProductImage(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    if (!req.file) throw new AppError(422, "VALIDATION_ERROR", "لم يتم رفع صورة");
+    const baseUrl = process.env.APP_URL || "";
+    const url = `${baseUrl}/uploads/products/${req.file.filename}`;
+    const product = await storeService.appendProductImage(tenantId, req.params.id, url);
+    return ok(res, 200, { product });
+  } catch (err) { next(err); }
+}
+
+/* ===================== DOCTOR: ORDERS / PAYMENTS ===================== */
+export async function doctorOrders(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const result = await storeService.listOrders(tenantId, {
+      status: req.query.status || undefined,
+      page: req.query.page ? Number(req.query.page) : 1,
+      limit: req.query.limit ? Number(req.query.limit) : 30,
+    });
+    return ok(res, 200, result);
+  } catch (err) { next(err); }
+}
+export async function doctorOrder(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const order = await storeService.getOrder(tenantId, req.params.id);
+    return ok(res, 200, { order });
+  } catch (err) { next(err); }
+}
+export async function updateOrderStatus(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const order = await storeService.updateOrderStatus(tenantId, req.params.id, req.body?.status);
+    return ok(res, 200, { order });
+  } catch (err) { next(err); }
+}
+export async function doctorPayments(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const payments = await storeService.listPayments(tenantId, { status: req.query.status || "pending" });
+    return ok(res, 200, { payments });
+  } catch (err) { next(err); }
+}
+export async function reviewPayment(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const approve = req.body?.action === "approve";
+    const result = await storeService.reviewPayment(tenantId, req.params.id, {
+      approve,
+      reviewerId: req.auth?.user?.id,
+      reason: req.body?.reason,
+    });
+    return ok(res, 200, result);
+  } catch (err) { next(err); }
+}

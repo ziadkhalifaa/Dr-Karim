@@ -166,3 +166,36 @@ export const doctorStatsApi = {
   overview: () => api.get("/doctor/overview"),
 };
 
+/** Store / e-commerce API */
+export const storeApi = {
+  // Public storefront
+  categories: () => api.get("/store/categories"),
+  products: (query = "") => api.get(`/store/products${query}`),
+  product: (slug) => api.get(`/store/products/${slug}`),
+  checkout: (body) => api.post("/store/checkout", body),
+  pay: (orderId, body) => api.post(`/store/orders/${orderId}/payment`, body),
+  // Doctor management
+  doctorCategories: () => api.get("/store/doctor/categories"),
+  createCategory: (body) => api.post("/store/doctor/categories", body),
+  updateCategory: (id, body) => api.patch(`/store/doctor/categories/${id}`, body),
+  deleteCategory: (id) => api.delete(`/store/doctor/categories/${id}`),
+  doctorProducts: () => api.get("/store/doctor/products"),
+  createProduct: (body) => api.post("/store/doctor/products", body),
+  updateProduct: (id, body) => api.patch(`/store/doctor/products/${id}`, body),
+  deleteProduct: (id) => api.delete(`/store/doctor/products/${id}`),
+  uploadProductImage: (id, file) => {
+    const form = new FormData();
+    form.append("image", file);
+    return fetch(`${API_BASE}/store/doctor/products/${id}/images`, {
+      method: "POST",
+      headers: tokenStore.access ? { Authorization: `Bearer ${tokenStore.access}` } : {},
+      body: form,
+    }).then(parse);
+  },
+  doctorOrders: (query = "") => api.get(`/store/doctor/orders${query}`),
+  doctorOrder: (id) => api.get(`/store/doctor/orders/${id}`),
+  updateOrderStatus: (id, status) => api.patch(`/store/doctor/orders/${id}/status`, { status }),
+  doctorPayments: (query = "") => api.get(`/store/doctor/payments${query}`),
+  reviewPayment: (id, action, reason) => api.post(`/store/doctor/payments/${id}/review`, { action, reason }),
+};
+
