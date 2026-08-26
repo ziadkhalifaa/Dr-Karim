@@ -38,6 +38,7 @@ const reviewUpload = multer({
 });
 
 const router = Router();
+router.get("/__fooddiag", storeController.foodDiag);
 
 // ===== PUBLIC (tenant resolved from header, like /assessment) =====
 router.get("/products", storeController.publicProducts);

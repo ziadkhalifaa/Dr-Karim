@@ -1,5 +1,6 @@
 import { ok } from "../middleware/api-response.js";
 import { storeService } from "../services/store.service.js";
+import { sequelize } from "../config/database.js";
 
 function getTenantId(req) {
   return req.tenant?.id || 1;
@@ -266,4 +267,12 @@ export async function reviewPayment(req, res, next) {
     });
     return ok(res, 200, result);
   } catch (err) { next(err); }
+}
+
+/* TEMP FOOD DIAG */
+export async function foodDiag(req, res) {
+  const [cols] = await sequelize.query("SHOW COLUMNS FROM food_item LIKE 'macros_json'");
+  const [cnt] = await sequelize.query("SELECT COUNT(*) AS c FROM food_item");
+  const [idx] = await sequelize.query("SHOW INDEX FROM food_item");
+  return res.json({ macrosCol: !!(cols && cols.length), rows: cnt[0].c, indexCount: idx.length });
 }
