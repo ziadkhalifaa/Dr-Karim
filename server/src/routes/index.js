@@ -38,7 +38,7 @@ export function routes(app) {
   api.use("/assessment", tenantResolver, assessmentRouter());
   // Public storefront: tenant resolved like /assessment; doctor sub-routes
   // enforce auth internally.
-  api.use("/store", tenantResolver, storeRouter());
+  api.use("/store", tenantResolver, storeRouter);
   api.use(requireTenantAccess);
   api.use("/doctor/reviews", doctorReviewRouter());
   api.use("/nutrition-plans", nutritionPlanRouter());
