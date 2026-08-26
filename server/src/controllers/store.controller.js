@@ -116,11 +116,10 @@ export async function deleteReview(req, res, next) {
 export async function checkout(req, res, next) {
   try {
     const tenantId = getTenantId(req);
-    // patientId is only trusted if the caller is authenticated as that patient.
-    let patientId = null;
-    if (req.auth?.membership?.role === "patient" && req.body?.patientId) {
-      patientId = req.body.patientId;
-    }
+    // Order is always linked to the authenticated patient (checkout requires
+    // patient auth), so the buyer can track it from their dashboard.
+    const patientId = req.auth?.user?.patient_id ? Number(req.auth.user.patient_id) : null;
+    if (!patientId) return res.status(403).json({ success: false, error: { code: "PATIENT_REQUIRED", message: "يجب تسجيل الدخول كمريض لإتمام الطلب" } });
     const order = await storeService.createOrder(tenantId, {
       ...req.body,
       patientId,
@@ -133,8 +132,33 @@ export async function checkout(req, res, next) {
 export async function submitPayment(req, res, next) {
   try {
     const tenantId = getTenantId(req);
+    // Patients may only pay for their own orders.
+    const patientId = req.auth?.user?.patient_id ? Number(req.auth.user.patient_id) : null;
+    if (!patientId) return res.status(403).json({ success: false, error: { code: "PATIENT_REQUIRED", message: "يجب تسجيل الدخول كمريض" } });
+    await storeService.getPatientOrder(tenantId, patientId, req.params.id); // 404/403 if not owned
     const payment = await storeService.createPayment(tenantId, req.params.id, req.body || {});
     return ok(res, 201, { payment });
+  } catch (err) { next(err); }
+}
+
+export async function patientOrders(req, res, next) {
+  try {
+    const tenantId = getTenantId(req);
+    const patientId = req.auth?.user?.patient_id ? Number(req.auth.user.patient_id) : null;
+    const result = await storeService.listPatientOrders(tenantId, patientId, {
+      page: Number(req.query.page) || 1,
+      limit: Number(req.query.limit) || 30,
+    });
+    return ok(res, 200, result);
+  } catch (err) { next(err); }
+}
+
+export async function patientOrderDetail(req, res, next) {
+  try {
+    const tenantId = getTenantId(req);
+    const patientId = req.auth?.user?.patient_id ? Number(req.auth.user.patient_id) : null;
+    const order = await storeService.getPatientOrder(tenantId, patientId, req.params.id);
+    return ok(res, 200, { order });
   } catch (err) { next(err); }
 }
 

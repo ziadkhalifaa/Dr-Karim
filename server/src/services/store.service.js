@@ -523,6 +523,48 @@ export async function getOrder(tenantId, id) {
   })) };
 }
 
+// Patient-facing order history (only their own orders).
+export async function listPatientOrders(tenantId, patientId, { page = 1, limit = 30 } = {}) {
+  if (!patientId) return { orders: [], total: 0, page: 1, pages: 1 };
+  const offset = Math.max(0, (Number(page) - 1) * Number(limit));
+  const { rows, count } = await StoreOrder.findAndCountAll({
+    where: { tenant_id: tenantId, patient_id: patientId },
+    order: [["created_at", "DESC"]],
+    limit: Number(limit),
+    offset,
+    include: [{ model: StoreOrderItem, as: "items" }, { model: StorePayment, as: "payments" }],
+  });
+  return {
+    orders: rows.map((o) => {
+      const base = serializeOrder(o, o.items || []);
+      const pay = (o.payments || [])[0];
+      return { ...base, paymentStatus: pay ? pay.status : null };
+    }),
+    total: count,
+    page: Number(page),
+    pages: Math.max(1, Math.ceil(count / Number(limit))),
+  };
+}
+
+export async function getPatientOrder(tenantId, patientId, id) {
+  if (!patientId) throw new AppError(403, "FORBIDDEN", "غير مسموح");
+  const o = await StoreOrder.findOne({
+    where: { id, tenant_id: tenantId, patient_id: patientId },
+    include: [{ model: StoreOrderItem, as: "items" }, { model: StorePayment, as: "payments" }],
+  });
+  if (!o) throw new AppError(404, "NOT_FOUND", "الطلب غير موجود");
+  const base = serializeOrder(o, o.items || []);
+  return { ...base, payments: (o.payments || []).map((p) => ({
+    id: String(p.id),
+    method: p.method,
+    amount: num(p.amount),
+    senderPhone: p.sender_phone,
+    transactionReference: p.transaction_reference,
+    status: p.status,
+    createdAt: p.created_at,
+  })) };
+}
+
 const VALID_ORDER_STATUS = ["pending_payment", "paid", "processing", "shipped", "delivered", "cancelled"];
 export async function updateOrderStatus(tenantId, id, status) {
   if (!VALID_ORDER_STATUS.includes(status)) throw new AppError(422, "VALIDATION_ERROR", "حالة الطلب غير صالحة");
@@ -595,6 +637,8 @@ export const storeService = {
   createPayment,
   listOrders,
   getOrder,
+  listPatientOrders,
+  getPatientOrder,
   updateOrderStatus,
   listPayments,
   reviewPayment,

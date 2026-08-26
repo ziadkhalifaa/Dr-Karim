@@ -1703,6 +1703,29 @@ textarea.pp-input { resize: vertical; min-height: 84px; }
 @keyframes stShimmer { to { background-position: -200% 0; } }
 .st-noresults { text-align: center; padding: 70px 20px; font-size: 16px; font-weight: 700; color: var(--dash-text-muted); }
 
+.st-login-gate {
+  max-width: 520px;
+  margin: 70px auto;
+  background: #fff;
+  border: 1.5px solid var(--dash-border);
+  border-radius: 24px;
+  padding: 44px;
+  text-align: center;
+  box-shadow: var(--dash-shadow);
+}
+.st-login-gate__icon {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--dash-primary-soft); color: var(--dash-primary);
+  display: grid; place-items: center; margin: 0 auto 18px;
+}
+.st-login-gate h2 { font-size: 24px; font-weight: 900; margin: 0 0 10px; }
+.st-login-gate p { color: var(--dash-text-muted); font-weight: 600; line-height: 1.7; margin: 6px 0 22px; }
+.st-login-gate__note {
+  background: var(--dash-primary-soft); color: var(--dash-primary);
+  border-radius: 12px; padding: 12px 14px; font-weight: 700; font-size: 13.5px;
+}
+.st-login-gate__actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
 /* ---- Product card ---- */
 .st-card { background: #fff; border: 1.5px solid var(--dash-border); border-radius: 18px; overflow: hidden; cursor: pointer; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; display: flex; flex-direction: column; }
 .st-card:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(15,23,42,0.12); border-color: #cbe7a0; }

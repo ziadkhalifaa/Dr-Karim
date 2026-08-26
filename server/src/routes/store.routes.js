@@ -43,8 +43,12 @@ const router = Router();
 router.get("/products", storeController.publicProducts);
 router.get("/products/:slug", storeController.publicProduct);
 router.get("/categories", storeController.publicCategories);
-router.post("/checkout", storeController.checkout);
-router.post("/orders/:id/payment", storeController.submitPayment);
+router.post("/checkout", requireAuth, requireRole("patient"), storeController.checkout);
+router.post("/orders/:id/payment", requireAuth, requireRole("patient"), storeController.submitPayment);
+
+// ===== PATIENT: my orders =====
+router.get("/patient/orders", requireAuth, requireRole("patient"), storeController.patientOrders);
+router.get("/patient/orders/:id", requireAuth, requireRole("patient"), storeController.patientOrderDetail);
 
 // ===== REVIEWS (public list; submit by verified buyers only) =====
 router.get("/products/:slug/reviews", storeController.getReviews);

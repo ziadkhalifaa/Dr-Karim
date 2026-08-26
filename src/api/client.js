@@ -183,6 +183,9 @@ export const storeApi = {
   },
   checkout: (body) => api.post("/store/checkout", body),
   pay: (orderId, body) => api.post(`/store/orders/${orderId}/payment`, body),
+  // Patient order tracking
+  patientOrders: (query = "") => api.get(`/store/patient/orders${query}`),
+  patientOrder: (id) => api.get(`/store/patient/orders/${id}`),
   // Doctor management
   doctorCategories: () => api.get("/store/doctor/categories"),
   createCategory: (body) => api.post("/store/doctor/categories", body),

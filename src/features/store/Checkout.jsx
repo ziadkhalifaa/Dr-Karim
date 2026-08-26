@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "./CartContext";
 import { storeApi, paymentApi } from "../../api/client";
+import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
-import { ShoppingCart, CheckCircle2, Truck, CreditCard } from "lucide-react";
+import { ShoppingCart, CheckCircle2, Truck, CreditCard, LogIn } from "lucide-react";
 import { VodafoneCashLogo, InstaPayLogo } from "./paymentLogos.jsx";
 
 const fmt = (n) => `${Number(n).toLocaleString("ar-EG")} ج`;
@@ -14,6 +15,8 @@ const METHODS = [
 
 export default function Checkout() {
   const cart = useCart();
+  const { user, authenticated } = useAuth();
+  const isPatient = authenticated && user?.role === "patient" && user?.patientId;
   const [settings, setSettings] = useState(null);
   const [method, setMethod] = useState("");
   const [senderPhone, setSenderPhone] = useState("");
@@ -45,7 +48,8 @@ export default function Checkout() {
           <h2>تم استلام طلبك!</h2>
           <p>رقم الطلب: <strong>#{success}</strong></p>
           <p className="st-success__note">تم إرسال بيانات الدفع وسيقوم فريق الدكتور كريم بمراجعتها وتأكيد الطلب قريباً.</p>
-          <button className="st-btn st-btn--primary" onClick={() => navigate("/store")}>العودة للمتجر</button>
+          <button className="st-btn st-btn--primary" onClick={() => navigate("/patient/orders")}>متابعة طلبي</button>
+          <button className="st-btn st-btn--ghost" onClick={() => navigate("/store")}>العودة للمتجر</button>
         </div>
       </div>
     );
@@ -58,6 +62,27 @@ export default function Checkout() {
         <div className="st-noresults">
           سلتك فارغة.{" "}
           <button className="st-link" onClick={() => navigate("/store")}>تصفح المنتجات ←</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isPatient) {
+    return (
+      <div className="st-page">
+        <StoreBar />
+        <div className="st-login-gate">
+          <div className="st-login-gate__icon"><LogIn size={40} /></div>
+          <h2>سجّل دخولك لإتمام الطلب</h2>
+          <p>عشان تقدر تتابع حالة طلبك و الإيصالات من ملفك الشخصي، لازم يكون عندك حساب مريض.</p>
+          {authenticated
+            ? <div className="st-login-gate__note">هذا الحساب ليس حساب مريض. سجّل دخولك بحساب مريض لتتمكن من الشراء.</div>
+            : (
+              <div className="st-login-gate__actions">
+                <button className="st-btn st-btn--primary" onClick={() => navigate("/login")}>تسجيل الدخول</button>
+                <button className="st-btn st-btn--ghost" onClick={() => navigate("/register")}>إنشاء حساب مريض</button>
+              </div>
+            )}
         </div>
       </div>
     );
