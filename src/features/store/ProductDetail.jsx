@@ -3,7 +3,7 @@ import { useCart } from "./CartContext";
 import { storeApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 import { useAuth } from "../../context/AuthProvider";
-import { ShoppingCart, X, Plus, Minus, ArrowRight, Truck, ShieldCheck, RotateCcw, Star } from "lucide-react";
+import { ShoppingCart, X, Plus, Minus, ArrowRight, Truck, ShieldCheck, RotateCcw, Star, ImagePlus } from "lucide-react";
 
 const fmt = (n) => `${Number(n).toLocaleString("ar-EG")} ج`;
 
@@ -23,6 +23,8 @@ export default function ProductDetail({ slug }) {
   const [myComment, setMyComment] = useState("");
   const [reviewMsg, setReviewMsg] = useState("");
   const [reviewSending, setReviewSending] = useState(false);
+  const [myFiles, setMyFiles] = useState([]);
+  const [myFilePreviews, setMyFilePreviews] = useState([]);
 
   useEffect(() => {
     setLoading(true);
@@ -50,10 +52,17 @@ export default function ProductDetail({ slug }) {
     setReviewSending(true);
     setReviewMsg("");
     try {
-      const r = await storeApi.addReview(slug, { rating: myRating, comment: myComment });
+      const payload = { rating: myRating, comment: myComment };
+      if (myFiles.length) {
+        const up = await storeApi.uploadReviewImages(myFiles);
+        payload.images = up.urls;
+      }
+      const r = await storeApi.addReview(slug, payload);
       setReviews((prev) => [r.review, ...prev]);
       setMyRating(0);
       setMyComment("");
+      setMyFiles([]);
+      setMyFilePreviews([]);
       setReviewMsg("✅ شكراً لتقييمك");
     } catch (err) {
       const msg = err?.response?.data?.error?.message || err?.message || "تعذّر إرسال التقييم";
@@ -173,6 +182,21 @@ export default function ProductDetail({ slug }) {
                   <strong>{rv.authorName}</strong>
                 </div>
                 {rv.comment && <p className="st-review__body">{rv.comment}</p>}
+                {rv.images?.length > 0 && (
+                  <div className="st-review__imgs">
+                    {rv.images.map((img, i) => (
+                      <a key={i} href={img.url} target="_blank" rel="noreferrer" className="st-review__img">
+                        <img src={img.url} alt="" loading="lazy" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+                {rv.doctorReply && (
+                  <div className="st-review__reply">
+                    <span className="st-review__reply-by">رد الدكتور</span>
+                    <p>{rv.doctorReply}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -195,9 +219,36 @@ export default function ProductDetail({ slug }) {
               value={myComment}
               onChange={(e) => setMyComment(e.target.value)}
             />
+            <label className="st-review-upload">
+              <ImagePlus size={16} /> إرفاق صور (حتى 6)
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                hidden
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  setMyFiles(files.slice(0, 6));
+                  setMyFilePreviews(files.slice(0, 6).map((f) => URL.createObjectURL(f)));
+                }}
+              />
+            </label>
+            {myFilePreviews.length > 0 && (
+              <div className="st-review__imgs">
+                {myFilePreviews.map((src, i) => (
+                  <div key={i} className="st-review__img">
+                    <img src={src} alt="" />
+                    <button type="button" className="st-review__img-x" onClick={() => {
+                      setMyFiles((prev) => prev.filter((_, j) => j !== i));
+                      setMyFilePreviews((prev) => prev.filter((_, j) => j !== i));
+                    }}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="st-review-form__foot">
-              <button type="submit" className="st-btn st-btn--primary" disabled={reviewSending}>
-                {reviewSending ? "جاري الإرسال..." : "إرسال التقييم"}
+              <button type="submit" className="st-btn st-btn--primary" disabled={reviewSending || uploading}>
+                {reviewSending || uploading ? "جاري الإرسال..." : "إرسال التقييم"}
               </button>
               {reviewMsg && <span className="st-review-form__msg">{reviewMsg}</span>}
             </div>

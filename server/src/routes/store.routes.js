@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "node:path";
 import { authenticateOptional, requireAuth, requireRole } from "../middleware/auth.js";
 import * as storeController from "../controllers/store.controller.js";
-import { productsDir } from "../config/uploads.js";
+import { productsDir, reviewsDir } from "../config/uploads.js";
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, productsDir),
@@ -15,6 +15,22 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) cb(null, true);
+    else cb(new Error("Only images allowed"));
+  },
+});
+
+const reviewStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, reviewsDir),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `review-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`);
+  },
+});
+const reviewUpload = multer({
+  storage: reviewStorage,
+  limits: { fileSize: 8 * 1024 * 1024, files: 6 },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype.startsWith("image/")) cb(null, true);
     else cb(new Error("Only images allowed"));
@@ -33,6 +49,7 @@ router.post("/orders/:id/payment", storeController.submitPayment);
 // ===== REVIEWS (public list; submit by verified buyers only) =====
 router.get("/products/:slug/reviews", storeController.getReviews);
 router.post("/products/:slug/reviews", authenticateOptional, requireRole("patient"), storeController.postReview);
+router.post("/reviews/images", authenticateOptional, requireRole("patient"), reviewUpload.array("images", 6), storeController.uploadReviewImages);
 
 // ===== DOCTOR (protected) =====
 const doc = [authenticateOptional, requireAuth, requireRole("doctor", "admin")];
@@ -55,6 +72,7 @@ router.get("/doctor/payments", ...doc, storeController.doctorPayments);
 router.post("/doctor/payments/:id/review", ...doc, storeController.reviewPayment);
 
 router.get("/doctor/reviews", ...doc, storeController.doctorReviews);
+router.post("/doctor/reviews/:id/reply", ...doc, storeController.doctorReplyReview);
 router.delete("/doctor/reviews/:id", ...doc, storeController.deleteReview);
 
 export default router;

@@ -280,11 +280,17 @@ export async function deleteProduct(tenantId, id) {
 
 /* ============================ REVIEWS (purchase-verified) ============================ */
 function serializeReview(r) {
+  const images = Array.isArray(r.images_json) ? r.images_json : [];
   return {
     id: String(r.id),
     rating: Number(r.rating),
     comment: r.comment || "",
+    productName: r.product ? r.product.name : null,
+    productSlug: r.product ? r.product.slug : null,
+    images: images.map((i) => (typeof i === "string" ? { url: i } : i)),
     authorName: r.author ? r.author.full_name : "مريض موثّق",
+    doctorReply: r.doctor_reply || null,
+    doctorReplyAt: r.doctor_reply_at || null,
     status: r.status,
     createdAt: r.created_at,
   };
@@ -299,9 +305,10 @@ export async function listReviews(tenantId, productId) {
   return rows.map(serializeReview);
 }
 
-export async function createReview(tenantId, productId, userId, { rating, comment, orderId } = {}) {
+export async function createReview(tenantId, productId, userId, { rating, comment, orderId, images } = {}) {
   const r = Math.floor(Number(rating));
   if (!r || r < 1 || r > 5) throw new AppError(422, "VALIDATION_ERROR", "التقييم يجب أن يكون من 1 إلى 5");
+  const imgs = Array.isArray(images) ? images.filter(Boolean).slice(0, 6) : [];
 
   const purchaseWhere = { tenant_id: tenantId, user_id: userId, status: "paid" };
   if (orderId) purchaseWhere.id = Number(orderId);
@@ -325,15 +332,27 @@ export async function createReview(tenantId, productId, userId, { rating, commen
       patient_id: order.patient_id || null,
       rating: r,
       comment: comment ? String(comment).slice(0, 2000) : null,
+      images_json: imgs,
       status: "approved",
     },
   });
   if (!created) {
     review.rating = r;
     review.comment = comment ? String(comment).slice(0, 2000) : null;
+    review.images_json = imgs;
     await review.save();
   }
   return serializeReview(review);
+}
+
+export async function doctorReply(tenantId, reviewId, { reply, doctorId } = {}) {
+  const r = await ProductReview.findOne({ where: { id: reviewId, tenant_id: tenantId } });
+  if (!r) throw new AppError(404, "NOT_FOUND", "التقييم غير موجود");
+  r.doctor_reply = reply ? String(reply).slice(0, 2000) : null;
+  r.doctor_reply_at = reply ? new Date() : null;
+  r.doctor_reply_by = reply ? Number(doctorId) || null : null;
+  await r.save();
+  return serializeReview(r);
 }
 
 export async function listAllReviews(tenantId) {

@@ -125,6 +125,10 @@ export const ProductReview = sequelize.define(
     order_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
     rating: { type: DataTypes.TINYINT.UNSIGNED, allowNull: false },
     comment: { type: DataTypes.TEXT, allowNull: true },
+    images_json: { type: DataTypes.JSON, allowNull: true },
+    doctor_reply: { type: DataTypes.TEXT, allowNull: true },
+    doctor_reply_at: { type: DataTypes.DATE, allowNull: true },
+    doctor_reply_by: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
     status: {
       type: DataTypes.ENUM("pending", "approved", "rejected"),
       allowNull: false,

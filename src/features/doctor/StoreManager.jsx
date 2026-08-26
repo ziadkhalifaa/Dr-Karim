@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { storeApi } from "../../api/client";
 import {
-  Plus, Pencil, Trash, X, Check, Save, ImagePlus, Package, Tag, ShoppingBag, CreditCard,
+  Plus, Pencil, Trash, X, Check, Save, ImagePlus, Package, Tag, ShoppingBag, CreditCard, MessageSquare,
 } from "lucide-react";
 
 const STATUS_LABEL = {
@@ -25,11 +25,13 @@ export default function StoreManager() {
         <button className={tab === "categories" ? "is-active" : ""} onClick={() => setTab("categories")}><Tag size={16} /> التصنيفات</button>
         <button className={tab === "orders" ? "is-active" : ""} onClick={() => setTab("orders")}><ShoppingBag size={16} /> الطلبات</button>
         <button className={tab === "payments" ? "is-active" : ""} onClick={() => setTab("payments")}><CreditCard size={16} /> المدفوعات</button>
+        <button className={tab === "reviews" ? "is-active" : ""} onClick={() => setTab("reviews")}><MessageSquare size={16} /> التقييمات</button>
       </div>
       {tab === "products" && <ProductsTab />}
       {tab === "categories" && <CategoriesTab />}
       {tab === "orders" && <OrdersTab />}
       {tab === "payments" && <PaymentsTab />}
+      {tab === "reviews" && <ReviewsTab />}
     </div>
   );
 }
@@ -389,6 +391,87 @@ function PaymentsTab() {
               </div>
             ))}
           </div>}
+    </div>
+  );
+}
+
+/* ============================ REVIEWS ============================ */
+function ReviewsTab() {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [replyTo, setReplyTo] = useState(null);
+
+  const load = async () => {
+    setLoading(true);
+    try { const r = await storeApi.doctorReviews(); setReviews(r.reviews || []); }
+    finally { setLoading(false); }
+  };
+  useEffect(() => { load(); }, []);
+
+  const sendReply = async (id, reply) => {
+    try { await storeApi.doctorReviewReply(id, reply); setReplyTo(null); load(); }
+    catch (e) { alert(e.message); }
+  };
+  const del = async (id) => {
+    if (!window.confirm("حذف التقييم؟")) return;
+    try { await storeApi.deleteReview(id); load(); } catch (e) { alert(e.message); }
+  };
+
+  return (
+    <div>
+      {loading ? <div className="dash-empty">...تحميل</div> :
+        reviews.length === 0 ? <div className="dash-empty">لا توجد تقييمات بعد</div> :
+          <div className="st-rev-list">
+            {reviews.map((rv) => (
+              <div key={rv.id} className="st-rev-card">
+                <div className="st-rev-card__head">
+                  <span className="st-card__stars">{"★".repeat(rv.rating)}{"☆".repeat(5 - rv.rating)}</span>
+                  <strong>{rv.authorName}</strong>
+                  <span className="st-muted">{rv.productName}</span>
+                </div>
+                {rv.comment && <p className="st-rev-card__body">{rv.comment}</p>}
+                {rv.images?.length > 0 && (
+                  <div className="st-review__imgs">
+                    {rv.images.map((img, i) => (
+                      <a key={i} href={img.url} target="_blank" rel="noreferrer" className="st-review__img"><img src={img.url} alt="" /></a>
+                    ))}
+                  </div>
+                )}
+                {rv.doctorReply ? (
+                  <div className="st-review__reply">
+                    <span className="st-review__reply-by">رد الدكتور</span>
+                    <p>{rv.doctorReply}</p>
+                    <button className="dash-btn dash-btn--ghost" onClick={() => setReplyTo(rv)}>تعديل الرد</button>
+                  </div>
+                ) : (
+                  <div className="st-rev-card__actions">
+                    <button className="dash-btn dash-btn--primary" onClick={() => setReplyTo(rv)}>رد</button>
+                    <button className="dash-btn dash-btn--danger" onClick={() => del(rv.id)}><Trash size={15} /></button>
+                  </div>
+                )}
+                {replyTo?.id === rv.id && (
+                  <ReplyBox
+                    initial={rv.doctorReply || ""}
+                    onCancel={() => setReplyTo(null)}
+                    onSend={(reply) => sendReply(rv.id, reply)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>}
+    </div>
+  );
+}
+
+function ReplyBox({ initial, onCancel, onSend }) {
+  const [text, setText] = useState(initial);
+  return (
+    <div className="st-reply-box">
+      <textarea className="st-input" rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder="رد الدكتور على التقييم" />
+      <div className="st-modal__actions">
+        <button className="dash-btn dash-btn--ghost" onClick={onCancel}>إلغاء</button>
+        <button className="dash-btn dash-btn--primary" onClick={() => onSend(text)}>إرسال الرد</button>
+      </div>
     </div>
   );
 }

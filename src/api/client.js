@@ -174,6 +174,13 @@ export const storeApi = {
   product: (slug) => api.get(`/store/products/${slug}`),
   reviews: (slug) => api.get(`/store/products/${slug}/reviews`),
   addReview: (slug, body) => api.post(`/store/products/${slug}/reviews`, body),
+  uploadReviewImages: (files) => {
+    const fd = new FormData();
+    files.forEach((f) => fd.append("images", f));
+    return api
+      .post(`/store/reviews/images`, fd, { headers: { "Content-Type": "multipart/form-data" } })
+      .then((r) => r.data);
+  },
   checkout: (body) => api.post("/store/checkout", body),
   pay: (orderId, body) => api.post(`/store/orders/${orderId}/payment`, body),
   // Doctor management
@@ -199,5 +206,8 @@ export const storeApi = {
   updateOrderStatus: (id, status) => api.patch(`/store/doctor/orders/${id}/status`, { status }),
   doctorPayments: (query = "") => api.get(`/store/doctor/payments${query}`),
   reviewPayment: (id, action, reason) => api.post(`/store/doctor/payments/${id}/review`, { action, reason }),
+  doctorReviews: () => api.get("/store/doctor/reviews"),
+  doctorReviewReply: (id, reply) => api.post(`/store/doctor/reviews/${id}/reply`, { reply }),
+  deleteReview: (id) => api.delete(`/store/doctor/reviews/${id}`),
 };
 

@@ -62,12 +62,24 @@ export async function postReview(req, res, next) {
   try {
     const tenantId = getTenantId(req);
     const product = await storeService.getProductBySlug(tenantId, req.params.slug);
-    const review = await storeService.createReview(tenantId, product.id, req.auth.user.id, {
+    const userId = req.auth?.user?.id;
+    if (!userId) throw new AppError(401, "UNAUTHENTICATED", "سجّل الدخول كمريض لتقييم المنتج");
+    const review = await storeService.createReview(tenantId, product.id, userId, {
       rating: req.body?.rating,
       comment: req.body?.comment,
       orderId: req.body?.orderId,
+      images: req.body?.images,
     });
     return ok(res, 201, { review });
+  } catch (err) { next(err); }
+}
+
+export async function uploadReviewImages(req, res, next) {
+  try {
+    requireRole(req.auth, "patient");
+    const files = req.files || [];
+    const urls = files.map((f) => `/uploads/reviews/${f.filename}`);
+    return ok(res, 200, { urls });
   } catch (err) { next(err); }
 }
 
@@ -77,6 +89,18 @@ export async function doctorReviews(req, res, next) {
     const tenantId = getTenantId(req);
     const reviews = await storeService.listAllReviews(tenantId);
     return ok(res, 200, { reviews });
+  } catch (err) { next(err); }
+}
+
+export async function doctorReplyReview(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const review = await storeService.doctorReply(tenantId, req.params.id, {
+      reply: req.body?.reply,
+      doctorId: req.auth?.user?.id,
+    });
+    return ok(res, 200, { review });
   } catch (err) { next(err); }
 }
 
