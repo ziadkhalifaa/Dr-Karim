@@ -1903,3 +1903,16 @@ textarea.pp-input { resize: vertical; min-height: 84px; }
 .st-price__sep { color: var(--dash-text-muted); }
 .st-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--dash-border); border-radius: 10px; background: #fff; font-size: 14px; color: var(--dash-text); font-family: inherit; }
 .st-input:focus { outline: none; border-color: var(--dash-primary); }
+
+/* ---- Store: price slider + filter chips ---- */
+.st-range { position: relative; padding: 6px 4px 0; }
+.st-range__track { position: relative; height: 5px; border-radius: 999px; background: var(--dash-border); }
+.st-range__fill { position: absolute; top: 0; bottom: 0; background: var(--dash-primary); border-radius: 999px; }
+.st-range__input { position: absolute; left: 0; right: 0; top: 0; width: 100%; height: 5px; margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none; }
+.st-range__input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; pointer-events: auto; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 3px solid var(--dash-primary); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+.st-range__input::-moz-range-thumb { pointer-events: auto; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 3px solid var(--dash-primary); cursor: pointer; }
+.st-range__readout { margin-top: 12px; font-size: 13px; font-weight: 700; color: var(--dash-text); text-align: center; }
+
+.st-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.st-chip { display: inline-flex; align-items: center; gap: 6px; background: color-mix(in srgb, var(--dash-primary) 12%, #fff); color: var(--dash-text); border: 1px solid color-mix(in srgb, var(--dash-primary) 35%, transparent); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s ease; }
+.st-chip:hover { background: color-mix(in srgb, var(--dash-primary) 20%, #fff); }

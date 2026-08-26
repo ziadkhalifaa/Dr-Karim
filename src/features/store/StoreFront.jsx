@@ -101,6 +101,44 @@ function CartDrawer({ open, onClose }) {
   );
 }
 
+const PRICE_FLOOR = 0;
+const PRICE_CEIL = 10000;
+const PRICE_STEP = 50;
+
+function PriceSlider({ low, high, onChange }) {
+  const lo = Math.min(Number(low) || PRICE_FLOOR, Number(high) || PRICE_CEIL);
+  const hi = Math.max(Number(high) || PRICE_CEIL, lo);
+  const pct = (v) => ((v - PRICE_FLOOR) / (PRICE_CEIL - PRICE_FLOOR)) * 100;
+  return (
+    <div className="st-range">
+      <div className="st-range__track">
+        <div className="st-range__fill" style={{ left: `${pct(lo)}%`, right: `${100 - pct(hi)}%` }} />
+      </div>
+      <input
+        type="range"
+        className="st-range__input st-range__input--lo"
+        min={PRICE_FLOOR}
+        max={PRICE_CEIL}
+        step={PRICE_STEP}
+        value={lo}
+        onChange={(e) => onChange(Math.min(Number(e.target.value), hi), hi)}
+        aria-label="أقل سعر"
+      />
+      <input
+        type="range"
+        className="st-range__input st-range__input--hi"
+        min={PRICE_FLOOR}
+        max={PRICE_CEIL}
+        step={PRICE_STEP}
+        value={hi}
+        onChange={(e) => onChange(lo, Math.max(Number(e.target.value), lo))}
+        aria-label="أعلى سعر"
+      />
+      <div className="st-range__readout">{fmt(lo)} — {fmt(hi)}</div>
+    </div>
+  );
+}
+
 export default function StoreFront() {
   const cart = useCart();
   const [categories, setCategories] = useState([]);
@@ -161,6 +199,17 @@ export default function StoreFront() {
   };
   const activeFilterCount =
     selectedCats.length + (priceMin ? 1 : 0) + (priceMax ? 1 : 0) + (inStock ? 1 : 0) + (featuredOnly ? 1 : 0);
+
+  const chips = [];
+  selectedCats.forEach((id) => {
+    const c = categories.find((x) => x.id === id);
+    if (c) chips.push({ key: `cat-${id}`, label: c.name, onClear: () => toggleCat(id) });
+  });
+  if (priceMin) chips.push({ key: "pmin", label: `من ${fmt(Number(priceMin))}`, onClear: () => setPriceMin("") });
+  if (priceMax) chips.push({ key: "pmax", label: `إلى ${fmt(Number(priceMax))}`, onClear: () => setPriceMax("") });
+  if (inStock) chips.push({ key: "stock", label: "متوفر فقط", onClear: () => setInStock(false) });
+  if (featuredOnly) chips.push({ key: "feat", label: "المميز فقط", onClear: () => setFeaturedOnly(false) });
+  if (search.trim()) chips.push({ key: "search", label: `بحث: ${search.trim()}`, onClear: () => setSearch("") });
 
   useEffect(() => {
     if (toast) {
@@ -226,11 +275,14 @@ export default function StoreFront() {
           </label>
 
           <div className="st-side__title" style={{ marginTop: 18 }}>نطاق السعر (ج)</div>
-          <div className="st-price-range">
-            <input className="st-input" type="number" min="0" inputMode="numeric" placeholder="من" value={priceMin} onChange={(e) => setPriceMin(e.target.value)} />
-            <span className="st-price__sep">—</span>
-            <input className="st-input" type="number" min="0" inputMode="numeric" placeholder="إلى" value={priceMax} onChange={(e) => setPriceMax(e.target.value)} />
-          </div>
+          <PriceSlider
+            low={priceMin ? Number(priceMin) : PRICE_FLOOR}
+            high={priceMax ? Number(priceMax) : PRICE_CEIL}
+            onChange={(lo, hi) => {
+              setPriceMin(lo > PRICE_FLOOR ? String(lo) : "");
+              setPriceMax(hi < PRICE_CEIL ? String(hi) : "");
+            }}
+          />
 
           <div className="st-side__title" style={{ marginTop: 18 }}>التصنيفات</div>
           <label className="st-check">
@@ -262,6 +314,15 @@ export default function StoreFront() {
             <div className="st-noresults">لا توجد منتجات مطابقة لبحثك.</div>
           ) : (
             <>
+              {chips.length > 0 && (
+                <div className="st-chips">
+                  {chips.map((c) => (
+                    <button key={c.key} className="st-chip" onClick={c.onClear}>
+                      {c.label} <X size={13} />
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="st-count">{total} منتج</div>
               <div className="st-grid">
                 {products.map((p) => (
