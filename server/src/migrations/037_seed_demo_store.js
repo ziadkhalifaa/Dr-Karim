@@ -115,7 +115,7 @@ async function seed(queryInterface) {
     sku: `SKU-${p.lock}`,
     status: "active",
     featured: p.featured,
-    images: JSON.stringify([IMG(p.img, p.lock)]),
+    images_json: JSON.stringify([IMG(p.img, p.lock)]),
     weight_grams: p.weight,
     sort_order: p.lock,
     created_at: now(),
