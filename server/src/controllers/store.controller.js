@@ -272,13 +272,17 @@ export async function reviewPayment(req, res, next) {
 /* TEMP DEBUG: removed after diagnosing seed */
 export async function debugSeed(req, res) {
   try {
-    const qi = models.sequelize.queryInterface;
     const tenantId = 1;
-    const [cats] = await models.sequelize.query("SELECT id, slug FROM product_category WHERE tenant_id = ?", { replacements: [tenantId] });
-    const catId = (s) => cats.find((c) => c.slug === s)?.id;
-    const row = {
+    const { Product, ProductCategory } = models;
+    const out = {};
+    const [cat] = await ProductCategory.findOrCreate({
+      where: { tenant_id: tenantId, slug: "vitamins" },
+      defaults: { tenant_id: tenantId, name: "فيتامينات", slug: "vitamins", description: "dbg", active: true, sort_order: 2 },
+    });
+    out.catId = cat.id;
+    const p = await Product.create({
       tenant_id: tenantId,
-      category_id: catId("vitamins"),
+      category_id: cat.id,
       name: "DEBUG",
       slug: "debug-product-xyz",
       short_description: "x",
@@ -289,15 +293,14 @@ export async function debugSeed(req, res) {
       stock_quantity: 1,
       sku: "SKU-DBG",
       status: "active",
-      featured: 0,
-      images_json: JSON.stringify(["https://loremflickr.com/600/600/vitamin,pills?lock=13"]),
+      featured: false,
+      images: ["https://loremflickr.com/600/600/vitamin,pills?lock=13"],
       weight_grams: 60,
       sort_order: 1,
-      created_at: new Date(),
-      updated_at: new Date(),
-    };
-    await qi.bulkInsert("product", [row]);
-    return res.status(200).json({ ok: true });
+    });
+    out.productId = p.id;
+    out.images = p.images;
+    return res.status(200).json({ ok: true, out });
   } catch (err) {
     return res.status(200).json({ error: String(err?.message || err), stack: err?.stack });
   }
