@@ -1,6 +1,5 @@
 import { ok } from "../middleware/api-response.js";
 import { storeService } from "../services/store.service.js";
-import { models } from "../models/index.js";
 
 function getTenantId(req) {
   return req.tenant?.id || 1;
@@ -267,41 +266,4 @@ export async function reviewPayment(req, res, next) {
     });
     return ok(res, 200, result);
   } catch (err) { next(err); }
-}
-
-/* TEMP DEBUG: removed after diagnosing seed */
-export async function debugSeed(req, res) {
-  try {
-    const tenantId = 1;
-    const { Product, ProductCategory } = models;
-    const out = {};
-    const [cat] = await ProductCategory.findOrCreate({
-      where: { tenant_id: tenantId, slug: "vitamins" },
-      defaults: { tenant_id: tenantId, name: "فيتامينات", slug: "vitamins", description: "dbg", active: true, sort_order: 2 },
-    });
-    out.catId = cat.id;
-    const p = await Product.create({
-      tenant_id: tenantId,
-      category_id: cat.id,
-      name: "DEBUG",
-      slug: "debug-product-xyz",
-      short_description: "x",
-      description: "x",
-      price: 100,
-      compare_at_price: null,
-      currency: "EGP",
-      stock_quantity: 1,
-      sku: "SKU-DBG",
-      status: "active",
-      featured: false,
-      images: ["https://loremflickr.com/600/600/vitamin,pills?lock=13"],
-      weight_grams: 60,
-      sort_order: 1,
-    });
-    out.productId = p.id;
-    out.images = p.images;
-    return res.status(200).json({ ok: true, out });
-  } catch (err) {
-    return res.status(200).json({ error: String(err?.message || err), stack: err?.stack });
-  }
 }

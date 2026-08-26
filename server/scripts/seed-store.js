@@ -1,4 +1,6 @@
-import { models } from "../models/index.js";
+// Demo store catalog seed (additive, idempotent by slug).
+// Runs after migrations via src/db-bootstrap.js, where models are ready.
+import { models } from "../src/models/index.js";
 
 const IMG = (keywords, lock) => `https://loremflickr.com/600/600/${keywords}?lock=${lock}`;
 
@@ -20,46 +22,45 @@ const PRODUCTS = [
   { categorySlug: "vitamins", name: "مغنيسيوم معدني", slug: "mineral-magnesium", shortDescription: "مغنيسيوم لاسترخاء العضلات", price: 110, compareAt: null, desc: "مغنيسيوم يدعم استرخاء العضلات ونوماً أفضل ويقلل التشنجات، مثالي لممارسي الرياضة.", weight: 60, img: "magnesium,pills", lock: 18, featured: 0 },
 ];
 
-export async function up() {
-  try {
-    const tenantId = 1;
-    const { Product, ProductCategory } = models;
-    const cnt = await Product.count({ where: { tenant_id: tenantId } });
-    if (cnt > 0) return; // already seeded
+export async function runStoreSeed() {
+  const tenantId = 1;
+  const { Product, ProductCategory } = models;
 
-    const catMap = {};
-    for (const c of CATS) {
-      const [row] = await ProductCategory.findOrCreate({
-        where: { tenant_id: tenantId, slug: c.slug },
-        defaults: { tenant_id: tenantId, name: c.name, slug: c.slug, description: c.description, active: true, sort_order: c.sortOrder },
-      });
-      catMap[c.slug] = row.id;
-    }
+  // clean up any leftover debug product from diagnosis
+  await Product.destroy({ where: { tenant_id: tenantId, slug: "debug-product-xyz" } });
 
-    for (const p of PRODUCTS) {
-      await Product.create({
-        tenant_id: tenantId,
-        category_id: catMap[p.categorySlug],
-        name: p.name,
-        slug: p.slug,
-        short_description: p.shortDescription,
-        description: p.desc,
-        price: p.price,
-        compare_at_price: p.compareAt,
-        currency: "EGP",
-        stock_quantity: 100,
-        sku: `SKU-${p.lock}`,
-        status: "active",
-        featured: !!p.featured,
-        images: [IMG(p.img, p.lock)],
-        weight_grams: p.weight,
-        sort_order: p.lock,
-      });
-    }
-    console.log("[seed] demo store seeded 8 products");
-  } catch (err) {
-    console.error("[seed] 039 demo store seeding skipped:", err?.message || err);
+  const catMap = {};
+  for (const c of CATS) {
+    const [row] = await ProductCategory.findOrCreate({
+      where: { tenant_id: tenantId, slug: c.slug },
+      defaults: { tenant_id: tenantId, name: c.name, slug: c.slug, description: c.description, active: true, sort_order: c.sortOrder },
+    });
+    catMap[c.slug] = row.id;
   }
-}
 
-export async function down() {}
+  let created = 0;
+  for (const p of PRODUCTS) {
+    const existing = await Product.findOne({ where: { tenant_id: tenantId, slug: p.slug } });
+    if (existing) continue;
+    await Product.create({
+      tenant_id: tenantId,
+      category_id: catMap[p.categorySlug],
+      name: p.name,
+      slug: p.slug,
+      short_description: p.shortDescription,
+      description: p.desc,
+      price: p.price,
+      compare_at_price: p.compareAt,
+      currency: "EGP",
+      stock_quantity: 100,
+      sku: `SKU-${p.lock}`,
+      status: "active",
+      featured: !!p.featured,
+      images: [IMG(p.img, p.lock)],
+      weight_grams: p.weight,
+      sort_order: p.lock,
+    });
+    created += 1;
+  }
+  console.log(`store seed: ${created} products created.`);
+}
