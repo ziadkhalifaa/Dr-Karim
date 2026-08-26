@@ -5,8 +5,7 @@ const IMG = (keywords, lock) => `https://loremflickr.com/600/600/${keywords}?loc
 
 export async function up(queryInterface) {
   const sequelize = queryInterface.sequelize;
-  const [tenants] = await sequelize.query("SELECT id FROM tenants WHERE slug = 'dr-kareem' LIMIT 1");
-  const tenantId = tenants[0]?.id || 1;
+  const tenantId = 1; // store resolves to tenant_id 1 by default
 
   const [existing] = await sequelize.query(
     "SELECT COUNT(*) AS c FROM product WHERE tenant_id = ?",
@@ -119,8 +118,7 @@ export async function up(queryInterface) {
 
 export async function down(queryInterface) {
   const sequelize = queryInterface.sequelize;
-  const [tenants] = await sequelize.query("SELECT id FROM tenants WHERE slug = 'dr-kareem' LIMIT 1");
-  const tenantId = tenants[0]?.id || 1;
+  const tenantId = 1;
   await sequelize.query("DELETE FROM product WHERE tenant_id = ?", { replacements: [tenantId] });
   await sequelize.query("DELETE FROM product_category WHERE tenant_id = ?", { replacements: [tenantId] });
 }
