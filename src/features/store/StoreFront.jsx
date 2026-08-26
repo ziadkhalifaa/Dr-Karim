@@ -108,7 +108,11 @@ export default function StoreFront() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [activeCat, setActiveCat] = useState(null);
+  const [selectedCats, setSelectedCats] = useState([]);
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+  const [inStock, setInStock] = useState(false);
+  const [featuredOnly, setFeaturedOnly] = useState(false);
   const [sort, setSort] = useState("popular");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [toast, setToast] = useState(false);
@@ -119,7 +123,11 @@ export default function StoreFront() {
     try {
       const qs = new URLSearchParams();
       if (search.trim()) qs.set("search", search.trim());
-      if (activeCat) qs.set("category", activeCat);
+      if (selectedCats.length) qs.set("category", selectedCats.join(","));
+      if (priceMin) qs.set("priceMin", priceMin);
+      if (priceMax) qs.set("priceMax", priceMax);
+      if (inStock) qs.set("inStock", "1");
+      if (featuredOnly) qs.set("featured", "1");
       qs.set("sort", sort);
       const res = await storeApi.products("?" + qs.toString());
       setProducts(res.products || []);
@@ -129,7 +137,7 @@ export default function StoreFront() {
     } finally {
       setLoading(false);
     }
-  }, [search, activeCat, sort]);
+  }, [search, selectedCats, priceMin, priceMax, inStock, featuredOnly, sort]);
 
   useEffect(() => {
     storeApi.categories().then((r) => setCategories(r.categories || [])).catch(() => {});
@@ -139,6 +147,20 @@ export default function StoreFront() {
     const t = setTimeout(loadProducts, 250);
     return () => clearTimeout(t);
   }, [loadProducts]);
+
+  const toggleCat = (id) =>
+    setSelectedCats((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
+  const clearFilters = () => {
+    setSelectedCats([]);
+    setPriceMin("");
+    setPriceMax("");
+    setInStock(false);
+    setFeaturedOnly(false);
+    setSearch("");
+    setSort("popular");
+  };
+  const activeFilterCount =
+    selectedCats.length + (priceMin ? 1 : 0) + (priceMax ? 1 : 0) + (inStock ? 1 : 0) + (featuredOnly ? 1 : 0);
 
   useEffect(() => {
     if (toast) {
@@ -156,9 +178,6 @@ export default function StoreFront() {
     <div className="st-page">
       <header className="st-header">
         <div className="st-header__inner">
-          <button className="st-logo" onClick={() => navigate("/")}>
-            <img src="/assets/logo.png" alt="د. كريم الليثي" />
-          </button>
           <div className="st-search">
             <Search size={18} />
             <input
@@ -190,20 +209,42 @@ export default function StoreFront() {
 
       <div className="st-layout">
         <aside className="st-side">
-          <div className="st-side__title">التصنيفات</div>
-          <button className={`st-cat ${!activeCat ? "is-active" : ""}`} onClick={() => setActiveCat(null)}>
-            كل المنتجات
-          </button>
+          <div className="st-side__head">
+            <div className="st-side__title">تصفية متقدمة</div>
+            {activeFilterCount > 0 && (
+              <button className="st-clear" onClick={clearFilters}>مسح ({activeFilterCount})</button>
+            )}
+          </div>
+
+          <label className="st-check">
+            <input type="checkbox" checked={featuredOnly} onChange={(e) => setFeaturedOnly(e.target.checked)} />
+            <span>⭐ المميز فقط</span>
+          </label>
+          <label className="st-check">
+            <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} />
+            <span>✅ المتوفر فقط</span>
+          </label>
+
+          <div className="st-side__title" style={{ marginTop: 18 }}>نطاق السعر (ج)</div>
+          <div className="st-price-range">
+            <input className="st-input" type="number" min="0" inputMode="numeric" placeholder="من" value={priceMin} onChange={(e) => setPriceMin(e.target.value)} />
+            <span className="st-price__sep">—</span>
+            <input className="st-input" type="number" min="0" inputMode="numeric" placeholder="إلى" value={priceMax} onChange={(e) => setPriceMax(e.target.value)} />
+          </div>
+
+          <div className="st-side__title" style={{ marginTop: 18 }}>التصنيفات</div>
+          <label className="st-check">
+            <input type="checkbox" checked={selectedCats.length === 0} onChange={() => setSelectedCats([])} />
+            <span>كل المنتجات</span>
+          </label>
           {categories.map((c) => (
-            <button
-              key={c.id}
-              className={`st-cat ${activeCat === c.id ? "is-active" : ""}`}
-              onClick={() => setActiveCat(c.id)}
-            >
-              {c.name}
-            </button>
+            <label key={c.id} className="st-check">
+              <input type="checkbox" checked={selectedCats.includes(c.id)} onChange={() => toggleCat(c.id)} />
+              <span>{c.name}</span>
+            </label>
           ))}
-          <div className="st-side__title" style={{ marginTop: 22 }}>ترتيب حسب</div>
+
+          <div className="st-side__title" style={{ marginTop: 18 }}>ترتيب حسب</div>
           <select className="st-select" value={sort} onChange={(e) => setSort(e.target.value)}>
             <option value="popular">الأكثر تميزاً</option>
             <option value="newest">الأحدث</option>

@@ -65,12 +65,12 @@ export default function App() {
   if (path === "/terms") return <PublicSite><ContentPage title="شروط الاستخدام" slug="terms-of-use" /></PublicSite>;
   if (path === "/faq") return <PublicSite><ContentPage title="الأسئلة الشائعة" slug="faq" /></PublicSite>;
 
-  if (path === "/store") return <PublicSite><CartProvider><StoreFront /></CartProvider></PublicSite>;
+  if (path === "/store") return <PublicSite><Header /><CartProvider><StoreFront /></CartProvider><Footer /></PublicSite>;
   if (path.startsWith("/store/")) {
     const slug = decodeURIComponent(path.replace("/store/", ""));
-    return <PublicSite><CartProvider><ProductDetail slug={slug} /></CartProvider></PublicSite>;
+    return <PublicSite><Header /><CartProvider><ProductDetail slug={slug} /></CartProvider><Footer /></PublicSite>;
   }
-  if (path === "/checkout") return <PublicSite><CartProvider><Checkout /></CartProvider></PublicSite>;
+  if (path === "/checkout") return <PublicSite><Header /><CartProvider><Checkout /></CartProvider><Footer /></PublicSite>;
 
   return (
     <PublicSite>

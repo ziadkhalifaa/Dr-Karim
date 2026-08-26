@@ -1891,3 +1891,15 @@ textarea.pp-input { resize: vertical; min-height: 84px; }
 .st-card--home { box-shadow: 0 4px 16px rgba(15,23,42,0.06); }
 .st-card__buy { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 800; color: var(--dash-primary); white-space: nowrap; }
 .st-card--home:hover .st-card__buy { gap: 8px; transition: gap .18s ease; }
+
+/* ---- Store: header offset + advanced filters ---- */
+.st-header { top: 80px; }
+.st-side__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.st-clear { background: none; border: none; color: var(--dash-primary); font-size: 12.5px; font-weight: 800; cursor: pointer; padding: 0; }
+.st-check { display: flex; align-items: center; gap: 9px; padding: 7px 0; font-size: 14px; color: var(--dash-text); cursor: pointer; }
+.st-check input { width: 17px; height: 17px; accent-color: var(--dash-primary); cursor: pointer; }
+.st-price-range { display: flex; align-items: center; gap: 8px; }
+.st-price-range .st-input { flex: 1; min-width: 0; }
+.st-price__sep { color: var(--dash-text-muted); }
+.st-input { width: 100%; padding: 10px 12px; border: 1.5px solid var(--dash-border); border-radius: 10px; background: #fff; font-size: 14px; color: var(--dash-text); font-family: inherit; }
+.st-input:focus { outline: none; border-color: var(--dash-primary); }

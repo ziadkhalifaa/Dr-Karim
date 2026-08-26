@@ -14,11 +14,15 @@ export async function publicProducts(req, res, next) {
   try {
     const tenantId = getTenantId(req);
     const q = req.query;
+    const cats = q.category ? String(q.category).split(",").map(Number).filter(Boolean) : null;
     const result = await storeService.listProducts(tenantId, {
       status: "active",
       search: q.search || undefined,
-      categoryId: q.category ? Number(q.category) : undefined,
+      categoryIds: cats && cats.length ? cats : undefined,
       featured: q.featured === "1" || q.featured === "true" ? true : undefined,
+      priceMin: q.priceMin || undefined,
+      priceMax: q.priceMax || undefined,
+      inStock: q.inStock === "1" || q.inStock === "true" || q.inStock === "on" ? true : undefined,
       sort: q.sort || undefined,
       page: q.page ? Number(q.page) : 1,
       limit: q.limit ? Number(q.limit) : 24,

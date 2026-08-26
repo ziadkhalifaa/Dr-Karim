@@ -104,11 +104,28 @@ function serializeProduct(p, categoryName = null) {
   };
 }
 
-export async function listProducts(tenantId, { status, search, categoryId, featured, sort, page = 1, limit = 24 } = {}) {
+export async function listProducts(tenantId, { status, search, categoryId, categoryIds, featured, priceMin, priceMax, inStock, sort, page = 1, limit = 24 } = {}) {
   const where = { tenant_id: tenantId };
   if (status) where.status = status;
   if (featured !== undefined) where.featured = featured;
-  if (categoryId) where.category_id = categoryId;
+
+  const catArr = Array.isArray(categoryIds) && categoryIds.length
+    ? categoryIds.map(Number).filter(Boolean)
+    : categoryId
+      ? [Number(categoryId)].filter(Boolean)
+      : null;
+  if (catArr && catArr.length) where.category_id = { [Op.in]: catArr };
+
+  if (priceMin != null && priceMin !== "" && !Number.isNaN(Number(priceMin))) {
+    where.price = { ...(where.price || {}), [Op.gte]: Number(priceMin) };
+  }
+  if (priceMax != null && priceMax !== "" && !Number.isNaN(Number(priceMax))) {
+    where.price = { ...(where.price || {}), [Op.lte]: Number(priceMax) };
+  }
+  if (inStock) {
+    where[Op.and] = [...(where[Op.and] || []), { stock_quantity: { [Op.gt]: 0 } }];
+  }
+
   if (search) where[Op.or] = [
     { name: { [Op.like]: `%${search}%` } },
     { name_en: { [Op.like]: `%${search}%` } },
