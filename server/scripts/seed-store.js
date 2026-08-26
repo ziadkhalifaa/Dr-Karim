@@ -23,11 +23,12 @@ const PRODUCTS = [
 ];
 
 export async function runStoreSeed() {
-  const tenantId = 1;
-  const { Product, ProductCategory } = models;
+  const { Product, ProductCategory, Tenant } = models;
+  const tenant = await Tenant.findOne({ where: { slug: "dr-kareem" } });
+  const tenantId = tenant?.id || 1;
 
-  // clean up any leftover debug product from diagnosis
-  await Product.destroy({ where: { tenant_id: tenantId, slug: "debug-product-xyz" } });
+  // clean up any leftover debug product from diagnosis (any tenant)
+  await Product.destroy({ where: { slug: "debug-product-xyz" } });
 
   const catMap = {};
   for (const c of CATS) {
@@ -40,8 +41,8 @@ export async function runStoreSeed() {
 
   let created = 0;
   for (const p of PRODUCTS) {
-    const existing = await Product.findOne({ where: { tenant_id: tenantId, slug: p.slug } });
-    if (existing) continue;
+    // remove any orphan (wrong-tenant) demo product with this slug, then create fresh
+    await Product.destroy({ where: { slug: p.slug } });
     await Product.create({
       tenant_id: tenantId,
       category_id: catMap[p.categorySlug],
@@ -62,5 +63,5 @@ export async function runStoreSeed() {
     });
     created += 1;
   }
-  console.log(`store seed: ${created} products created.`);
+  console.log(`store seed: ${created} products created (tenant_id=${tenantId}).`);
 }
