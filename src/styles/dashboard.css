@@ -1964,3 +1964,10 @@ textarea.pp-input { resize: vertical; min-height: 84px; }
 .st-rev-card__body { margin: 6px 0 0; font-size: 14px; color: var(--dash-text); line-height: 1.6; }
 .st-rev-card__actions { display: flex; gap: 8px; margin-top: 10px; }
 .st-reply-box { margin-top: 12px; border-top: 1px dashed var(--dash-border); padding-top: 12px; }
+
+.st-verified { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 800; color: #2f8f1f; background: color-mix(in srgb, #2f8f1f 12%, #fff); border: 1px solid color-mix(in srgb, #2f8f1f 30%, #fff); border-radius: 999px; padding: 2px 8px; }
+.st-review__img { border: none; padding: 0; cursor: zoom-in; background: none; }
+
+.st-lightbox { position: fixed; inset: 0; z-index: 2000; background: rgba(8,15,25,.82); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.st-lightbox img { max-width: 92vw; max-height: 90vh; border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.st-lightbox__close { position: absolute; top: 18px; right: 18px; width: 42px; height: 42px; border-radius: 50%; border: none; background: rgba(255,255,255,.15); color: #fff; font-size: 24px; cursor: pointer; }

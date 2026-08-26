@@ -25,6 +25,7 @@ export default function ProductDetail({ slug }) {
   const [reviewSending, setReviewSending] = useState(false);
   const [myFiles, setMyFiles] = useState([]);
   const [myFilePreviews, setMyFilePreviews] = useState([]);
+  const [lightbox, setLightbox] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -180,14 +181,15 @@ export default function ProductDetail({ slug }) {
                 <div className="st-review__head">
                   <span className="st-card__stars">{"★".repeat(rv.rating)}{"☆".repeat(5 - rv.rating)}</span>
                   <strong>{rv.authorName}</strong>
+                  <span className="st-verified" title="تقييم من مشتري موثّق">✓ شراء موثّق</span>
                 </div>
                 {rv.comment && <p className="st-review__body">{rv.comment}</p>}
                 {rv.images?.length > 0 && (
                   <div className="st-review__imgs">
                     {rv.images.map((img, i) => (
-                      <a key={i} href={img.url} target="_blank" rel="noreferrer" className="st-review__img">
+                      <button key={i} type="button" className="st-review__img" onClick={() => setLightbox(img.url)}>
                         <img src={img.url} alt="" loading="lazy" />
-                      </a>
+                      </button>
                     ))}
                   </div>
                 )}
@@ -257,6 +259,13 @@ export default function ProductDetail({ slug }) {
           <p className="st-reviews__note">سجّل الدخول كمريض لتتمكن من تقييم المنتجات التي اشتريتها.</p>
         )}
       </section>
+
+      {lightbox && (
+        <div className="st-lightbox" onClick={() => setLightbox(null)}>
+          <button className="st-lightbox__close" onClick={() => setLightbox(null)}>×</button>
+          <img src={lightbox} alt="" />
+        </div>
+      )}
 
       {related.length > 0 && (
         <div className="st-related">
