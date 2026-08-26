@@ -11,6 +11,7 @@ import MedicalTipsSection from "./components/MedicalTipsSection";
 import TestimonialsSection from "./components/TestimonialsSection";
 import WarningSection from "./components/WarningSection";
 import PackagesSection from "./components/PackagesSection";
+import StoreSection from "./components/StoreSection";
 import Footer from "./components/Footer";
 import { useRoute } from "./lib/router";
 import AssessmentPage from "./features/assessment/pages/AssessmentPage";
@@ -83,6 +84,7 @@ export default function App() {
         <CareSection />
         <ServicesSection />
         <PackagesSection />
+        <StoreSection />
         <MedicalTipsSection />
         <TestimonialsSection />
         <WarningSection />
