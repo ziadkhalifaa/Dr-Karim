@@ -1,6 +1,5 @@
 import { ok } from "../middleware/api-response.js";
 import { storeService } from "../services/store.service.js";
-import { models } from "../models/index.js";
 
 function getTenantId(req) {
   return req.tenant?.id || 1;
@@ -267,12 +266,4 @@ export async function reviewPayment(req, res, next) {
     });
     return ok(res, 200, result);
   } catch (err) { next(err); }
-}
-
-/* TEMP DIAG */
-export async function diag(req, res) {
-  const seq = models.Product.sequelize;
-  const [byTenant] = await seq.query("SELECT tenant_id, COUNT(*) AS c FROM product GROUP BY tenant_id");
-  const [cats] = await seq.query("SELECT tenant_id, COUNT(*) AS c FROM product_category GROUP BY tenant_id");
-  return res.status(200).json({ tenant: req.tenant, byTenant, cats, defaultSlug: process.env.DEFAULT_TENANT_SLUG });
 }

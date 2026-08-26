@@ -35,8 +35,12 @@ export async function ensureDatabaseSync() {
     }
 
     logger.info("db sync starting", { step: "scripts/seed-store.js" });
-    await runStoreSeed();
-    logger.info("db sync done", { step: "scripts/seed-store.js" });
+    try {
+      await runStoreSeed();
+      logger.info("db sync done", { step: "scripts/seed-store.js" });
+    } catch (storeErr) {
+      logger.error("store seed failed — continuing startup", { errorMessage: storeErr.message, stack: storeErr.stack });
+    }
   } catch (err) {
     logger.error("db sync failed", { errorMessage: err.message, stack: err.stack });
     throw err;

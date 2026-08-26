@@ -57,7 +57,7 @@ export async function runStoreSeed() {
       sku: `SKU-${p.lock}`,
       status: "active",
       featured: !!p.featured,
-      images: [IMG(p.img, p.lock)],
+      images_json: [IMG(p.img, p.lock)],
       weight_grams: p.weight,
       sort_order: p.lock,
     });
