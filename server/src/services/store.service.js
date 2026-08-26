@@ -1,13 +1,9 @@
 import { Op } from "sequelize";
 import { sequelize } from "../config/database.js";
-import {
-  Product,
-  ProductCategory,
-  StoreOrder,
-  StoreOrderItem,
-  StorePayment,
-} from "../models/index.js";
+import { models } from "../models/index.js";
 import { AppError } from "../utils/errors.js";
+
+const { Product, ProductCategory, StoreOrder, StoreOrderItem, StorePayment } = models;
 
 function slugify(input, fallback = "") {
   const s = String(input || "")
