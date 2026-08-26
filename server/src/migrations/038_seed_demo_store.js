@@ -4,14 +4,15 @@ const now = () => new Date();
 const IMG = (keywords, lock) => `https://loremflickr.com/600/600/${keywords}?lock=${lock}`;
 
 export async function up(queryInterface) {
-  const sequelize = queryInterface.sequelize;
-  const tenantId = 1; // store resolves to tenant_id 1 by default
+  try {
+    const sequelize = queryInterface.sequelize;
+    const tenantId = 1; // store resolves to tenant_id 1 by default
 
-  const [existing] = await sequelize.query(
-    "SELECT COUNT(*) AS c FROM product WHERE tenant_id = ?",
-    { replacements: [tenantId] }
-  );
-  if (Number(existing[0]?.c) > 0) return; // already seeded
+    const [existing] = await sequelize.query(
+      "SELECT COUNT(*) AS c FROM product WHERE tenant_id = ?",
+      { replacements: [tenantId] }
+    );
+    if (Number(existing[0]?.c) > 0) return; // already seeded
 
   const cats = [
     { name: "مكملات غذائية", slug: "supplements", description: "بروتين ومكملات لدعم اللياقة", active: 1, sortOrder: 1 },
@@ -76,6 +77,9 @@ export async function up(queryInterface) {
     updated_at: now(),
   }));
   await queryInterface.bulkInsert("product", prodRows);
+  } catch (err) {
+    console.error("[seed] demo store seeding (038) skipped:", err?.message || err);
+  }
 }
 
 export async function down(queryInterface) {
