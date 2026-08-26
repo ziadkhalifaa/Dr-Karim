@@ -9,7 +9,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function runFoodSeed() {
   await sequelize.authenticate();
-  await FoodItem.sync({ alter: true });
+  // Schema (including macros_json) is managed by migrations — no model.sync here,
+  // because altering the production food_item table triggers "Too many keys".
 
   const data = JSON.parse(fs.readFileSync(path.join(__dirname, "food_seed.json"), "utf8"));
 
