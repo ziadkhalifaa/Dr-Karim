@@ -172,6 +172,8 @@ export const storeApi = {
   categories: () => api.get("/store/categories"),
   products: (query = "") => api.get(`/store/products${query}`),
   product: (slug) => api.get(`/store/products/${slug}`),
+  reviews: (slug) => api.get(`/store/products/${slug}/reviews`),
+  addReview: (slug, body) => api.post(`/store/products/${slug}/reviews`, body),
   checkout: (body) => api.post("/store/checkout", body),
   pay: (orderId, body) => api.post(`/store/orders/${orderId}/payment`, body),
   // Doctor management

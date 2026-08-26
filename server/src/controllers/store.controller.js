@@ -20,6 +20,8 @@ export async function publicProducts(req, res, next) {
       search: q.search || undefined,
       categoryIds: cats && cats.length ? cats : undefined,
       featured: q.featured === "1" || q.featured === "true" ? true : undefined,
+      freeShipping: q.freeShipping === "1" || q.freeShipping === "true" || q.freeShipping === "on" ? true : undefined,
+      ratingMin: q.rating || undefined,
       priceMin: q.priceMin || undefined,
       priceMax: q.priceMax || undefined,
       inStock: q.inStock === "1" || q.inStock === "true" || q.inStock === "on" ? true : undefined,
@@ -47,6 +49,46 @@ export async function publicProduct(req, res, next) {
   } catch (err) { next(err); }
 }
 
+export async function getReviews(req, res, next) {
+  try {
+    const tenantId = getTenantId(req);
+    const product = await storeService.getProductBySlug(tenantId, req.params.slug);
+    const reviews = await storeService.listReviews(tenantId, product.id);
+    return ok(res, 200, { reviews });
+  } catch (err) { next(err); }
+}
+
+export async function postReview(req, res, next) {
+  try {
+    const tenantId = getTenantId(req);
+    const product = await storeService.getProductBySlug(tenantId, req.params.slug);
+    const review = await storeService.createReview(tenantId, product.id, req.auth.user.id, {
+      rating: req.body?.rating,
+      comment: req.body?.comment,
+      orderId: req.body?.orderId,
+    });
+    return ok(res, 201, { review });
+  } catch (err) { next(err); }
+}
+
+export async function doctorReviews(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const reviews = await storeService.listAllReviews(tenantId);
+    return ok(res, 200, { reviews });
+  } catch (err) { next(err); }
+}
+
+export async function deleteReview(req, res, next) {
+  try {
+    requireDoctor(req.auth);
+    const tenantId = getTenantId(req);
+    const result = await storeService.deleteReview(tenantId, req.params.id);
+    return ok(res, 200, result);
+  } catch (err) { next(err); }
+}
+
 export async function checkout(req, res, next) {
   try {
     const tenantId = getTenantId(req);
@@ -55,7 +97,11 @@ export async function checkout(req, res, next) {
     if (req.auth?.membership?.role === "patient" && req.body?.patientId) {
       patientId = req.body.patientId;
     }
-    const order = await storeService.createOrder(tenantId, { ...req.body, patientId });
+    const order = await storeService.createOrder(tenantId, {
+      ...req.body,
+      patientId,
+      userId: req.auth?.user?.id,
+    });
     return ok(res, 201, { order });
   } catch (err) { next(err); }
 }

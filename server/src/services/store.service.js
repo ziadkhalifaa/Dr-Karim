@@ -3,7 +3,7 @@ import { sequelize } from "../config/database.js";
 import { models } from "../models/index.js";
 import { AppError } from "../utils/errors.js";
 
-const { Product, ProductCategory, StoreOrder, StoreOrderItem, StorePayment } = models;
+const { Product, ProductCategory, StoreOrder, StoreOrderItem, StorePayment, ProductReview, Patient } = models;
 
 function slugify(input, fallback = "") {
   const s = String(input || "")
@@ -20,6 +20,21 @@ function num(v, d = 0) {
   const n = Number(v);
   return Number.isFinite(n) ? n : d;
 }
+
+const RATING_ATTRS = [
+  [
+    sequelize.literal(
+      "(SELECT COALESCE(ROUND(AVG(rating),1),0) FROM product_review WHERE product_review.product_id = product.id AND product_review.status = 'approved')"
+    ),
+    "avgRating",
+  ],
+  [
+    sequelize.literal(
+      "(SELECT COUNT(*) FROM product_review WHERE product_review.product_id = product.id AND product_review.status = 'approved')"
+    ),
+    "reviewCount",
+  ],
+];
 
 /* ============================ CATEGORIES ============================ */
 export async function listCategories(tenantId, { onlyActive = false } = {}) {
@@ -99,15 +114,18 @@ function serializeProduct(p, categoryName = null) {
     primaryImage: images[0]?.url || images[0] || null,
     weightGrams: p.weight_grams != null ? num(p.weight_grams) : null,
     sortOrder: num(p.sort_order),
+    avgRating: p.avgRating != null ? Number(p.avgRating) : 0,
+    reviewCount: p.reviewCount != null ? Number(p.reviewCount) : 0,
     createdAt: p.created_at,
     updatedAt: p.updated_at,
   };
 }
 
-export async function listProducts(tenantId, { status, search, categoryId, categoryIds, featured, priceMin, priceMax, inStock, sort, page = 1, limit = 24 } = {}) {
+export async function listProducts(tenantId, { status, search, categoryId, categoryIds, featured, priceMin, priceMax, inStock, freeShipping, ratingMin, sort, page = 1, limit = 24 } = {}) {
   const where = { tenant_id: tenantId };
   if (status) where.status = status;
   if (featured !== undefined) where.featured = featured;
+  if (freeShipping) where.free_shipping = true;
 
   const catArr = Array.isArray(categoryIds) && categoryIds.length
     ? categoryIds.map(Number).filter(Boolean)
@@ -124,6 +142,14 @@ export async function listProducts(tenantId, { status, search, categoryId, categ
   }
   if (inStock) {
     where[Op.and] = [...(where[Op.and] || []), { stock_quantity: { [Op.gt]: 0 } }];
+  }
+  if (ratingMin != null && ratingMin !== "" && !Number.isNaN(Number(ratingMin))) {
+    const [rows] = await sequelize.query(
+      `SELECT product_id FROM product_review WHERE tenant_id = :tid AND status = 'approved' GROUP BY product_id HAVING AVG(rating) >= :rm`,
+      { replacements: { tid: tenantId, rm: Number(ratingMin) }, type: sequelize.QueryTypes.SELECT }
+    );
+    const ids = (rows || []).map((r) => r.product_id);
+    where.id = { [Op.in]: ids.length ? ids : [0] };
   }
 
   if (search) where[Op.or] = [
@@ -144,6 +170,7 @@ export async function listProducts(tenantId, { status, search, categoryId, categ
     order,
     limit: Number(limit),
     offset,
+    attributes: { include: RATING_ATTRS },
     include: [{ model: ProductCategory, as: "category", attributes: ["name"], required: false }],
   });
   return {
@@ -175,6 +202,7 @@ export async function listAllProducts(tenantId) {
 export async function getProductBySlug(tenantId, slug) {
   const p = await Product.findOne({
     where: { tenant_id: tenantId, slug },
+    attributes: { include: RATING_ATTRS },
     include: [{ model: ProductCategory, as: "category", attributes: ["name", "slug"], required: false }],
   });
   if (!p) throw new AppError(404, "NOT_FOUND", "المنتج غير موجود");
@@ -250,6 +278,83 @@ export async function deleteProduct(tenantId, id) {
   return { deleted: true };
 }
 
+/* ============================ REVIEWS (purchase-verified) ============================ */
+function serializeReview(r) {
+  return {
+    id: String(r.id),
+    rating: Number(r.rating),
+    comment: r.comment || "",
+    authorName: r.author ? r.author.full_name : "مريض موثّق",
+    status: r.status,
+    createdAt: r.created_at,
+  };
+}
+
+export async function listReviews(tenantId, productId) {
+  const rows = await ProductReview.findAll({
+    where: { tenant_id: tenantId, product_id: productId, status: "approved" },
+    order: [["created_at", "DESC"]],
+    include: [{ model: Patient, attributes: ["full_name"], required: false, as: "author" }],
+  });
+  return rows.map(serializeReview);
+}
+
+export async function createReview(tenantId, productId, userId, { rating, comment, orderId } = {}) {
+  const r = Math.floor(Number(rating));
+  if (!r || r < 1 || r > 5) throw new AppError(422, "VALIDATION_ERROR", "التقييم يجب أن يكون من 1 إلى 5");
+
+  const purchaseWhere = { tenant_id: tenantId, user_id: userId, status: "paid" };
+  if (orderId) purchaseWhere.id = Number(orderId);
+  const orders = await StoreOrder.findAll({
+    where: purchaseWhere,
+    include: [{ model: StoreOrderItem, where: { product_id: productId }, required: true, as: "items" }],
+    limit: 1,
+  });
+  if (!orders.length) {
+    throw new AppError(409, "NOT_PURCHASED", "يمكن فقط للمرضى الذين اشتروا المنتج تقييمه");
+  }
+  const order = orders[0];
+
+  const [review, created] = await ProductReview.findOrCreate({
+    where: { product_id: productId, user_id: userId },
+    defaults: {
+      tenant_id: tenantId,
+      product_id: productId,
+      user_id: userId,
+      order_id: order.id,
+      patient_id: order.patient_id || null,
+      rating: r,
+      comment: comment ? String(comment).slice(0, 2000) : null,
+      status: "approved",
+    },
+  });
+  if (!created) {
+    review.rating = r;
+    review.comment = comment ? String(comment).slice(0, 2000) : null;
+    await review.save();
+  }
+  return serializeReview(review);
+}
+
+export async function listAllReviews(tenantId) {
+  const rows = await ProductReview.findAll({
+    where: { tenant_id: tenantId },
+    order: [["created_at", "DESC"]],
+    include: [
+      { model: Product, attributes: ["name"], required: false, as: "product" },
+      { model: Patient, attributes: ["full_name"], required: false, as: "author" },
+    ],
+  });
+  return rows.map((r) => ({ ...serializeReview(r), productName: r.product ? r.product.name : null }));
+}
+
+export async function deleteReview(tenantId, id) {
+  const r = await ProductReview.findOne({ where: { id, tenant_id: tenantId } });
+  if (!r) throw new AppError(404, "NOT_FOUND", "التقييم غير موجود");
+  await r.destroy();
+  return { deleted: true };
+}
+
 /* ============================ CHECKOUT / ORDERS ============================ */
 function genOrderNumber() {
   const d = new Date();
@@ -306,6 +411,7 @@ export async function createOrder(tenantId, payload) {
       subtotal,
       currency: "EGP",
       status: "pending_payment",
+      user_id: payload.userId ? Number(payload.userId) : null,
     }, { transaction: t });
     await StoreOrderItem.bulkCreate(orderItems.map((i) => ({ ...i, order_id: order.id })), { transaction: t });
     await t.commit();
@@ -462,6 +568,10 @@ export const storeService = {
   updateProduct,
   appendProductImage,
   deleteProduct,
+  listReviews,
+  createReview,
+  listAllReviews,
+  deleteReview,
   createOrder,
   createPayment,
   listOrders,

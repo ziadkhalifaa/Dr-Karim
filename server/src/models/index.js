@@ -69,7 +69,7 @@ const {
   PatientProgress, ProgressMeasurement, PatientProgressGoal, PatientProgressGoalVersion,
 } = GROUP_19;
 const {
-  ProductCategory, Product, StoreOrder, StoreOrderItem, StorePayment,
+  ProductCategory, Product, StoreOrder, StoreOrderItem, StorePayment, ProductReview,
 } = GROUP_20;
 
 // ---- Tenant scope (§7) ----
@@ -361,6 +361,13 @@ StoreOrder.hasMany(StorePayment, { foreignKey: "order_id", as: "payments" });
 StorePayment.belongsTo(StoreOrder, { foreignKey: "order_id" });
 Product.hasMany(StoreOrderItem, { foreignKey: "product_id", as: "orderItems" });
 StoreOrderItem.belongsTo(Product, { foreignKey: "product_id", as: "product" });
+
+// Reviews (purchase-verified, buyers only)
+Product.hasMany(ProductReview, { foreignKey: "product_id", as: "reviews" });
+ProductReview.belongsTo(Product, { foreignKey: "product_id" });
+ProductReview.belongsTo(StoreOrder, { foreignKey: "order_id", as: "order" });
+ProductReview.belongsTo(Patient, { foreignKey: "patient_id", as: "author" });
+StoreOrder.hasMany(ProductReview, { foreignKey: "order_id", as: "reviews" });
 
 export const models = {
   ...sequelize.models,

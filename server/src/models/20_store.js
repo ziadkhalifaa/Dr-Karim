@@ -71,6 +71,7 @@ export const StoreOrder = sequelize.define(
       defaultValue: "pending_payment",
     },
     payment_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
+    user_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
     ...ts,
   },
   { tableName: "store_order", underscored: true }
@@ -113,4 +114,25 @@ export const StorePayment = sequelize.define(
   { tableName: "store_payment", underscored: true }
 );
 
-export const GROUP_20 = { ProductCategory, Product, StoreOrder, StoreOrderItem, StorePayment };
+export const ProductReview = sequelize.define(
+  "product_review",
+  {
+    id: ID,
+    tenant_id: tenant,
+    product_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    user_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    patient_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
+    order_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
+    rating: { type: DataTypes.TINYINT.UNSIGNED, allowNull: false },
+    comment: { type: DataTypes.TEXT, allowNull: true },
+    status: {
+      type: DataTypes.ENUM("pending", "approved", "rejected"),
+      allowNull: false,
+      defaultValue: "approved",
+    },
+    ...ts,
+  },
+  { tableName: "product_review", underscored: true }
+);
+
+export const GROUP_20 = { ProductCategory, Product, StoreOrder, StoreOrderItem, StorePayment, ProductReview };

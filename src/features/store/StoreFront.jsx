@@ -26,6 +26,12 @@ function ProductCard({ product, onOpen, onAdd }) {
       <div className="st-card__body">
         {product.categoryName && <div className="st-card__cat">{product.categoryName}</div>}
         <h3 className="st-card__name">{product.name}</h3>
+        {product.reviewCount > 0 && (
+          <div className="st-card__rate">
+            <span className="st-card__stars">{"★".repeat(Math.round(product.avgRating))}{"☆".repeat(5 - Math.round(product.avgRating))}</span>
+            <span className="st-card__ratecount">({product.reviewCount})</span>
+          </div>
+        )}
         {product.shortDescription && <p className="st-card__desc">{product.shortDescription}</p>}
         <div className="st-card__foot">
           <div className="st-price">
@@ -151,6 +157,8 @@ export default function StoreFront() {
   const [priceMax, setPriceMax] = useState("");
   const [inStock, setInStock] = useState(false);
   const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [ratingMin, setRatingMin] = useState("");
+  const [freeShipping, setFreeShipping] = useState(false);
   const [sort, setSort] = useState("popular");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [toast, setToast] = useState(false);
@@ -166,6 +174,8 @@ export default function StoreFront() {
       if (priceMax) qs.set("priceMax", priceMax);
       if (inStock) qs.set("inStock", "1");
       if (featuredOnly) qs.set("featured", "1");
+      if (ratingMin) qs.set("rating", ratingMin);
+      if (freeShipping) qs.set("freeShipping", "1");
       qs.set("sort", sort);
       const res = await storeApi.products("?" + qs.toString());
       setProducts(res.products || []);
@@ -194,11 +204,13 @@ export default function StoreFront() {
     setPriceMax("");
     setInStock(false);
     setFeaturedOnly(false);
+    setRatingMin("");
+    setFreeShipping(false);
     setSearch("");
     setSort("popular");
   };
   const activeFilterCount =
-    selectedCats.length + (priceMin ? 1 : 0) + (priceMax ? 1 : 0) + (inStock ? 1 : 0) + (featuredOnly ? 1 : 0);
+    selectedCats.length + (priceMin ? 1 : 0) + (priceMax ? 1 : 0) + (inStock ? 1 : 0) + (featuredOnly ? 1 : 0) + (ratingMin ? 1 : 0) + (freeShipping ? 1 : 0);
 
   const chips = [];
   selectedCats.forEach((id) => {
@@ -209,6 +221,8 @@ export default function StoreFront() {
   if (priceMax) chips.push({ key: "pmax", label: `إلى ${fmt(Number(priceMax))}`, onClear: () => setPriceMax("") });
   if (inStock) chips.push({ key: "stock", label: "متوفر فقط", onClear: () => setInStock(false) });
   if (featuredOnly) chips.push({ key: "feat", label: "المميز فقط", onClear: () => setFeaturedOnly(false) });
+  if (ratingMin) chips.push({ key: "rate", label: `${ratingMin}+ نجوم`, onClear: () => setRatingMin("") });
+  if (freeShipping) chips.push({ key: "ship", label: "شحن مجاني", onClear: () => setFreeShipping(false) });
   if (search.trim()) chips.push({ key: "search", label: `بحث: ${search.trim()}`, onClear: () => setSearch("") });
 
   useEffect(() => {
@@ -273,6 +287,23 @@ export default function StoreFront() {
             <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} />
             <span>✅ المتوفر فقط</span>
           </label>
+          <label className="st-check">
+            <input type="checkbox" checked={freeShipping} onChange={(e) => setFreeShipping(e.target.checked)} />
+            <span>🚚 شحن مجاني</span>
+          </label>
+
+          <div className="st-side__title" style={{ marginTop: 18 }}>التقييم</div>
+          <div className="st-rates">
+            {[5, 4, 3, 2].map((r) => (
+              <button
+                key={r}
+                className={`st-rate ${ratingMin === String(r) ? "is-active" : ""}`}
+                onClick={() => setRatingMin(ratingMin === String(r) ? "" : String(r))}
+              >
+                {"★".repeat(r)} وما فوق
+              </button>
+            ))}
+          </div>
 
           <div className="st-side__title" style={{ marginTop: 18 }}>نطاق السعر (ج)</div>
           <PriceSlider

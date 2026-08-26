@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { useCart } from "./CartContext";
 import { storeApi } from "../../api/client";
 import { navigate } from "../../lib/router";
-import { ShoppingCart, X, Plus, Minus, ArrowRight, Truck, ShieldCheck, RotateCcw } from "lucide-react";
+import { useAuth } from "../../context/AuthProvider";
+import { ShoppingCart, X, Plus, Minus, ArrowRight, Truck, ShieldCheck, RotateCcw, Star } from "lucide-react";
 
 const fmt = (n) => `${Number(n).toLocaleString("ar-EG")} ج`;
 
 export default function ProductDetail({ slug }) {
   const cart = useCart();
+  const { authenticated, user } = useAuth();
+  const isPatient = authenticated && user?.role === "patient";
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [activeImg, setActiveImg] = useState(0);
@@ -15,6 +18,11 @@ export default function ProductDetail({ slug }) {
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [myRating, setMyRating] = useState(0);
+  const [myComment, setMyComment] = useState("");
+  const [reviewMsg, setReviewMsg] = useState("");
+  const [reviewSending, setReviewSending] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -31,6 +39,29 @@ export default function ProductDetail({ slug }) {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [slug]);
+
+  useEffect(() => {
+    storeApi.reviews(slug).then((r) => setReviews(r.reviews || [])).catch(() => {});
+  }, [slug]);
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!myRating) { setReviewMsg("من فضلك اختر تقييماً بالنجوم"); return; }
+    setReviewSending(true);
+    setReviewMsg("");
+    try {
+      const r = await storeApi.addReview(slug, { rating: myRating, comment: myComment });
+      setReviews((prev) => [r.review, ...prev]);
+      setMyRating(0);
+      setMyComment("");
+      setReviewMsg("✅ شكراً لتقييمك");
+    } catch (err) {
+      const msg = err?.response?.data?.error?.message || err?.message || "تعذّر إرسال التقييم";
+      setReviewMsg(msg);
+    } finally {
+      setReviewSending(false);
+    }
+  };
 
   useEffect(() => {
     if (added) {
@@ -90,6 +121,13 @@ export default function ProductDetail({ slug }) {
         <div className="st-detail__info">
           {product.categoryName && <div className="st-card__cat">{product.categoryName}</div>}
           <h1 className="st-detail__name">{product.name}</h1>
+          {product.reviewCount > 0 && (
+            <div className="st-rate-summary">
+              <span className="st-card__stars">{"★".repeat(Math.round(product.avgRating))}{"☆".repeat(5 - Math.round(product.avgRating))}</span>
+              <strong>{Number(product.avgRating).toFixed(1)}</strong>
+              <span className="st-rate-summary__count">({product.reviewCount} تقييم)</span>
+            </div>
+          )}
           <div className="st-price st-price--lg">
             <span className="st-price__now">{fmt(product.price)}</span>
             {product.compareAtPrice && product.compareAtPrice > product.price && (
@@ -122,6 +160,53 @@ export default function ProductDetail({ slug }) {
         </div>
       </div>
 
+      <section className="st-reviews">
+        <h2 className="st-reviews__title">تقييمات المشترين</h2>
+        {reviews.length === 0 ? (
+          <p className="st-reviews__empty">لا توجد تقييمات بعد. كن أول من يقيم هذا المنتج بعد الشراء.</p>
+        ) : (
+          <div className="st-reviews__list">
+            {reviews.map((rv) => (
+              <div key={rv.id} className="st-review">
+                <div className="st-review__head">
+                  <span className="st-card__stars">{"★".repeat(rv.rating)}{"☆".repeat(5 - rv.rating)}</span>
+                  <strong>{rv.authorName}</strong>
+                </div>
+                {rv.comment && <p className="st-review__body">{rv.comment}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {isPatient ? (
+          <form className="st-review-form" onSubmit={submitReview}>
+            <div className="st-review-form__title">قيّم هذا المنتج (للمشترين فقط)</div>
+            <div className="st-review-stars">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button type="button" key={n} className={n <= myRating ? "is-on" : ""} onClick={() => setMyRating(n)} aria-label={`${n} نجوم`}>
+                  <Star size={22} fill={n <= myRating ? "#f5a623" : "none"} />
+                </button>
+              ))}
+            </div>
+            <textarea
+              className="st-input"
+              rows={3}
+              placeholder="اكتب تجربتك مع المنتج (اختياري)"
+              value={myComment}
+              onChange={(e) => setMyComment(e.target.value)}
+            />
+            <div className="st-review-form__foot">
+              <button type="submit" className="st-btn st-btn--primary" disabled={reviewSending}>
+                {reviewSending ? "جاري الإرسال..." : "إرسال التقييم"}
+              </button>
+              {reviewMsg && <span className="st-review-form__msg">{reviewMsg}</span>}
+            </div>
+          </form>
+        ) : (
+          <p className="st-reviews__note">سجّل الدخول كمريض لتتمكن من تقييم المنتجات التي اشتريتها.</p>
+        )}
+      </section>
+
       {related.length > 0 && (
         <div className="st-related">
           <h2 className="st-related__title">منتجات ذات صلة</h2>
@@ -152,9 +237,6 @@ function StoreBar({ cart, onCart }) {
   return (
     <header className="st-header">
       <div className="st-header__inner">
-        <button className="st-logo" onClick={() => navigate("/")}>
-          <img src="/assets/logo.png" alt="د. كريم الليثي" />
-        </button>
         <div style={{ flex: 1 }} />
         <button className="st-cart-btn" onClick={onCart}>
           <ShoppingCart size={20} />

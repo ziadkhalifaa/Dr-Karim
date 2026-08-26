@@ -1916,3 +1916,32 @@ textarea.pp-input { resize: vertical; min-height: 84px; }
 .st-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .st-chip { display: inline-flex; align-items: center; gap: 6px; background: color-mix(in srgb, var(--dash-primary) 12%, #fff); color: var(--dash-text); border: 1px solid color-mix(in srgb, var(--dash-primary) 35%, transparent); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s ease; }
 .st-chip:hover { background: color-mix(in srgb, var(--dash-primary) 20%, #fff); }
+
+/* ---- Store: ratings & reviews ---- */
+.st-card__rate { display: flex; align-items: center; gap: 6px; margin: 4px 0 2px; }
+.st-card__stars { color: #f5a623; letter-spacing: 1px; font-size: 13px; }
+.st-card__ratecount { font-size: 12px; color: var(--dash-text-muted); }
+.st-side__title { margin-bottom: 8px; }
+.st-rates { display: flex; flex-direction: column; gap: 6px; }
+.st-rate { text-align: right; background: #fff; border: 1.5px solid var(--dash-border); border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 700; color: var(--dash-text); cursor: pointer; transition: all .15s ease; }
+.st-rate:hover { border-color: var(--dash-primary); }
+.st-rate.is-active { background: color-mix(in srgb, var(--dash-primary) 12%, #fff); border-color: var(--dash-primary); color: #3e7a00; }
+
+.st-rate-summary { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.st-rate-summary__count { font-size: 13px; color: var(--dash-text-muted); }
+
+.st-reviews { max-width: 880px; margin: 30px auto 0; padding: 0 4px; }
+.st-reviews__title { font-size: 20px; font-weight: 900; margin-bottom: 14px; }
+.st-reviews__empty, .st-reviews__note { color: var(--dash-text-muted); font-size: 14px; }
+.st-reviews__list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+.st-review { background: #fff; border: 1px solid var(--dash-border); border-radius: 14px; padding: 14px 16px; }
+.st-review__head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.st-review__body { margin: 0; color: var(--dash-text); font-size: 14px; line-height: 1.6; }
+
+.st-review-form { background: #fff; border: 1.5px solid var(--dash-border); border-radius: 16px; padding: 18px; }
+.st-review-form__title { font-weight: 800; margin-bottom: 10px; }
+.st-review-stars { display: flex; gap: 4px; margin-bottom: 12px; }
+.st-review-stars button { background: none; border: none; cursor: pointer; color: #d9dee6; padding: 2px; }
+.st-review-stars button.is-on { color: #f5a623; }
+.st-review-form__foot { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+.st-review-form__msg { font-size: 13px; font-weight: 700; color: var(--dash-primary); }

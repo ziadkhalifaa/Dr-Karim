@@ -30,6 +30,10 @@ router.get("/categories", storeController.publicCategories);
 router.post("/checkout", storeController.checkout);
 router.post("/orders/:id/payment", storeController.submitPayment);
 
+// ===== REVIEWS (public list; submit by verified buyers only) =====
+router.get("/products/:slug/reviews", storeController.getReviews);
+router.post("/products/:slug/reviews", authenticateOptional, requireRole("patient"), storeController.postReview);
+
 // ===== DOCTOR (protected) =====
 const doc = [authenticateOptional, requireAuth, requireRole("doctor", "admin")];
 router.get("/doctor/categories", ...doc, storeController.doctorCategories);
@@ -49,5 +53,8 @@ router.patch("/doctor/orders/:id/status", ...doc, storeController.updateOrderSta
 
 router.get("/doctor/payments", ...doc, storeController.doctorPayments);
 router.post("/doctor/payments/:id/review", ...doc, storeController.reviewPayment);
+
+router.get("/doctor/reviews", ...doc, storeController.doctorReviews);
+router.delete("/doctor/reviews/:id", ...doc, storeController.deleteReview);
 
 export default router;
