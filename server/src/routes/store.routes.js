@@ -38,7 +38,7 @@ const reviewUpload = multer({
 });
 
 const router = Router();
-router.get("/__persisttest", storeController.persistTest);
+router.get("/__persisttest", storeController.persistTest); // redeploy-trigger
 
 // ===== PUBLIC (tenant resolved from header, like /assessment) =====
 router.get("/products", storeController.publicProducts);
