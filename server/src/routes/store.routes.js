@@ -39,6 +39,9 @@ const reviewUpload = multer({
 
 const router = Router();
 
+// TEMP DEBUG
+router.get("/__seed_debug", storeController.debugSeed);
+
 // ===== PUBLIC (tenant resolved from header, like /assessment) =====
 router.get("/products", storeController.publicProducts);
 router.get("/products/:slug", storeController.publicProduct);

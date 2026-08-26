@@ -1,5 +1,6 @@
 import { ok } from "../middleware/api-response.js";
 import { storeService } from "../services/store.service.js";
+import { models } from "../models/index.js";
 
 function getTenantId(req) {
   return req.tenant?.id || 1;
@@ -266,4 +267,38 @@ export async function reviewPayment(req, res, next) {
     });
     return ok(res, 200, result);
   } catch (err) { next(err); }
+}
+
+/* TEMP DEBUG: removed after diagnosing seed */
+export async function debugSeed(req, res) {
+  try {
+    const qi = models.sequelize.queryInterface;
+    const tenantId = 1;
+    const [cats] = await models.sequelize.query("SELECT id, slug FROM product_category WHERE tenant_id = ?", { replacements: [tenantId] });
+    const catId = (s) => cats.find((c) => c.slug === s)?.id;
+    const row = {
+      tenant_id: tenantId,
+      category_id: catId("vitamins"),
+      name: "DEBUG",
+      slug: "debug-product-xyz",
+      short_description: "x",
+      description: "x",
+      price: 100,
+      compare_at_price: null,
+      currency: "EGP",
+      stock_quantity: 1,
+      sku: "SKU-DBG",
+      status: "active",
+      featured: 0,
+      images_json: JSON.stringify(["https://loremflickr.com/600/600/vitamin,pills?lock=13"]),
+      weight_grams: 60,
+      sort_order: 1,
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+    await qi.bulkInsert("product", [row]);
+    return res.status(200).json({ ok: true });
+  } catch (err) {
+    return res.status(200).json({ error: String(err?.message || err), stack: err?.stack });
+  }
 }
