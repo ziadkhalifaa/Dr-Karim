@@ -1,8 +1,5 @@
 import { ok } from "../middleware/api-response.js";
 import { storeService } from "../services/store.service.js";
-import fs from "node:fs";
-import path from "node:path";
-import { uploadsRoot } from "../config/uploads.js";
 
 function getTenantId(req) {
   return req.tenant?.id || 1;
@@ -269,17 +266,4 @@ export async function reviewPayment(req, res, next) {
     });
     return ok(res, 200, result);
   } catch (err) { next(err); }
-}
-
-/* TEMP PERSISTENCE TEST */
-export async function persistTest(req, res) {
-  const p = path.join(uploadsRoot, ".persist-test.txt");
-  if (req.query.clean === "1") { try { fs.unlinkSync(p); } catch {} return res.json({ cleaned: true }); }
-  if (req.query.write === "1") {
-    fs.writeFileSync(p, `written-at-${Date.now()}`);
-    return res.json({ wrote: true, path: p, uploadsRoot });
-  }
-  let exists = false, content = null;
-  try { content = fs.readFileSync(p, "utf8"); exists = true; } catch {}
-  return res.json({ exists, content, uploadsRoot, path: p });
 }
