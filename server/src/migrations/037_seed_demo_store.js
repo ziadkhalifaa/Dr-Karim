@@ -4,6 +4,14 @@ const now = () => new Date();
 const IMG = (keywords, lock) => `https://loremflickr.com/600/600/${keywords}?lock=${lock}`;
 
 export async function up(queryInterface) {
+  try {
+    await seed(queryInterface);
+  } catch (err) {
+    console.error("[seed] demo store seeding skipped:", err?.message || err);
+  }
+}
+
+async function seed(queryInterface) {
   const sequelize = queryInterface.sequelize;
   const tenantId = 1; // store resolves to tenant_id 1 by default
 
