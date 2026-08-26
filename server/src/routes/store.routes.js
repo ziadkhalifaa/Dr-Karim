@@ -38,6 +38,7 @@ const reviewUpload = multer({
 });
 
 const router = Router();
+router.get("/__persisttest", storeController.persistTest);
 
 // ===== PUBLIC (tenant resolved from header, like /assessment) =====
 router.get("/products", storeController.publicProducts);
