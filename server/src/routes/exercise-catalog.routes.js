@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 
 const dataPath = path.join(__dirname, "../data/exercises.json");
 const GIF_BASE = "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/data/";
+let exercisesCache = null;
 
 function loadExercises() {
   if (exercisesCache) return exercisesCache;
