@@ -12,29 +12,24 @@ let exercisesCache = null;
 
 function loadExercises() {
   if (exercisesCache) return exercisesCache;
-  try {
-    const rawData = fs.readFileSync(dataPath, "utf8");
-    exercisesCache = JSON.parse(rawData).map((ex, index) => ({
-      id: ex.id || `ex_${index}`,
-      name: ex.name,
-      category: ex.category,
-      equipment: ex.equipment,
-      bodyPart: ex.body_part,
-      target: ex.target,
-      muscleGroup: ex.muscle_group,
-      primaryMuscles: ex.muscle_group ? [ex.muscle_group] : [],
-      secondaryMuscles: ex.secondary_muscles || [],
-      instructions: ex.instructions || (ex.instruction_steps?.en?.join(" ") || ""),
-      level: ex.level || null,
-      gifUrl: ex.gif_url ? GIF_BASE + ex.gif_url : null,
-      imageUrl: ex.image ? GIF_BASE + ex.image : null,
-      attribution: ex.attribution || null,
-    }));
-    return exercisesCache;
-  } catch (err) {
-    console.error("Failed to load exercises dataset:", err);
-    return [];
-  }
+  const rawData = fs.readFileSync(dataPath, "utf8");
+  exercisesCache = JSON.parse(rawData).map((ex, index) => ({
+    id: ex.id || `ex_${index}`,
+    name: ex.name,
+    category: ex.category,
+    equipment: ex.equipment,
+    bodyPart: ex.body_part,
+    target: ex.target,
+    muscleGroup: ex.muscle_group,
+    primaryMuscles: ex.muscle_group ? [ex.muscle_group] : [],
+    secondaryMuscles: ex.secondary_muscles || [],
+    instructions: ex.instructions || (ex.instruction_steps?.en ? ex.instruction_steps.en.join(" ") : ""),
+    level: ex.level || null,
+    gifUrl: ex.gif_url ? GIF_BASE + ex.gif_url : null,
+    imageUrl: ex.image ? GIF_BASE + ex.image : null,
+    attribution: ex.attribution || null,
+  }));
+  return exercisesCache;
 }
 
 export function exerciseCatalogRouter() {
