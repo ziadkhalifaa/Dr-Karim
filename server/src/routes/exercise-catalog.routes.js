@@ -52,8 +52,11 @@ export function exerciseCatalogRouter() {
       }
 
       res.json({
-        items: exercises.slice(0, limit),
-        total: exercises.length
+        success: true,
+        data: {
+          items: exercises.slice(0, limit),
+          total: exercises.length
+        }
       });
     } catch (err) {
       next(err);
