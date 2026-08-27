@@ -50,6 +50,55 @@ const MACRO_TILES = [
   ["fat", "دهون", "pp-macro--fat"],
 ];
 
+function ExerciseItem({ ex, idx }) {
+  const [expanded, setExpanded] = useState(false);
+  const gifUrl = ex.exercise?.gifUrl || null;
+  const imgUrl = ex.exercise?.imageUrl || gifUrl;
+
+  return (
+    <div style={{ background: "var(--dash-bg)", borderRadius: "12px", border: "1px solid var(--dash-border)", overflow: "hidden" }}>
+      <div 
+        onClick={() => setExpanded(!expanded)} 
+        style={{ padding: "12px", display: "flex", gap: "12px", alignItems: "center", cursor: "pointer" }}
+      >
+        <div style={{ width: 48, height: 48, borderRadius: "8px", background: "#fff", border: "1px solid var(--dash-border)", overflow: "hidden", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {imgUrl ? (
+            <img src={imgUrl} alt={ex.exercise?.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
+          ) : (
+            <Dumbbell size={20} style={{ color: "var(--dash-text-muted)", opacity: 0.5 }} />
+          )}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+            <span style={{ width: 20, height: 20, background: "var(--dash-primary)", color: "#fff", borderRadius: "4px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "800" }}>{idx + 1}</span>
+            <span style={{ fontSize: "14px", fontWeight: "800", color: "var(--dash-text)" }}>{ex.exercise?.name}</span>
+          </div>
+          <div style={{ fontSize: "12px", color: "var(--dash-text-muted)", fontWeight: "600" }}>
+            {ex.sets} مجموعات × {ex.reps} • راحة: {ex.rest}
+          </div>
+        </div>
+        {gifUrl && (
+          <span style={{ background: "#e0f2fe", color: "#0369a1", padding: "2px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: "700" }}>
+            {expanded ? "إخفاء الـ GIF" : "عرض الـ GIF"}
+          </span>
+        )}
+      </div>
+
+      {expanded && gifUrl && (
+        <div style={{ padding: "16px", background: "#000", display: "flex", justifyContent: "center", borderTop: "1px solid var(--dash-border)" }}>
+          <img src={gifUrl} alt={ex.exercise?.name} style={{ maxHeight: "250px", borderRadius: "8px" }} loading="lazy" />
+        </div>
+      )}
+      
+      {expanded && ex.instructions && (
+        <div style={{ padding: "12px", fontSize: "13px", color: "var(--dash-text-muted)", borderTop: "1px solid var(--dash-border)", background: "#fff" }}>
+          <strong>ملاحظات:</strong> {ex.instructions}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PlanCard({ title, version, icon: Icon }) {
   const { t } = useTranslation();
   const targets = version?.targets_json || null;
@@ -152,6 +201,21 @@ function PlanCard({ title, version, icon: Icon }) {
                     </div>
                   );
                 })}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {version && Array.isArray(version.exercises_json) && version.exercises_json.length > 0 && (
+          <div className="pp-days" style={{ marginTop: "16px" }}>
+            {[...new Set(version.exercises_json.map(e => e.dayId))].sort((a,b)=>a-b).map(dayId => (
+              <div key={dayId} style={{ marginBottom: "20px" }}>
+                <div className="pp-day__label">اليوم {dayId}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "10px" }}>
+                  {version.exercises_json.filter(e => e.dayId === dayId).map((ex, idx) => (
+                    <ExerciseItem key={ex.id || idx} ex={ex} idx={idx} />
+                  ))}
+                </div>
               </div>
             ))}
           </div>

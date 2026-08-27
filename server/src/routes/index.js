@@ -16,6 +16,7 @@ import { careRouter } from "./care.routes.js";
 import { progressRouter } from "./progress.routes.js";
 import { patientRouter } from "./patient.routes.js";
 import { foodRouter } from "./food.routes.js";
+import { exerciseCatalogRouter } from "./exercise-catalog.routes.js";
 import packageRouter from "./package.routes.js";
 import servicesRouter from "./services.routes.js";
 import storeRouter from "./store.routes.js";
@@ -54,6 +55,7 @@ export function routes(app) {
   api.use(progressRouter());
   api.use("/patients", patientRouter());
   api.use("/food", foodRouter());
+  api.use("/exercises", exerciseCatalogRouter());
   api.get("/doctor/overview", requireAuth, requireRole("doctor", "staff"), doctorStatsController.overview);
   // /services is now served dynamically via /public/services
   // api.use("/services", placeholderRouter("services"));

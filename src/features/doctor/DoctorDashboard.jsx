@@ -32,6 +32,7 @@ import PatientsList from "./PatientsList";
 import PatientProfile from "./PatientProfile";
 import ReviewDetail from "./ReviewDetail";
 import NutritionBuilder from "./NutritionBuilder";
+import ExerciseBuilder from "./ExerciseBuilder";
 import ArticleManager from "./ArticleManager";
 import ServicesManager from "./ServicesManager";
 import ContactMessages from "./ContactMessages";
@@ -430,10 +431,12 @@ export default function DoctorDashboard({ path }) {
 
   const patientProfileMatch = path.match(/^\/doctor\/patients\/(\d+)$/);
   const nutritionBuilderMatch = path.match(/^\/doctor\/patients\/(\d+)\/nutrition-builder$/);
+  const exerciseBuilderMatch = path.match(/^\/doctor\/patients\/(\d+)\/exercise-builder$/);
   const reviewDetailMatch = path.match(/^\/doctor\/reviews\/(\d+)$/);
 
   let page;
   if (nutritionBuilderMatch) page = <NutritionBuilder patientId={nutritionBuilderMatch[1]} />;
+  else if (exerciseBuilderMatch) page = <ExerciseBuilder patientId={exerciseBuilderMatch[1]} />;
   else if (patientProfileMatch) page = <PatientProfile patientId={patientProfileMatch[1]} />;
   else if (reviewDetailMatch) page = <ReviewDetail reviewId={reviewDetailMatch[1]} />;
   else if (path === "/doctor/patients") page = <PatientsList />;

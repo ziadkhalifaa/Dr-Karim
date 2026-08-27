@@ -60,6 +60,7 @@ export const ExercisePlanVersion = sequelize.define(
     previous_version_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
     approved_by: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
     approved_at: { type: DataTypes.DATE, allowNull: true },
+    exercises_json: { type: DataTypes.JSON, allowNull: true },
   },
   {
     tableName: "exercise_plan_version",

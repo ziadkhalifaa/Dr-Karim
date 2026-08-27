@@ -618,15 +618,26 @@ export default function CarePrograms({ patientId, patientLabel }) {
           <div className="dash-row-actions">
             <span className="dash-badge dash-badge--primary">{rows.length}</span>
             {patientId && (
-              <button 
-                className="dash-btn dash-btn--sm" 
-                onClick={() => navigate(`/doctor/patients/${patientId}/nutrition-builder`)} 
-                style={{ background: "linear-gradient(135deg, #024fab 0%, #024fab 100%)", color: "#fff", border: "none", boxShadow: "0 4px 15px rgba(2, 79, 171, 0.4)", display: "flex", alignItems: "center", gap: "6px", fontWeight: "900", padding: "8px 16px", borderRadius: "10px", transition: "all 0.2s" }}
-                onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
-                onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
-              >
-                🥗 إضافة وتعديل النظام الغذائي (الأكل)
-              </button>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button 
+                  className="dash-btn dash-btn--sm" 
+                  onClick={() => navigate(`/doctor/patients/${patientId}/nutrition-builder`)} 
+                  style={{ background: "linear-gradient(135deg, #024fab 0%, #024fab 100%)", color: "#fff", border: "none", boxShadow: "0 4px 15px rgba(2, 79, 171, 0.4)", display: "flex", alignItems: "center", gap: "6px", fontWeight: "900", padding: "8px 16px", borderRadius: "10px", transition: "all 0.2s" }}
+                  onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+                  onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
+                >
+                  🥗 بناء النظام الغذائي
+                </button>
+                <button 
+                  className="dash-btn dash-btn--sm" 
+                  onClick={() => navigate(`/doctor/patients/${patientId}/exercise-builder`)} 
+                  style={{ background: "linear-gradient(135deg, #ef4444 0%, #ef4444 100%)", color: "#fff", border: "none", boxShadow: "0 4px 15px rgba(239, 68, 68, 0.4)", display: "flex", alignItems: "center", gap: "6px", fontWeight: "900", padding: "8px 16px", borderRadius: "10px", transition: "all 0.2s" }}
+                  onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-2px)"}
+                  onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
+                >
+                  💪 بناء خطة التمارين
+                </button>
+              </div>
             )}
             <button className="dash-btn dash-btn--primary dash-btn--sm" onClick={() => setShowCreate((s) => !s)}>
               <Plus />{t("doctorCare.newProgram")}
