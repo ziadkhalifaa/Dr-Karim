@@ -96,11 +96,13 @@ export default function NutritionBuilder({ planId, patientId }) {
   const prepareApiMeals = () => {
     const apiMeals = [];
     meals.forEach(m => {
-      if (m.items.length === 0) return;
+      // Only include items that have a valid foodItemId
+      const validItems = m.items.filter(it => it.foodItemId);
+      if (validItems.length === 0) return;
       apiMeals.push({
         code: m.code,
         dayNumber: m.dayId,
-        items: m.items.map((it, idx) => ({
+        items: validItems.map((it, idx) => ({
           foodItemId: it.foodItemId,
           quantity: it.quantity,
           unit: it.unit,
