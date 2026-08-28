@@ -371,18 +371,22 @@ export default function NutritionBuilder({ planId, patientId }) {
             ) : (
               <div style={{ flex: 1, overflowY: "auto", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "20px", paddingBottom: "20px" }}>
                 {templatesList.length === 0 ? <p style={{ color: "var(--dash-text-muted)" }}>لا توجد قوالب محفوظة.</p> : templatesList.map(tmpl => (
-                  <div key={tmpl.id} style={{ border: "1.5px solid var(--dash-border)", borderRadius: "16px", overflow: "hidden", display: "flex", flexDirection: "column", background: "#fff", transition: "all 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.borderColor="var(--dash-primary)"} onMouseLeave={(e) => e.currentTarget.style.borderColor="var(--dash-border)"}>
-                    <div style={{ width: "100%", height: "140px", background: "var(--dash-bg)", position: "relative" }}>
+                  <div key={tmpl.id} style={{ border: "1.5px solid var(--dash-border)", borderRadius: "16px", overflow: "hidden", display: "flex", flexDirection: "column", background: "#fff", transition: "all 0.2s", height: "380px" }} onMouseEnter={(e) => e.currentTarget.style.borderColor="var(--dash-primary)"} onMouseLeave={(e) => e.currentTarget.style.borderColor="var(--dash-border)"}>
+                    <div style={{ width: "100%", height: "150px", background: "var(--dash-bg)", position: "relative", flexShrink: 0 }}>
                       {tmpl.image_url ? (
                         <img src={tmpl.image_url} alt={tmpl.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       ) : (
                         <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--dash-text-soft)" }}><BookTemplate size={48} opacity={0.5} /></div>
                       )}
                     </div>
-                    <div style={{ padding: "16px", display: "flex", flexDirection: "column", flex: 1 }}>
-                      <strong style={{ display: "block", marginBottom: "8px", fontSize: "15px", fontWeight: "800", color: "var(--dash-text)" }}>{tmpl.name}</strong>
-                      {tmpl.description && <p style={{ fontSize: "12px", color: "var(--dash-text-muted)", margin: "0 0 12px", lineHeight: 1.5, flex: 1 }}>{tmpl.description}</p>}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto" }}>
+                    <div style={{ padding: "16px", display: "flex", flexDirection: "column", flex: 1, minWidth: 0 }}>
+                      <strong style={{ display: "block", marginBottom: "6px", fontSize: "15px", fontWeight: "800", color: "var(--dash-text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{tmpl.name}</strong>
+                      {tmpl.description ? (
+                        <p style={{ fontSize: "12px", color: "var(--dash-text-muted)", margin: "0 0 12px", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", flex: 1 }}>{tmpl.description}</p>
+                      ) : (
+                        <div style={{ flex: 1 }} />
+                      )}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", pt: "8px", borderTop: "1px solid var(--dash-border)" }}>
                         <span style={{ fontSize: "11px", color: "var(--dash-text-soft)", fontWeight: "600" }}>{new Date(tmpl.created_at).toLocaleDateString()}</span>
                         <button onClick={() => {
                           if (!window.confirm("استيراد القالب سيقوم بتغيير الأهداف والوجبات الحالية. هل أنت متأكد؟")) return;
