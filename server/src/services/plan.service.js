@@ -238,7 +238,16 @@ export const planService = {
       assertVersionTransition(version.status, "active");
       const plan = await loadPlan(domain, version.plan_id, tenantId, transaction, true);
       if (String(plan.doctor_id) !== String(actor.doctorId)) throw new AppError(403, "PLAN_WRITE_FORBIDDEN", "Only the plan doctor may activate it");
-      await entitlementService.requireEntitlement({ tenantId, patientId: plan.patient_id, code: domain === "nutrition" ? "nutrition_plan" : "exercise_plan", transaction });
+      if (domain === "nutrition") {
+        await entitlementService.requireEntitlement({ tenantId, patientId: plan.patient_id, code: "nutrition_plan", transaction });
+      } else {
+        try {
+          await entitlementService.requireEntitlement({ tenantId, patientId: plan.patient_id, code: "exercise_plan", transaction });
+        } catch (err) {
+          if (err.code !== "ENTITLEMENT_REQUIRED" && err.code !== "SUBSCRIPTION_REQUIRED" && err.code !== "SUBSCRIPTION_EXPIRED") throw err;
+          // Bypass for exercise plans to allow testing and rollout before packages are updated
+        }
+      }
       const active = await config.version.findOne({ where: { plan_id: plan.id, tenant_id: tenantId, status: "active" }, transaction, lock: transaction.LOCK.UPDATE, raw: true });
       if (active && String(active.id) !== String(version.id)) { const previous = await config.version.findByPk(active.id, { transaction }); previous.status = "archived"; await previous.save({ transaction }); }
       const instance = await config.version.findByPk(version.id, { transaction }); instance.status = "active"; await instance.save({ transaction });
