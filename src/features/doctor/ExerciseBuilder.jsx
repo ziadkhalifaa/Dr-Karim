@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, X, ArrowLeft, Save, RefreshCw, Dumbbell, Play } from "lucide-react";
-import { api, exerciseApi } from "../../api/client";
+import { Plus, Search, X, ArrowLeft, Save, RefreshCw, Dumbbell, Play, BookTemplate, Download } from "lucide-react";
+import { api, exerciseApi, planTemplateApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 
 const DAYS = [
@@ -147,6 +147,45 @@ export default function ExerciseBuilder({ planId, patientId }) {
   const [globalNotes, setGlobalNotes] = useState("");
   const [previewEx, setPreviewEx] = useState(null);
 
+  // Templates state
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [showLoadTemplate, setShowLoadTemplate] = useState(false);
+  const [templatesList, setTemplatesList] = useState([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+
+  const handleSaveTemplate = async () => {
+    if (!templateName.trim()) return alert("يرجى إدخال اسم القالب");
+    try {
+      setSaving(true);
+      await planTemplateApi.create({
+        domain: "exercise",
+        name: templateName,
+        content_json: { exercises, notes: globalNotes }
+      });
+      setShowSaveTemplate(false);
+      setTemplateName("");
+      alert("تم حفظ القالب بنجاح!");
+    } catch (err) {
+      alert("Error saving template: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const openLoadTemplates = async () => {
+    setShowLoadTemplate(true);
+    setLoadingTemplates(true);
+    try {
+      const res = await planTemplateApi.list("exercise");
+      setTemplatesList(res.data || []);
+    } catch (err) {
+      alert("Error loading templates: " + err.message);
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
+
   useEffect(() => {
     async function load() {
       try {
@@ -229,15 +268,66 @@ export default function ExerciseBuilder({ planId, patientId }) {
           </h1>
           <p style={{ margin: "8px 0 0", color: "var(--dash-text-muted)", fontSize: "14px", fontWeight: "600" }}>1324 تمرين مع GIF توضيحي — مقسمة على أيام الأسبوع</p>
         </div>
-        <button
-          onClick={savePlan}
-          disabled={saving}
-          style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)", color: "#fff", border: "none", padding: "14px 28px", borderRadius: "14px", fontSize: "15px", fontWeight: "800", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 4px 20px rgba(239,68,68,0.35)", opacity: saving ? 0.7 : 1, fontFamily: "inherit" }}
-        >
-          {saving ? <RefreshCw size={18} style={{ animation: "spin 1s linear infinite" }} /> : <Save size={18} />}
-          {saving ? "جاري الحفظ..." : "حفظ الخطة"}
-        </button>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button onClick={openLoadTemplates} style={{ background: "#fff", color: "var(--dash-text)", border: "1.5px solid var(--dash-border)", padding: "12px 20px", borderRadius: "12px", fontSize: "15px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+            <Download size={18} /> استيراد قالب
+          </button>
+          <button onClick={() => setShowSaveTemplate(true)} style={{ background: "#fff", color: "var(--dash-text)", border: "1.5px solid var(--dash-border)", padding: "12px 20px", borderRadius: "12px", fontSize: "15px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+            <BookTemplate size={18} /> حفظ كقالب
+          </button>
+          <button
+            onClick={savePlan}
+            disabled={saving}
+            style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)", color: "#fff", border: "none", padding: "14px 28px", borderRadius: "14px", fontSize: "15px", fontWeight: "800", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 4px 20px rgba(239,68,68,0.35)", opacity: saving ? 0.7 : 1, fontFamily: "inherit" }}
+          >
+            {saving ? <RefreshCw size={18} style={{ animation: "spin 1s linear infinite" }} /> : <Save size={18} />}
+            {saving ? "جاري الحفظ..." : "حفظ الخطة"}
+          </button>
+        </div>
       </div>
+
+      {showSaveTemplate && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)" }}>
+          <div style={{ background: "#fff", padding: "24px", borderRadius: "20px", width: "400px", maxWidth: "90%" }}>
+            <h3 style={{ margin: "0 0 16px", fontSize: "18px" }}>حفظ الخطة كقالب</h3>
+            <input type="text" placeholder="اسم القالب (مثال: Push Pull Legs)" value={templateName} onChange={(e) => setTemplateName(e.target.value)} style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--dash-border)", marginBottom: "20px" }} />
+            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+              <button onClick={() => setShowSaveTemplate(false)} style={{ background: "transparent", border: "none", color: "var(--dash-text)", cursor: "pointer", fontWeight: "700" }}>إلغاء</button>
+              <button onClick={handleSaveTemplate} disabled={saving} style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "10px", cursor: "pointer", fontWeight: "700" }}>حفظ القالب</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLoadTemplate && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)" }}>
+          <div style={{ background: "#fff", padding: "24px", borderRadius: "20px", width: "500px", maxWidth: "90%", maxHeight: "80vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <h3 style={{ margin: 0, fontSize: "18px" }}>استيراد من قالب</h3>
+              <button onClick={() => setShowLoadTemplate(false)} style={{ background: "transparent", border: "none", cursor: "pointer" }}><X size={20} /></button>
+            </div>
+            {loadingTemplates ? <p>جاري التحميل...</p> : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {templatesList.length === 0 ? <p style={{ color: "var(--dash-text-muted)" }}>لا توجد قوالب محفوظة.</p> : templatesList.map(tmpl => (
+                  <div key={tmpl.id} style={{ padding: "16px", border: "1px solid var(--dash-border)", borderRadius: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <strong style={{ display: "block", marginBottom: "4px" }}>{tmpl.name}</strong>
+                      <span style={{ fontSize: "12px", color: "var(--dash-text-muted)" }}>تم الحفظ في: {new Date(tmpl.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <button onClick={() => {
+                      if (!window.confirm("استيراد القالب سيقوم بتبديل التمارين الحالية. هل أنت متأكد؟")) return;
+                      const content = tmpl.content_json;
+                      if (content.exercises) setExercises(content.exercises);
+                      if (content.notes) setGlobalNotes(content.notes);
+                      setShowLoadTemplate(false);
+                    }} style={{ background: "#fee2e2", color: "#ef4444", border: "none", padding: "8px 16px", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}>استيراد</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Global Notes */}
       <div style={{ background: "#fff", borderRadius: "18px", border: "1.5px solid var(--dash-border)", padding: "20px", marginBottom: "24px" }}>

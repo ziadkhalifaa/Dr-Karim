@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, X, Check, ArrowLeft, Save, AlertCircle, RefreshCw, Flame, Beef, Wheat, Droplet } from "lucide-react";
-import { foodApi, nutritionApi } from "../../api/client";
+import { Plus, Search, X, Check, ArrowLeft, Save, AlertCircle, RefreshCw, Flame, Beef, Wheat, Droplet, BookTemplate, Download } from "lucide-react";
+import { foodApi, nutritionApi, planTemplateApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 
 const DAYS = [
@@ -84,6 +84,88 @@ export default function NutritionBuilder({ planId, patientId }) {
     calories: 2000, protein: 150, carbs: 200, fats: 66,
   });
   const [loading, setLoading] = useState(true);
+
+  // Templates state
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [showLoadTemplate, setShowLoadTemplate] = useState(false);
+  const [templatesList, setTemplatesList] = useState([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+
+  const prepareApiMeals = () => {
+    const apiMeals = [];
+    meals.forEach(m => {
+      if (m.items.length === 0) return;
+      apiMeals.push({
+        code: m.code,
+        dayNumber: m.dayId,
+        items: m.items.map((it, idx) => ({
+          foodItemId: it.foodItemId,
+          quantity: it.quantity,
+          unit: it.unit,
+          sortOrder: idx
+        }))
+      });
+    });
+    return apiMeals;
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!templateName.trim()) return alert("يرجى إدخال اسم القالب");
+    try {
+      setSaving(true);
+      const apiMeals = prepareApiMeals();
+      await planTemplateApi.create({
+        domain: "nutrition",
+        name: templateName,
+        content_json: { targets, meals: apiMeals, rawMeals: meals }
+      });
+      setShowSaveTemplate(false);
+      setTemplateName("");
+      alert("تم حفظ القالب بنجاح!");
+    } catch (err) {
+      alert("Error saving template: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const openLoadTemplates = async () => {
+    setShowLoadTemplate(true);
+    setLoadingTemplates(true);
+    try {
+      const res = await planTemplateApi.list("nutrition");
+      setTemplatesList(res.data || []);
+    } catch (err) {
+      alert("Error loading templates: " + err.message);
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
+
+  const loadTemplate = async (tmpl) => {
+    try {
+      const active = tmpl.content_json;
+      if (active.targets) {
+        setTargets(active.targets);
+      }
+      if (active.meals) {
+        // Fetch full food details for the template items because template only has foodItemId
+        // To keep it simple, we use a basic item object. When saving, the backend only needs the ID.
+        // But for UI, we need the name and macros. Let's fetch them in a batch if needed,
+        // or rely on the stored names if we had stored them.
+        // For now, we will map them directly; if the name is missing it says "صنف محفوظ".
+        // Better: we can store the rich items in the template! 
+        // Wait, prepareApiMeals drops the rich data. Let's fix prepareApiMeals to include it just for templates?
+        // Let's just use what's there and let the backend handle it during actual plan creation.
+        alert("تنبيه: سيتم تطبيق القالب وتحديث الخطة الحالية.");
+        // Actually, for proper UX, we should have stored the full `meals` array in the template instead of `apiMeals`.
+        // I will change handleSaveTemplate to just save `meals` array directly!
+      }
+    } catch (err) {
+      alert("Error applying template");
+    }
+  };
 
   useEffect(() => {
     async function load() {
@@ -192,20 +274,7 @@ export default function NutritionBuilder({ planId, patientId }) {
     setSaving(true);
     try {
       // transform meals to api format
-      const apiMeals = [];
-      meals.forEach(m => {
-        if (m.items.length === 0) return;
-        apiMeals.push({
-          code: m.code,
-          dayNumber: m.dayId,
-          items: m.items.map((it, idx) => ({
-            foodItemId: it.foodItemId,
-            quantity: it.quantity,
-            unit: it.unit,
-            sortOrder: idx
-          }))
-        });
-      });
+      const apiMeals = prepareApiMeals();
 
       const body = {
         targets,
@@ -258,11 +327,60 @@ export default function NutritionBuilder({ planId, patientId }) {
           <h1 style={{ fontSize: "28px", fontWeight: "900", color: "var(--dash-text)", margin: 0 }}>مُنشئ خطة التغذية</h1>
         </div>
         <div style={{ display: "flex", gap: "12px" }}>
+          <button onClick={openLoadTemplates} style={{ background: "#fff", color: "var(--dash-text)", border: "1.5px solid var(--dash-border)", padding: "12px 20px", borderRadius: "12px", fontSize: "15px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+            <Download size={18} /> استيراد قالب
+          </button>
+          <button onClick={() => setShowSaveTemplate(true)} style={{ background: "#fff", color: "var(--dash-text)", border: "1.5px solid var(--dash-border)", padding: "12px 20px", borderRadius: "12px", fontSize: "15px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+            <BookTemplate size={18} /> حفظ كقالب
+          </button>
           <button onClick={savePlan} disabled={saving} style={{ background: "var(--dash-primary)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "12px", fontSize: "15px", fontWeight: "800", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", opacity: saving ? 0.7 : 1 }}>
             {saving ? <RefreshCw size={18} className="spin" /> : <Save size={18} />} حفظ الخطة
           </button>
         </div>
       </div>
+
+      {showSaveTemplate && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)" }}>
+          <div style={{ background: "#fff", padding: "24px", borderRadius: "20px", width: "400px", maxWidth: "90%" }}>
+            <h3 style={{ margin: "0 0 16px", fontSize: "18px" }}>حفظ الخطة كقالب</h3>
+            <input type="text" placeholder="اسم القالب (مثال: نظام تنشيف للمبتدئين)" value={templateName} onChange={(e) => setTemplateName(e.target.value)} style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--dash-border)", marginBottom: "20px" }} />
+            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+              <button onClick={() => setShowSaveTemplate(false)} style={{ background: "transparent", border: "none", color: "var(--dash-text)", cursor: "pointer", fontWeight: "700" }}>إلغاء</button>
+              <button onClick={handleSaveTemplate} disabled={saving} style={{ background: "var(--dash-primary)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "10px", cursor: "pointer", fontWeight: "700" }}>حفظ القالب</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLoadTemplate && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)" }}>
+          <div style={{ background: "#fff", padding: "24px", borderRadius: "20px", width: "500px", maxWidth: "90%", maxHeight: "80vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <h3 style={{ margin: 0, fontSize: "18px" }}>استيراد من قالب</h3>
+              <button onClick={() => setShowLoadTemplate(false)} style={{ background: "transparent", border: "none", cursor: "pointer" }}><X size={20} /></button>
+            </div>
+            {loadingTemplates ? <p>جاري التحميل...</p> : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                {templatesList.length === 0 ? <p style={{ color: "var(--dash-text-muted)" }}>لا توجد قوالب محفوظة.</p> : templatesList.map(tmpl => (
+                  <div key={tmpl.id} style={{ padding: "16px", border: "1px solid var(--dash-border)", borderRadius: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <strong style={{ display: "block", marginBottom: "4px" }}>{tmpl.name}</strong>
+                      <span style={{ fontSize: "12px", color: "var(--dash-text-muted)" }}>تم الحفظ في: {new Date(tmpl.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <button onClick={() => {
+                      if (!window.confirm("استيراد القالب سيقوم بتغيير الأهداف والوجبات الحالية. هل أنت متأكد؟")) return;
+                      const content = tmpl.content_json;
+                      if (content.targets) setTargets(content.targets);
+                      if (content.rawMeals) setMeals(content.rawMeals); // Uses the raw state we will save
+                      setShowLoadTemplate(false);
+                    }} style={{ background: "var(--dash-primary-soft)", color: "var(--dash-primary)", border: "none", padding: "8px 16px", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}>استيراد</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Target Macros */}
       <div style={{ background: "#fff", borderRadius: "20px", border: "1.5px solid var(--dash-border)", padding: "24px", marginBottom: "24px" }}>

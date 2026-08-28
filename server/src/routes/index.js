@@ -8,6 +8,7 @@ import { authRouter } from "./auth.routes.js";
 import { doctorReviewRouter } from "./doctor-review.routes.js";
 import { nutritionPlanRouter, exercisePlanRouter, patientPlanRouter } from "./plan.routes.js";
 import { nutritionPlanVersionRouter, exercisePlanVersionRouter } from "./plan-version.routes.js";
+import { planTemplateRouter } from "./plan-template.routes.js";
 import { nutritionPlanController, exercisePlanController } from "../controllers/plan.controller.js";
 import { careCycleRouter } from "./care-cycle.routes.js";
 import { paymentRouter } from "./payment.routes.js";
@@ -46,6 +47,7 @@ export function routes(app) {
   api.use("/exercise-plans", exercisePlanRouter());
   api.use("/nutrition-plan-versions", nutritionPlanVersionRouter());
   api.use("/exercise-plan-versions", exercisePlanVersionRouter());
+  api.use("/plan-templates", planTemplateRouter());
   api.use("/patients", patientPlanRouter(nutritionPlanController));
   api.get("/patients/:id/exercise-plan", authenticateOptional, requireTenantAccess, exercisePlanController.patient);
   api.use(careCycleRouter());

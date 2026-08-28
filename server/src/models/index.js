@@ -369,6 +369,8 @@ ProductReview.belongsTo(StoreOrder, { foreignKey: "order_id", as: "order" });
 ProductReview.belongsTo(Patient, { foreignKey: "patient_id", as: "author" });
 StoreOrder.hasMany(ProductReview, { foreignKey: "order_id", as: "reviews" });
 
+import { GROUP_21 } from "./21_plan_templates.js";
+
 export const models = {
   ...sequelize.models,
   ...GROUP_01,
@@ -391,6 +393,7 @@ export const models = {
   ...GROUP_18,
   ...GROUP_19,
   ...GROUP_20,
+  ...GROUP_21,
 };
 
 export { sequelize };
