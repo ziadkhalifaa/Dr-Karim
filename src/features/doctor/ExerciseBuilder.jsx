@@ -181,7 +181,7 @@ export default function ExerciseBuilder({ planId, patientId }) {
     setLoadingTemplates(true);
     try {
       const res = await planTemplateApi.list("exercise");
-      setTemplatesList(res.data || []);
+      setTemplatesList(res || []);
     } catch (err) {
       alert("Error loading templates: " + err.message);
     } finally {

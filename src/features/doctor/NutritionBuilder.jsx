@@ -138,7 +138,7 @@ export default function NutritionBuilder({ planId, patientId }) {
     setLoadingTemplates(true);
     try {
       const res = await planTemplateApi.list("nutrition");
-      setTemplatesList(res.data || []);
+      setTemplatesList(res || []);
     } catch (err) {
       alert("Error loading templates: " + err.message);
     } finally {
