@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox, UserRound, BookTemplate, Check, Trash2
+  ClipboardList, Plus, ArrowLeft, Save, Play, X, Inbox, UserRound, BookTemplate, Check, Trash2, Edit
 } from "lucide-react";
-import { careApi, patientApi } from "../../api/client";
+import { careApi, patientApi, nutritionApi, exerciseApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 import PatientSelector from "../shared/PatientSelector";
 import { templateStore } from "../../lib/templateStore";
@@ -507,18 +507,43 @@ const PLAN_STATUS_AR = { draft: "مسودة", doctor_review: "قيد المرا�
 
 function SavedPlans({ patientId, reloadKey }) {
   const [plans, setPlans] = useState(null);
-  useEffect(() => {
+  const [busy, setBusy] = useState(null);
+  const navigate = typeof window !== "undefined" ? null : null;
+
+  const reload = () => {
     if (!patientId) { setPlans(null); return; }
-    let cancelled = false;
     patientApi.planVersions(patientId)
-      .then((res) => { if (!cancelled) setPlans(res); })
-      .catch(() => { if (!cancelled) setPlans({ nutrition: [], exercise: [] }); });
-    return () => { cancelled = true; };
+      .then((res) => setPlans(res))
+      .catch(() => setPlans({ nutrition: [], exercise: [] }));
+  };
+
+  useEffect(() => {
+    reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientId, reloadKey]);
+
+  const handleArchive = async (domain, versionId) => {
+    if (!window.confirm("هل أنت متأكد من أرشفة هذه الخطة؟ لن تظهر للمريض بعد ذلك.")) return;
+    setBusy(versionId);
+    try {
+      const api = domain === "nutrition" ? nutritionApi : exerciseApi;
+      await api.archive(versionId);
+      reload();
+    } catch (err) {
+      alert(err.message || "حدث خطأ أثناء الأرشفة");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleOpen = (domain, planId) => {
+    window.location.href = `/doctor/${domain === "nutrition" ? "nutrition" : "exercise"}/${planId}`;
+  };
+
   if (!plans) return null;
   const rows = [
-    ...plans.nutrition.map((v) => ({ ...v, icon: "🥗", label: "تغذية" })),
-    ...plans.exercise.map((v) => ({ ...v, icon: "🏋️", label: "رياضة" })),
+    ...plans.nutrition.map((v) => ({ ...v, icon: "🥗", label: "تغذية", domain: "nutrition" })),
+    ...plans.exercise.map((v) => ({ ...v, icon: "🏋️", label: "رياضة", domain: "exercise" })),
   ];
   return (
     <section className="dash-panel">
@@ -535,6 +560,7 @@ function SavedPlans({ patientId, reloadKey }) {
                 <th>النسخة</th>
                 <th>الحالة</th>
                 <th>مفعّلة من</th>
+                <th>إجراءات</th>
               </tr>
             </thead>
             <tbody>
@@ -544,6 +570,27 @@ function SavedPlans({ patientId, reloadKey }) {
                   <td>#{v.versionNo}</td>
                   <td><span className={`dash-badge ${statusTone(v.status)}`}>{PLAN_STATUS_AR[v.status] || v.status}</span></td>
                   <td className="dash-cell-muted">{v.effectiveFrom || "—"}</td>
+                  <td>
+                    <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+                      <button
+                        className="dash-btn dash-btn--ghost dash-btn--sm"
+                        onClick={() => handleOpen(v.domain, v.planId)}
+                        title="فتح وتعديل الخطة"
+                      >
+                        <Edit size={14} /> تعديل
+                      </button>
+                      {v.status !== "archived" && (
+                        <button
+                          className="dash-btn dash-btn--danger dash-btn--sm"
+                          onClick={() => handleArchive(v.domain, v.id)}
+                          disabled={busy === v.id}
+                          title="أرشفة الخطة"
+                        >
+                          <Trash2 size={14} /> {busy === v.id ? "..." : "حذف"}
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -555,6 +602,7 @@ function SavedPlans({ patientId, reloadKey }) {
     </section>
   );
 }
+
 
 export default function CarePrograms({ patientId, patientLabel }) {
   const { t } = useTranslation();
