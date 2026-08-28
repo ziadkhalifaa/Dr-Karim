@@ -14,6 +14,7 @@ export const PlanTemplate = sequelize.define(
     name: { type: DataTypes.STRING(120), allowNull: false },
     description: { type: DataTypes.TEXT, allowNull: true },
     content_json: { type: DataTypes.JSON, allowNull: false },
+    image_url: { type: DataTypes.STRING(255), allowNull: true, defaultValue: null },
     created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
   },

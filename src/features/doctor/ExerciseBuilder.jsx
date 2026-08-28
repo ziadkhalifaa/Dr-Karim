@@ -150,6 +150,7 @@ export default function ExerciseBuilder({ planId, patientId }) {
   // Templates state
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
   const [templateName, setTemplateName] = useState("");
+  const [templateImageUrl, setTemplateImageUrl] = useState("");
   const [showLoadTemplate, setShowLoadTemplate] = useState(false);
   const [templatesList, setTemplatesList] = useState([]);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
@@ -161,10 +162,12 @@ export default function ExerciseBuilder({ planId, patientId }) {
       await planTemplateApi.create({
         domain: "exercise",
         name: templateName,
+        image_url: templateImageUrl,
         content_json: { exercises, notes: globalNotes }
       });
       setShowSaveTemplate(false);
       setTemplateName("");
+      setTemplateImageUrl("");
       alert("تم حفظ القالب بنجاح!");
     } catch (err) {
       alert("Error saving template: " + err.message);
@@ -290,7 +293,8 @@ export default function ExerciseBuilder({ planId, patientId }) {
         <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)" }}>
           <div style={{ background: "#fff", padding: "24px", borderRadius: "20px", width: "400px", maxWidth: "90%" }}>
             <h3 style={{ margin: "0 0 16px", fontSize: "18px" }}>حفظ الخطة كقالب</h3>
-            <input type="text" placeholder="اسم القالب (مثال: Push Pull Legs)" value={templateName} onChange={(e) => setTemplateName(e.target.value)} style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--dash-border)", marginBottom: "20px" }} />
+            <input type="text" placeholder="اسم القالب (مثال: Push Pull Legs)" value={templateName} onChange={(e) => setTemplateName(e.target.value)} style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--dash-border)", marginBottom: "12px" }} />
+            <input type="text" placeholder="رابط صورة الغلاف (اختياري)" value={templateImageUrl} onChange={(e) => setTemplateImageUrl(e.target.value)} style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1px solid var(--dash-border)", marginBottom: "20px" }} />
             <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
               <button onClick={() => setShowSaveTemplate(false)} style={{ background: "transparent", border: "none", color: "var(--dash-text)", cursor: "pointer", fontWeight: "700" }}>إلغاء</button>
               <button onClick={handleSaveTemplate} disabled={saving} style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "10px", cursor: "pointer", fontWeight: "700" }}>حفظ القالب</button>
@@ -300,27 +304,42 @@ export default function ExerciseBuilder({ planId, patientId }) {
       )}
 
       {showLoadTemplate && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)" }}>
-          <div style={{ background: "#fff", padding: "24px", borderRadius: "20px", width: "500px", maxWidth: "90%", maxHeight: "80vh", overflowY: "auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h3 style={{ margin: 0, fontSize: "18px" }}>استيراد من قالب</h3>
-              <button onClick={() => setShowLoadTemplate(false)} style={{ background: "transparent", border: "none", cursor: "pointer" }}><X size={20} /></button>
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#fff", padding: "32px", borderRadius: "24px", width: "900px", maxWidth: "95%", maxHeight: "85vh", display: "flex", flexDirection: "column", boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexShrink: 0 }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: "22px", fontWeight: "900", color: "var(--dash-text)" }}>استيراد من قالب التمارين</h3>
+                <p style={{ margin: "4px 0 0", color: "var(--dash-text-muted)", fontSize: "14px" }}>اختر برنامجاً لتطبيقه على الخطة الحالية.</p>
+              </div>
+              <button onClick={() => setShowLoadTemplate(false)} style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--dash-text-muted)", padding: "4px" }}><X size={24} /></button>
             </div>
-            {loadingTemplates ? <p>جاري التحميل...</p> : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {loadingTemplates ? (
+              <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}><RefreshCw size={32} className="spin" style={{ color: "var(--dash-primary)" }} /></div>
+            ) : (
+              <div style={{ flex: 1, overflowY: "auto", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "20px", paddingBottom: "20px" }}>
                 {templatesList.length === 0 ? <p style={{ color: "var(--dash-text-muted)" }}>لا توجد قوالب محفوظة.</p> : templatesList.map(tmpl => (
-                  <div key={tmpl.id} style={{ padding: "16px", border: "1px solid var(--dash-border)", borderRadius: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                      <strong style={{ display: "block", marginBottom: "4px" }}>{tmpl.name}</strong>
-                      <span style={{ fontSize: "12px", color: "var(--dash-text-muted)" }}>تم الحفظ في: {new Date(tmpl.created_at).toLocaleDateString()}</span>
+                  <div key={tmpl.id} style={{ border: "1.5px solid var(--dash-border)", borderRadius: "16px", overflow: "hidden", display: "flex", flexDirection: "column", background: "#fff", transition: "all 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.borderColor="var(--dash-primary)"} onMouseLeave={(e) => e.currentTarget.style.borderColor="var(--dash-border)"}>
+                    <div style={{ width: "100%", height: "140px", background: "var(--dash-bg)", position: "relative" }}>
+                      {tmpl.image_url ? (
+                        <img src={tmpl.image_url} alt={tmpl.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--dash-text-soft)" }}><Dumbbell size={48} opacity={0.5} /></div>
+                      )}
                     </div>
-                    <button onClick={() => {
-                      if (!window.confirm("استيراد القالب سيقوم بتبديل التمارين الحالية. هل أنت متأكد؟")) return;
-                      const content = tmpl.content_json;
-                      if (content.exercises) setExercises(content.exercises);
-                      if (content.notes) setGlobalNotes(content.notes);
-                      setShowLoadTemplate(false);
-                    }} style={{ background: "#fee2e2", color: "#ef4444", border: "none", padding: "8px 16px", borderRadius: "8px", fontWeight: "700", cursor: "pointer" }}>استيراد</button>
+                    <div style={{ padding: "16px", display: "flex", flexDirection: "column", flex: 1 }}>
+                      <strong style={{ display: "block", marginBottom: "8px", fontSize: "15px", fontWeight: "800", color: "var(--dash-text)" }}>{tmpl.name}</strong>
+                      {tmpl.description && <p style={{ fontSize: "12px", color: "var(--dash-text-muted)", margin: "0 0 12px", lineHeight: 1.5, flex: 1 }}>{tmpl.description}</p>}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto" }}>
+                        <span style={{ fontSize: "11px", color: "var(--dash-text-soft)", fontWeight: "600" }}>{new Date(tmpl.created_at).toLocaleDateString()}</span>
+                        <button onClick={() => {
+                          if (!window.confirm("استيراد القالب سيقوم بتبديل التمارين الحالية. هل أنت متأكد؟")) return;
+                          const content = tmpl.content_json;
+                          if (content.exercises) setExercises(content.exercises);
+                          if (content.notes) setGlobalNotes(content.notes);
+                          setShowLoadTemplate(false);
+                        }} style={{ background: "#fee2e2", color: "#ef4444", border: "none", padding: "8px 16px", borderRadius: "8px", fontWeight: "800", cursor: "pointer", fontSize: "13px" }}>استيراد</button>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

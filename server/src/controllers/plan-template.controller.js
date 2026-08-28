@@ -31,7 +31,7 @@ export const planTemplateController = {
     try {
       const doctorId = req.auth.user.doctor_id;
       if (!doctorId) throw new AppError(403, "FORBIDDEN", "A doctor profile is required");
-      const { domain, name, description, content_json } = req.body;
+      const { domain, name, description, content_json, image_url } = req.body;
       
       if (!domain || !name || !content_json) {
         throw new AppError(422, "VALIDATION_ERROR", "Domain, name, and content_json are required");
@@ -46,6 +46,7 @@ export const planTemplateController = {
         domain,
         name,
         description: description || null,
+        image_url: image_url || null,
         content_json,
       });
       
