@@ -10,7 +10,7 @@ export const planTemplateController = {
       if (!doctorId) throw new AppError(403, "FORBIDDEN", "A doctor profile is required");
       const { domain } = req.query;
       
-      const where = { tenant_id: req.tenantId, doctor_id: doctorId };
+      const where = { tenant_id: req.tenant.id, doctor_id: doctorId };
       if (domain) {
         where.domain = domain;
       }
@@ -41,7 +41,7 @@ export const planTemplateController = {
       }
       
       const template = await PlanTemplate.create({
-        tenant_id: req.tenantId,
+        tenant_id: req.tenant.id,
         doctor_id: doctorId,
         domain,
         name,
@@ -63,7 +63,7 @@ export const planTemplateController = {
       const { id } = req.params;
       
       const template = await PlanTemplate.findOne({
-        where: { id, tenant_id: req.tenantId, doctor_id: doctorId },
+        where: { id, tenant_id: req.tenant.id, doctor_id: doctorId },
       });
       
       if (!template) {
