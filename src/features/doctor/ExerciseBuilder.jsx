@@ -64,7 +64,7 @@ function ExerciseSearchModal({ onClose, onSelect }) {
     const delay = setTimeout(async () => {
       setLoading(true);
       try {
-        const res = await api.get(trimmed ? `/exercises?q=${encodeURIComponent(trimmed)}&limit=30` : "/exercises?limit=30");
+        const res = await api.get(trimmed ? `/exercises?q=${encodeURIComponent(trimmed)}&limit=100` : "/exercises?limit=100");
         setResults(res.items || []);
       } catch (err) {
         console.error(err);
@@ -130,7 +130,7 @@ function ExerciseSearchModal({ onClose, onSelect }) {
         </div>
 
         <div style={{ padding: "12px 24px", borderTop: "1px solid var(--dash-border)", fontSize: "12px", color: "var(--dash-text-muted)", fontWeight: "600", display: "flex", justifyContent: "space-between" }}>
-          <span>📊 {results.length} تمرين متاح</span>
+          <span>📊 عرض {results.length} نتيجة (ابحث للمزيد)</span>
           <span>مصدر: hasaneyldrm/exercises-dataset — 1324 تمرين</span>
         </div>
       </motion.div>
