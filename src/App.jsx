@@ -13,6 +13,7 @@ import TestimonialsSection from "./components/TestimonialsSection";
 import WarningSection from "./components/WarningSection";
 import PackagesSection from "./components/PackagesSection";
 import StoreSection from "./components/StoreSection";
+import CalorieCalculator from "./components/CalorieCalculator";
 import Footer from "./components/Footer";
 import { useRoute } from "./lib/router";
 import { AuthProvider } from "./context/AuthProvider";
@@ -124,6 +125,7 @@ export default function App() {
           <Hero />
           <Mission />
           <AssessmentSection />
+          <CalorieCalculator />
           <ValuesSection />
           <Banner />
           <CareSection />
