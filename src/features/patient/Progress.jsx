@@ -98,6 +98,85 @@ function GoalCard({ goal, goalProgress }) {
   );
 }
 
+function ProgressChart({ items, targetWeight }) {
+  if (!items || items.length < 2) return null;
+
+  // Sort chronologically (oldest to newest for graph left-to-right)
+  const sorted = [...items].sort((a, b) => new Date(a.measuredOn) - new Date(b.measuredOn));
+  const values = sorted.map((d) => d.value);
+
+  const minVal = Math.min(...values, targetWeight || Infinity) - 2;
+  const maxVal = Math.max(...values, targetWeight || -Infinity) + 2;
+  const range = maxVal - minVal || 1;
+
+  const height = 180;
+  const width = 600;
+  const paddingX = 40;
+  const paddingY = 20;
+
+  const points = sorted.map((item, index) => {
+    const x = paddingX + (index / (sorted.length - 1)) * (width - paddingX * 2);
+    const y = height - paddingY - ((item.value - minVal) / range) * (height - paddingY * 2);
+    return { x, y, value: item.value, date: item.measuredOn };
+  });
+
+  const pathD = points.reduce((acc, point, i) => {
+    return i === 0 ? `M ${point.x} ${point.y}` : `${acc} L ${point.x} ${point.y}`;
+  }, "");
+
+  const areaD = `${pathD} L ${points[points.length - 1].x} ${height - paddingY} L ${points[0].x} ${height - paddingY} Z`;
+
+  let targetY = null;
+  if (targetWeight != null && targetWeight >= minVal && targetWeight <= maxVal) {
+    targetY = height - paddingY - ((targetWeight - minVal) / range) * (height - paddingY * 2);
+  }
+
+  return (
+    <section className="dash-panel" style={{ padding: 20 }}>
+      <div className="dash-panel__head" style={{ marginBottom: 12 }}>
+        <h3 className="dash-panel__title" style={{ fontSize: 15, fontWeight: 800 }}>📈 الرسم البياني لتغير الوزن</h3>
+      </div>
+      <div style={{ width: "100%", overflowX: "auto" }}>
+        <svg viewBox={`0 0 ${width} ${height}`} style={{ width: "100%", height: "auto", minWidth: 400 }}>
+          <defs>
+            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--dash-primary, #6fd005)" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="var(--dash-primary, #6fd005)" stopOpacity="0.0" />
+            </linearGradient>
+          </defs>
+
+          {/* Area fill */}
+          <path d={areaD} fill="url(#chartGradient)" />
+
+          {/* Target Weight dashed line */}
+          {targetY !== null && (
+            <g>
+              <line x1={paddingX} y1={targetY} x2={width - paddingX} y2={targetY} stroke="#3b82f6" strokeDasharray="4 4" strokeWidth="1.5" opacity="0.7" />
+              <text x={width - paddingX + 5} y={targetY + 4} fill="#3b82f6" fontSize="10" fontWeight="bold">الهدف: {targetWeight}kg</text>
+            </g>
+          )}
+
+          {/* Main trend line */}
+          <path d={pathD} fill="none" stroke="var(--dash-primary, #6fd005)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+          {/* Data Points */}
+          {points.map((pt, i) => (
+            <g key={i}>
+              <circle cx={pt.x} cy={pt.y} r="5" fill="#ffffff" stroke="var(--dash-primary, #6fd005)" strokeWidth="2.5" />
+              <text x={pt.x} y={pt.y - 10} textAnchor="middle" fill="var(--dash-text, #101f2e)" fontSize="11" fontWeight="bold">
+                {pt.value}
+              </text>
+              <text x={pt.x} y={height - 4} textAnchor="middle" fill="var(--dash-text-muted, #64748b)" fontSize="9">
+                {pt.date?.slice(5) || ""}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+    </section>
+  );
+}
+
 function History({ items }) {
   const { t } = useTranslation();
   if (!items || !items.length) {
@@ -157,6 +236,7 @@ export default function PatientProgress() {
       </div>
 
       <RecordForm weight={data} onSaved={reload} />
+      <ProgressChart items={data.recent} targetWeight={data.goal?.targetValue} />
       <GoalCard goal={data.goal} goalProgress={data.goalProgress} />
 
       <section className="dash-panel">

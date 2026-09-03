@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, KeyRound, CheckCircle2, MessageCircle } from "lucide-react";
+import { waUrl } from "../../config";
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -10,6 +12,10 @@ export default function LoginPage() {
   const [form, setForm] = useState({ identifier: "", password: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
@@ -87,27 +93,34 @@ export default function LoginPage() {
             />
           </label>
           
-          <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontWeight: "600", fontSize: "14px", color: "var(--text)" }}>
-            كلمة المرور
-            <motion.input 
-              whileFocus={{ scale: 1.01, borderColor: "var(--primary)" }}
-              required 
-              type="password" 
-              value={form.password} 
-              onChange={(e) => setForm({ ...form, password: e.target.value })} 
-              autoComplete="current-password" 
-              style={{
-                padding: "14px",
-                borderRadius: "12px",
-                border: "1px solid var(--line)",
-                background: "var(--bg-soft)",
-                color: "var(--text)",
-                outline: "none",
-                fontSize: "16px",
-                transition: "border 0.2s ease, box-shadow 0.2s ease"
-              }}
-            />
-          </label>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--text)" }}>كلمة المرور</span>
+            <button
+              type="button"
+              onClick={() => setForgotOpen(true)}
+              style={{ background: "none", border: "none", color: "var(--primary)", fontSize: "13px", fontWeight: "700", cursor: "pointer" }}
+            >
+              نسيت كلمة المرور؟
+            </button>
+          </div>
+          <motion.input 
+            whileFocus={{ scale: 1.01, borderColor: "var(--primary)" }}
+            required 
+            type="password" 
+            value={form.password} 
+            onChange={(e) => setForm({ ...form, password: e.target.value })} 
+            autoComplete="current-password" 
+            style={{
+              padding: "14px",
+              borderRadius: "12px",
+              border: "1px solid var(--line)",
+              background: "var(--bg-soft)",
+              color: "var(--text)",
+              outline: "none",
+              fontSize: "16px",
+              transition: "border 0.2s ease, box-shadow 0.2s ease"
+            }}
+          />
 
           {(error || authError) && (
             <motion.p 
@@ -158,6 +171,105 @@ export default function LoginPage() {
           ← العودة للصفحة الرئيسية
         </button>
       </motion.div>
+
+      <AnimatePresence>
+        {forgotOpen && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(0,0,0,0.6)",
+              backdropFilter: "blur(6px)",
+              padding: 20,
+            }}
+            onClick={() => setForgotOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "var(--card-bg)",
+                width: "100%",
+                maxWidth: 420,
+                borderRadius: 20,
+                padding: 28,
+                boxShadow: "var(--shadow-lg)",
+                textAlign: "start",
+                position: "relative",
+              }}
+            >
+              <button
+                onClick={() => setForgotOpen(false)}
+                style={{ position: "absolute", top: 20, left: 20, background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}
+              >
+                <X size={20} />
+              </button>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                <span style={{ width: 40, height: 40, borderRadius: 10, background: "var(--primary-tint)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <KeyRound size={22} />
+                </span>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>استعادة كلمة المرور</h3>
+              </div>
+
+              {!forgotSent ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!forgotEmail.trim()) return;
+                    setForgotSent(true);
+                  }}
+                  style={{ display: "flex", flexDirection: "column", gap: 14 }}
+                >
+                  <p style={{ fontSize: 14, color: "var(--text-muted)", margin: 0, lineHeight: 1.6 }}>
+                    أدخل البريد الإلكتروني أو رقم الهاتف المرتبط بحسابك وستتلقى تعليمات استعادة كلمة المرور أو التواصل المباشر مع الدعم.
+                  </p>
+
+                  <input
+                    type="text"
+                    required
+                    className="input"
+                    placeholder="البريد الإلكتروني أو الهاتف..."
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                  />
+
+                  <button className="btn btn-accent" style={{ width: "100%", justifyContent: "center", padding: 12 }}>
+                    إرسال طلب الاستعادة
+                  </button>
+
+                  <a
+                    href={waUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-outline"
+                    style={{ width: "100%", justifyContent: "center", padding: 12, gap: 8 }}
+                  >
+                    <MessageCircle size={18} /> التواصل عبر واتساب للمساعدة
+                  </a>
+                </form>
+              ) : (
+                <div style={{ textAlign: "center", padding: "10px 0" }}>
+                  <CheckCircle2 size={48} style={{ color: "var(--primary)", marginBottom: 12 }} />
+                  <h4 style={{ margin: "0 0 8px 0", fontSize: 16, fontWeight: 800 }}>تم استلام طلبك!</h4>
+                  <p style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 20 }}>
+                    إذا كان الحساب ({forgotEmail}) مسجلاً لدينا، تم إرسال تعليمات إعادة تعيين كلمة المرور. يمكنك أيضاً التواصل مع العيادة مباشرة.
+                  </p>
+                  <button className="btn btn-primary" onClick={() => setForgotOpen(false)} style={{ width: "100%", justifyContent: "center" }}>
+                    تم
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
