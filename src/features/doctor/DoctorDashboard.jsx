@@ -444,11 +444,15 @@ export default function DoctorDashboard({ path }) {
   const patientProfileMatch = path.match(/^\/doctor\/patients\/(\d+)$/);
   const nutritionBuilderMatch = path.match(/^\/doctor\/patients\/(\d+)\/nutrition-builder$/);
   const exerciseBuilderMatch = path.match(/^\/doctor\/patients\/(\d+)\/exercise-builder$/);
+  const nutritionAltMatch = path.match(/^\/doctor\/nutrition\/(\d+)$/);
+  const exerciseAltMatch = path.match(/^\/doctor\/exercise\/(\d+)$/);
   const reviewDetailMatch = path.match(/^\/doctor\/reviews\/(\d+)$/);
 
   let page;
   if (nutritionBuilderMatch) page = <NutritionBuilder patientId={nutritionBuilderMatch[1]} />;
   else if (exerciseBuilderMatch) page = <ExerciseBuilder patientId={exerciseBuilderMatch[1]} />;
+  else if (nutritionAltMatch) page = <NutritionBuilder patientId={nutritionAltMatch[1]} />;
+  else if (exerciseAltMatch) page = <ExerciseBuilder patientId={exerciseAltMatch[1]} />;
   else if (patientProfileMatch) page = <PatientProfile patientId={patientProfileMatch[1]} />;
   else if (reviewDetailMatch) page = <ReviewDetail reviewId={reviewDetailMatch[1]} />;
   else if (path === "/doctor/patients") page = <PatientsList />;

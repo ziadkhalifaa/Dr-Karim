@@ -546,8 +546,10 @@ function SavedPlans({ patientId, reloadKey }) {
     }
   };
 
-  const handleOpen = (domain, planId) => {
-    window.location.href = `/doctor/${domain === "nutrition" ? "nutrition" : "exercise"}/${planId}`;
+  const handleOpen = (domain) => {
+    if (patientId) {
+      navigate(`/doctor/patients/${patientId}/${domain === "nutrition" ? "nutrition" : "exercise"}-builder`);
+    }
   };
 
   if (!plans) return null;
