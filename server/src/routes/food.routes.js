@@ -7,6 +7,9 @@ export function foodRouter() {
   router.use(requireAuth);
   
   router.get("/", foodController.list);
+  router.post("/", foodController.create);
+  router.put("/:id", foodController.update);
+  router.delete("/:id", foodController.remove);
   
   return router;
 }

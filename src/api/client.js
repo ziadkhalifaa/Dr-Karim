@@ -49,6 +49,9 @@ export const patientApi = {
 };
 export const foodApi = {
   list: (query = "") => api.get(`/food${query}`),
+  create: (body) => api.post("/food", body),
+  update: (id, body) => api.put(`/food/${id}`, body),
+  delete: (id) => api.delete(`/food/${id}`),
 };
 export const servicesApi = {
   // Doctor protected
