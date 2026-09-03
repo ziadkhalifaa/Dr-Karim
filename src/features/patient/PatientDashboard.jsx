@@ -16,6 +16,7 @@ import {
   ShoppingBag,
   Trophy,
   Coins,
+  MessageCircle,
 } from "lucide-react";
 import DashboardShell from "../shared/DashboardShell";
 import NotificationsPanel from "../shared/NotificationsPanel";
