@@ -93,6 +93,11 @@ export const planApi = (domain) => ({ create: (body) => api.post(`/${domain}-pla
 export const nutritionApi = planApi("nutrition");
 export const exerciseApi = planApi("exercise");
 export const planTemplateApi = { list: (domain) => api.get(`/plan-templates${domain ? `?domain=${domain}` : ""}`), create: (body) => api.post("/plan-templates", body), delete: (id) => api.delete(`/plan-templates/${id}`) };
+export const exerciseCatalogApi = {
+  list: (query = "") => api.get(`/exercises${query}`),
+  setArName: (exerciseId, exerciseName, nameAr) => api.put(`/exercises/${exerciseId}/ar-name`, { exerciseId, exerciseName, nameAr }),
+  getOverrides: () => api.get("/exercises/ar-overrides"),
+};
 export const checkinApi = { list: (id) => api.get(`/patients/${id}/checkins`), create: (id, body) => api.post(`/patients/${id}/checkins`, body), review: (id, body) => api.post(`/checkins/${id}/review`, body) };
 export const appointmentApi = { get: (id) => api.get(`/appointments/${id}`), patientList: (id) => api.get(`/patients/${id}/appointments`), doctorList: (id) => api.get(`/doctors/${id}/appointments`), create: (body) => api.post("/appointments", body), transition: (id, action) => api.post(`/appointments/${id}/${action}`, {}) };
 export const slotApi = { list: (query = "") => api.get(`/appointments/slots${query}`), create: (body) => api.post("/appointments/slots", body), book: (id, body = {}) => api.post(`/appointments/slots/${id}/book`, body), cancel: (id) => api.post(`/appointments/slots/${id}/cancel`, {}) };

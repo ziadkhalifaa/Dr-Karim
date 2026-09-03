@@ -39,7 +39,8 @@ function GifCard({ item, onSelect }) {
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: "800", color: "var(--dash-text)", fontSize: "14px", marginBottom: "6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.name}</div>
+        <div style={{ fontWeight: "800", color: "var(--dash-text)", fontSize: "14px", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.nameAr || item.name}</div>
+        {item.nameAr && <div style={{ fontSize: "11px", color: "var(--dash-text-muted)", fontWeight: "600", marginBottom: "4px" }}>{item.name}</div>}
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
           {item.muscleGroup && <span style={{ background: "#fee2e2", color: "#ef4444", padding: "2px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: "700" }}>{item.muscleGroup}</span>}
           {item.equipment && <span style={{ background: "var(--dash-bg)", padding: "2px 8px", borderRadius: "6px", fontSize: "11px", fontWeight: "600", color: "var(--dash-text-muted)" }}>{item.equipment}</span>}
