@@ -1,6 +1,6 @@
 // Migration 042 — Points & rewards: patient point ledger and reward redemptions.
 
-import { DataTypes } from "sequelize";
+import { DataTypes, Sequelize } from "sequelize";
 
 export async function up(queryInterface) {
   await queryInterface.createTable("care_points", {
@@ -19,7 +19,7 @@ export async function up(queryInterface) {
       allowNull: false,
     },
     reference_id: { type: DataTypes.STRING(120), allowNull: true },
-    created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.literal("CURRENT_TIMESTAMP") },
+    created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: Sequelize.literal("CURRENT_TIMESTAMP") },
   });
 
   await queryInterface.createTable("care_reward", {
@@ -33,7 +33,7 @@ export async function up(queryInterface) {
       allowNull: false,
       defaultValue: "approved",
     },
-    created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.literal("CURRENT_TIMESTAMP") },
+    created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: Sequelize.literal("CURRENT_TIMESTAMP") },
   });
 }
 
