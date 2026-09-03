@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { careApi, patientApi, nutritionApi, exerciseApi } from "../../api/client";
 import { navigate } from "../../lib/router";
+import { useToast } from "../../context/ToastContext";
 import PatientSelector from "../shared/PatientSelector";
 import { templateStore } from "../../lib/templateStore";
 
@@ -518,7 +519,7 @@ const PLAN_STATUS_AR = { draft: "مسودة", doctor_review: "قيد المرا�
 function SavedPlans({ patientId, reloadKey }) {
   const [plans, setPlans] = useState(null);
   const [busy, setBusy] = useState(null);
-  const navigate = typeof window !== "undefined" ? null : null;
+  const toast = useToast();
 
   const reload = () => {
     if (!patientId) { setPlans(null); return; }
@@ -533,14 +534,15 @@ function SavedPlans({ patientId, reloadKey }) {
   }, [patientId, reloadKey]);
 
   const handleArchive = async (domain, versionId) => {
-    if (!window.confirm("هل أنت متأكد من أرشفة هذه الخطة؟ لن تظهر للمريض بعد ذلك.")) return;
+    if (!window.confirm("هل أنت متأكد من حذف الخطة؟ لن تظهر للمريض بعد ذلك.")) return;
     setBusy(versionId);
     try {
       const api = domain === "nutrition" ? nutritionApi : exerciseApi;
       await api.archive(versionId);
+      toast.success("تم حذف الخطة بنجاح");
       reload();
     } catch (err) {
-      alert(err.message || "حدث خطأ أثناء الأرشفة");
+      toast.error(err.message || "حدث خطأ أثناء الحذف");
     } finally {
       setBusy(null);
     }
