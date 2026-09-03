@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { requireAuth } from "../middleware/auth.js";
 import { ok } from "../middleware/api-response.js";
+import multer from "multer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,10 +12,32 @@ const __dirname = path.dirname(__filename);
 const dataPath = path.join(__dirname, "../data/exercises.json");
 const arPath = path.join(__dirname, "../data/exercises-ar.json");
 const overridesPath = path.join(__dirname, "../data/exercises-ar-overrides.json");
+const mediaOverridesPath = path.join(__dirname, "../data/exercises-media-overrides.json");
 const GIF_BASE = "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/";
+
+// Set up multer for local uploads
+const upload = multer({
+  dest: path.join(__dirname, "../../../public/uploads/exercises/"),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+});
 
 let exercisesCache = null;
 let arNames = null;
+let mediaOverridesCache = null;
+
+function loadMediaOverrides() {
+  if (mediaOverridesCache) return mediaOverridesCache;
+  try {
+    if (fs.existsSync(mediaOverridesPath)) {
+      mediaOverridesCache = JSON.parse(fs.readFileSync(mediaOverridesPath, "utf8"));
+    } else {
+      mediaOverridesCache = {};
+    }
+  } catch {
+    mediaOverridesCache = {};
+  }
+  return mediaOverridesCache;
+}
 
 function loadArNames() {
   if (arNames) return arNames;
@@ -39,11 +62,29 @@ function loadExercises() {
   if (exercisesCache) return exercisesCache;
   const rawData = fs.readFileSync(dataPath, "utf8");
   const ar = loadArNames();
+  const mediaOverrides = loadMediaOverrides();
+  
   exercisesCache = JSON.parse(rawData).map((ex, index) => {
+    const id = ex.id || `ex_${index}`;
     const nameKey = (ex.name || "").toLowerCase();
     const nameAr = ar[nameKey] || null;
+    const customMedia = mediaOverrides[id] || null;
+    
+    let gifUrl = ex.gif_url ? GIF_BASE + ex.gif_url : null;
+    let imageUrl = ex.image ? GIF_BASE + ex.image : null;
+    
+    if (customMedia) {
+      if (customMedia.endsWith(".gif") || customMedia.endsWith(".mp4") || customMedia.endsWith(".webm") || customMedia.includes("giphy.com")) {
+        gifUrl = customMedia.startsWith("http") ? customMedia : `/uploads/exercises/${customMedia}`;
+        imageUrl = customMedia.startsWith("http") ? customMedia : `/uploads/exercises/${customMedia}`;
+      } else {
+        imageUrl = customMedia.startsWith("http") ? customMedia : `/uploads/exercises/${customMedia}`;
+        gifUrl = customMedia.startsWith("http") ? customMedia : `/uploads/exercises/${customMedia}`; // Using image as gif if none exists
+      }
+    }
+
     return {
-      id: ex.id || `ex_${index}`,
+      id,
       name: ex.name,
       nameAr,
       category: ex.category,
@@ -55,8 +96,8 @@ function loadExercises() {
       secondaryMuscles: ex.secondary_muscles || [],
       instructions: ex.instructions || (ex.instruction_steps?.en ? ex.instruction_steps.en.join(" ") : ""),
       level: ex.level || null,
-      gifUrl: ex.gif_url ? GIF_BASE + ex.gif_url : null,
-      imageUrl: ex.image ? GIF_BASE + ex.image : null,
+      gifUrl,
+      imageUrl,
       attribution: ex.attribution || null,
     };
   });
@@ -66,6 +107,7 @@ function loadExercises() {
 function invalidateCache() {
   exercisesCache = null;
   arNames = null;
+  mediaOverridesCache = null;
 }
 
 export function exerciseCatalogRouter() {
@@ -139,6 +181,44 @@ export function exerciseCatalogRouter() {
         overrides = JSON.parse(fs.readFileSync(overridesPath, "utf8"));
       }
       return res.json({ success: true, data: overrides });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Doctor-only: set media for an exercise (URL or upload)
+  router.put("/:exerciseId/media", requireAuth, upload.single("mediaFile"), (req, res, next) => {
+    try {
+      if (req.auth.role !== "doctor" && req.auth.role !== "admin") {
+        return res.status(403).json({ success: false, error: { message: "غير مصرح" } });
+      }
+      
+      const { exerciseId } = req.params;
+      const { mediaUrl } = req.body;
+      
+      let finalMedia = null;
+      
+      if (req.file) {
+        // file uploaded locally
+        finalMedia = req.file.filename;
+      } else if (mediaUrl && mediaUrl.trim()) {
+        // external url provided
+        finalMedia = mediaUrl.trim();
+      } else {
+        return res.status(400).json({ success: false, error: { message: "يجب إرسال رابط أو رفع ملف" } });
+      }
+      
+      let overrides = {};
+      if (fs.existsSync(mediaOverridesPath)) {
+        overrides = JSON.parse(fs.readFileSync(mediaOverridesPath, "utf8"));
+      }
+      
+      overrides[exerciseId] = finalMedia;
+      fs.writeFileSync(mediaOverridesPath, JSON.stringify(overrides, null, 2), "utf8");
+      
+      invalidateCache();
+      
+      return res.json({ success: true, data: { exerciseId, media: finalMedia } });
     } catch (err) {
       next(err);
     }

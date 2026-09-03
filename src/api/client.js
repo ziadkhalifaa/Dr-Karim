@@ -97,6 +97,18 @@ export const exerciseCatalogApi = {
   list: (query = "") => api.get(`/exercises${query}`),
   setArName: (exerciseId, exerciseName, nameAr) => api.put(`/exercises/${exerciseId}/ar-name`, { exerciseId, exerciseName, nameAr }),
   getOverrides: () => api.get("/exercises/ar-overrides"),
+  setMedia: (exerciseId, mediaUrlOrFile) => {
+    if (mediaUrlOrFile instanceof File) {
+      const form = new FormData();
+      form.append("mediaFile", mediaUrlOrFile);
+      return fetch(`${API_BASE}/exercises/${exerciseId}/media`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${tokenStore.access}` },
+        body: form,
+      }).then(parse);
+    }
+    return api.put(`/exercises/${exerciseId}/media`, { mediaUrl: mediaUrlOrFile });
+  }
 };
 export const checkinApi = { list: (id) => api.get(`/patients/${id}/checkins`), create: (id, body) => api.post(`/patients/${id}/checkins`, body), review: (id, body) => api.post(`/checkins/${id}/review`, body) };
 export const appointmentApi = { get: (id) => api.get(`/appointments/${id}`), patientList: (id) => api.get(`/patients/${id}/appointments`), doctorList: (id) => api.get(`/doctors/${id}/appointments`), create: (body) => api.post("/appointments", body), transition: (id, action) => api.post(`/appointments/${id}/${action}`, {}) };

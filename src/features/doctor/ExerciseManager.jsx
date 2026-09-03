@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Search, Edit2, Save, X, RefreshCw, Dumbbell, Play, Check } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Search, Edit2, Save, X, RefreshCw, Dumbbell, Play, Check, ImageIcon, UploadCloud, Link as LinkIcon } from "lucide-react";
 import { exerciseCatalogApi } from "../../api/client";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,6 +11,14 @@ export default function ExerciseManager() {
   const [editValue, setEditValue] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedIds, setSavedIds] = useState(new Set());
+  
+  const [mediaModalOpen, setMediaModalOpen] = useState(false);
+  const [selectedEx, setSelectedEx] = useState(null);
+  const [mediaType, setMediaType] = useState("url"); // "url" | "file"
+  const [mediaUrl, setMediaUrl] = useState("");
+  const [mediaFile, setMediaFile] = useState(null);
+  const [mediaSaving, setMediaSaving] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const delay = setTimeout(fetchExercises, query ? 400 : 0);
@@ -56,6 +64,35 @@ export default function ExerciseManager() {
       alert(err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const openMediaModal = (ex) => {
+    setSelectedEx(ex);
+    setMediaType("url");
+    setMediaUrl(ex.gifUrl || ex.imageUrl || "");
+    setMediaFile(null);
+    setMediaModalOpen(true);
+  };
+
+  const saveMedia = async () => {
+    if (mediaType === "url" && !mediaUrl.trim()) return;
+    if (mediaType === "file" && !mediaFile) return;
+    
+    setMediaSaving(true);
+    try {
+      const payload = mediaType === "file" ? mediaFile : mediaUrl.trim();
+      const res = await exerciseCatalogApi.setMedia(selectedEx.id, payload);
+      const newUrl = mediaType === "file" ? `/uploads/exercises/${res.data.media}` : res.data.media;
+      
+      setExercises(prev =>
+        prev.map(e => e.id === selectedEx.id ? { ...e, gifUrl: newUrl, imageUrl: newUrl } : e)
+      );
+      setMediaModalOpen(false);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setMediaSaving(false);
     }
   };
 
@@ -155,9 +192,14 @@ export default function ExerciseManager() {
                           </button>
                         </div>
                       ) : (
-                        <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={() => startEdit(ex)}>
-                          <Edit2 size={15} /> تعديل
-                        </button>
+                        <div className="dash-row-actions">
+                          <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={() => startEdit(ex)}>
+                            <Edit2 size={15} /> تعديل الاسم
+                          </button>
+                          <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={() => openMediaModal(ex)}>
+                            <ImageIcon size={15} /> الوسائط
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -167,6 +209,59 @@ export default function ExerciseManager() {
           </div>
         )}
       </section>
+
+      <AnimatePresence>
+        {mediaModalOpen && selectedEx && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }} onClick={() => setMediaModalOpen(false)}>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
+              style={{ background: "var(--dash-card-bg)", width: "100%", maxWidth: 500, borderRadius: 20, boxShadow: "0 20px 40px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column" }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--dash-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>تعديل فيديو / صورة التمرين</h3>
+                <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={() => setMediaModalOpen(false)}><X size={20}/></button>
+              </div>
+              <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+                <div style={{ display: "flex", gap: 8, padding: 4, background: "var(--dash-bg)", borderRadius: 12 }}>
+                  <button className={`dash-btn ${mediaType === "url" ? "dash-btn--primary" : "dash-btn--ghost"}`} style={{ flex: 1 }} onClick={() => setMediaType("url")}>
+                    <LinkIcon size={16} /> رابط خارجي
+                  </button>
+                  <button className={`dash-btn ${mediaType === "file" ? "dash-btn--primary" : "dash-btn--ghost"}`} style={{ flex: 1 }} onClick={() => setMediaType("file")}>
+                    <UploadCloud size={16} /> رفع ملف
+                  </button>
+                </div>
+
+                {mediaType === "url" ? (
+                  <label className="dash-field">
+                    <span>رابط الصورة المتحركة (GIF) أو الفيديو</span>
+                    <input type="url" className="dash-input" placeholder="https://..." value={mediaUrl} onChange={e => setMediaUrl(e.target.value)} />
+                    <span style={{ fontSize: 11, color: "var(--dash-text-muted)", marginTop: 4 }}>يمكنك لصق رابط من Giphy أو يوتيوب أو أي موقع آخر</span>
+                  </label>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    <input type="file" ref={fileInputRef} style={{ display: "none" }} accept="image/*,video/mp4" onChange={e => setMediaFile(e.target.files[0])} />
+                    <div 
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{ border: "2px dashed var(--dash-border)", borderRadius: 12, padding: 30, textAlign: "center", cursor: "pointer", background: "var(--dash-bg)" }}
+                    >
+                      <UploadCloud size={32} style={{ color: "var(--dash-text-muted)", marginBottom: 12 }} />
+                      <div style={{ fontWeight: 600 }}>{mediaFile ? mediaFile.name : "اضغط هنا لاختيار ملف"}</div>
+                      <div style={{ fontSize: 12, color: "var(--dash-text-muted)", marginTop: 4 }}>يدعم الصور, GIF, والفيديو (أقل من 10MB)</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div style={{ padding: "16px 24px", borderTop: "1px solid var(--dash-border)", display: "flex", justifyContent: "flex-end", gap: 12 }}>
+                <button type="button" className="dash-btn dash-btn--ghost" onClick={() => setMediaModalOpen(false)}>إلغاء</button>
+                <button type="button" className="dash-btn dash-btn--primary" onClick={saveMedia} disabled={mediaSaving}>
+                  <Save size={18} /> حفظ الوسائط
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
