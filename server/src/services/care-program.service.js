@@ -170,8 +170,23 @@ function programStatusMessage(program) {
   return { programId: String(program.id), status: program.status, startDate: program.start_date, endDate: program.end_date };
 }
 
+const MEAL_NAMES_AR = {
+  breakfast: "وجبة الفطور",
+  lunch: "وجبة الغداء",
+  dinner: "وجبة العشاء",
+  snack_1: "وجبة خفيفة 1",
+  snack_2: "وجبة خفيفة 2",
+};
+const MEAL_NAMES_EN = {
+  breakfast: "Breakfast",
+  lunch: "Lunch",
+  dinner: "Dinner",
+  snack_1: "Snack 1",
+  snack_2: "Snack 2",
+};
+
 async function deriveDefinitionsFromPlans(version, tenantId, transaction) {
-  const definitions = [];
+  const rawDefs = [];
   let sortCounter = 0;
   if (version.nutrition_plan_version_id) {
     const meals = await MealTemplate.findAll({
@@ -179,14 +194,20 @@ async function deriveDefinitionsFromPlans(version, tenantId, transaction) {
       order: [["sort_order", "ASC"], ["id", "ASC"]], transaction, raw: true,
     });
     for (const meal of meals) {
-      definitions.push({
+      const code = "meal_" + String(meal.code).toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 30);
+      const nameAr = meal.name_ar || MEAL_NAMES_AR[meal.code] || meal.code || "وجبة غذائية";
+      const nameEn = meal.name_en || MEAL_NAMES_EN[meal.code] || meal.code || "Meal";
+      rawDefs.push({
+        tenant_id: tenantId,
+        care_program_version_id: version.id,
         activity_type: "nutrition",
-        code: "meal_" + String(meal.code).toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 40),
-        name_ar: meal.name_ar, name_en: meal.name_en,
+        code,
+        name_ar: nameAr,
+        name_en: nameEn,
         measure: "boolean",
         planned_target_json: { mealTemplateId: meal.id, dayNumber: meal.day_number },
         sort_order: sortCounter++,
-        points_reward: POINTS.nutrition_completed,
+        active: true,
       });
     }
   }
@@ -200,19 +221,35 @@ async function deriveDefinitionsFromPlans(version, tenantId, transaction) {
       for (let i = 0; i < exercises.length; i++) {
         const ex = exercises[i];
         const exercise = ex.exercise || ex;
-        definitions.push({
+        const code = "ex_" + String(exercise.code || exercise.id || i).toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 30);
+        const nameAr = exercise.name_ar || exercise.nameAr || exercise.name || "تمرين رياضي";
+        const nameEn = exercise.name_en || exercise.nameEn || exercise.name || "Exercise";
+        rawDefs.push({
+          tenant_id: tenantId,
+          care_program_version_id: version.id,
           activity_type: "exercise",
-          code: "exercise_" + (exercise.code || String(exercise.id)),
-          name_ar: exercise.name_ar, name_en: exercise.name_en,
+          code,
+          name_ar: nameAr,
+          name_en: nameEn,
           measure: "boolean",
           planned_target_json: { exerciseId: exercise.id, sets: ex.sets, reps: ex.reps, rest: ex.rest, duration: ex.duration },
           sort_order: sortCounter++,
-          points_reward: POINTS.exercise_completed,
+          active: true,
         });
       }
     }
   }
-  return definitions;
+
+  const createdDefs = [];
+  for (const def of rawDefs) {
+    const [row] = await CareActivityDefinition.findOrCreate({
+      where: { tenant_id: tenantId, care_program_version_id: version.id, code: def.code },
+      defaults: def,
+      transaction,
+    });
+    createdDefs.push(row.toJSON());
+  }
+  return createdDefs;
 }
 
 export const careProgramService = {

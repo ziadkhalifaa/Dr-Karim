@@ -150,13 +150,12 @@ export const CareActivityInstance = sequelize.define(
     measure: { type: DataTypes.ENUM(...ENUM.CARE_ACTIVITY_MEASURE), allowNull: false },
     planned_target_json: { type: DataTypes.JSON, allowNull: true },
     sort_order: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
+    created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
   },
   {
     tableName: "care_activity_instance",
     underscored: true,
-    timestamps: true,
-    createdAt: "created_at",
-    updatedAt: false,
+    timestamps: false,
     indexes: [
       { name: "cai_day_definition", unique: true, fields: ["care_day_id", "care_activity_definition_id"] },
       { name: "cai_tenant_day", fields: ["tenant_id", "care_day_id"] },
@@ -185,13 +184,12 @@ export const CareActivityExecution = sequelize.define(
     source: { type: DataTypes.ENUM(...ENUM.CARE_EXECUTION_SOURCE), allowNull: false, defaultValue: "patient" },
     idempotency_key: { type: DataTypes.STRING(120), allowNull: true },
     metadata_json: { type: DataTypes.JSON, allowNull: true },
+    created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
   },
   {
     tableName: "care_activity_execution",
     underscored: true,
-    timestamps: true,
-    createdAt: "created_at",
-    updatedAt: false,
+    timestamps: false,
     indexes: [
       { name: "cae_instance_status", fields: ["activity_instance_id", "status"] },
       { name: "cae_tenant_day", fields: ["tenant_id", "care_day_id"] },
