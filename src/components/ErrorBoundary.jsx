@@ -1,5 +1,41 @@
 import { Component } from "react";
 
+// Detect Vite chunk hash mismatch after a new deployment.
+// When a lazy-loaded chunk fails ("Failed to fetch dynamically imported module"),
+// the browser is holding stale index.html referencing old hashes. A hard reload
+// fixes it automatically. We guard against infinite reload loops with sessionStorage.
+const CHUNK_RELOAD_KEY = "__chunk_reload_attempted";
+function isChunkLoadError(error) {
+  const msg = String(error?.message || error || "");
+  return (
+    msg.includes("Failed to fetch dynamically imported module") ||
+    msg.includes("Importing a module script failed") ||
+    msg.includes("Unable to preload CSS") ||
+    msg.includes("error loading dynamically imported module")
+  );
+}
+
+// Global handler: catches errors that bypass React (e.g. from dynamic import
+// at the router level before any component mounts).
+if (typeof window !== "undefined") {
+  window.addEventListener("error", (e) => {
+    if (isChunkLoadError(e.error || e.message)) {
+      if (!sessionStorage.getItem(CHUNK_RELOAD_KEY)) {
+        sessionStorage.setItem(CHUNK_RELOAD_KEY, "1");
+        window.location.reload();
+      }
+    }
+  });
+  window.addEventListener("unhandledrejection", (e) => {
+    if (isChunkLoadError(e.reason)) {
+      if (!sessionStorage.getItem(CHUNK_RELOAD_KEY)) {
+        sessionStorage.setItem(CHUNK_RELOAD_KEY, "1");
+        window.location.reload();
+      }
+    }
+  });
+}
+
 // Route-level safety net: React unmounts the whole tree on an uncaught render
 // error (blank white page). This boundary keeps the rest of the UI alive and
 // surfaces the failure instead.
@@ -14,11 +50,23 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
+    // If it's a chunk load error, auto-reload once
+    if (isChunkLoadError(error)) {
+      if (!sessionStorage.getItem(CHUNK_RELOAD_KEY)) {
+        sessionStorage.setItem(CHUNK_RELOAD_KEY, "1");
+        window.location.reload();
+        return;
+      }
+    }
+    // Clear reload guard on non-chunk errors
+    sessionStorage.removeItem(CHUNK_RELOAD_KEY);
     console.error("UI crash:", error, info?.componentStack);
   }
 
   render() {
     if (this.state.error) {
+      // Don't render error UI for chunk errors - we're reloading anyway
+      if (isChunkLoadError(this.state.error)) return null;
       return (
         <div dir="rtl" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg, #f6fafc)", padding: 24, fontFamily: "var(--font-body, sans-serif)" }}>
           <div style={{ maxWidth: 480, textAlign: "center", background: "var(--card-bg, #fff)", border: "1px solid var(--line, rgba(16,31,46,.1))", borderRadius: 20, padding: "32px 28px", boxShadow: "var(--shadow, 0 8px 24px rgba(2,36,102,.08))" }}>
@@ -32,7 +80,7 @@ export default class ErrorBoundary extends Component {
             </pre>
             <button
               type="button"
-              onClick={() => window.location.reload()}
+              onClick={() => { sessionStorage.removeItem(CHUNK_RELOAD_KEY); window.location.reload(); }}
               style={{ padding: "12px 26px", borderRadius: 12, border: "none", background: "var(--primary, #6fd005)", color: "#fff", fontWeight: 800, fontSize: 15, cursor: "pointer", fontFamily: "inherit" }}
             >
               تحديث الصفحة
