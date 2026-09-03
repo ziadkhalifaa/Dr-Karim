@@ -9,6 +9,7 @@ import {
   markContactRead,
   listPackages,
 } from "../controllers/public.controller.js";
+import { testimonialController } from "../controllers/testimonial.controller.js";
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.get("/services/:code", getService);
 router.get("/packages", listPackages);
 router.get("/settings", getPublicSettings);
 router.post("/contact", submitContact);
+router.get("/testimonials", testimonialController.listPublic);
 
 // ===== DOCTOR protected =====
 router.get(

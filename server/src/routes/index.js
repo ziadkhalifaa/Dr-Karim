@@ -21,6 +21,9 @@ import { exerciseCatalogRouter } from "./exercise-catalog.routes.js";
 import packageRouter from "./package.routes.js";
 import servicesRouter from "./services.routes.js";
 import storeRouter from "./store.routes.js";
+import { testimonialRouter } from "./testimonial.routes.js";
+import { couponRouter } from "./coupon.routes.js";
+import { chatRouter } from "./chat.routes.js";
 import { doctorStatsController } from "../controllers/doctor-stats.controller.js";
 import { authenticateOptional, requireTenantAccess, requireAuth, requireRole } from "../middleware/auth.js";
 import { tenantResolver } from "../middleware/tenant.js";
@@ -58,6 +61,9 @@ export function routes(app) {
   api.use("/patients", patientRouter());
   api.use("/food", foodRouter());
   api.use("/exercises", exerciseCatalogRouter());
+  api.use("/testimonials", testimonialRouter);
+  api.use("/coupons", couponRouter);
+  api.use("/chat", chatRouter);
   api.get("/doctor/overview", requireAuth, requireRole("doctor", "staff"), doctorStatsController.overview);
   // /services is now served dynamically via /public/services
   // api.use("/services", placeholderRouter("services"));
