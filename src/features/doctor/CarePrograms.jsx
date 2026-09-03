@@ -556,8 +556,8 @@ function SavedPlans({ patientId, reloadKey }) {
 
   if (!plans) return null;
   const rows = [
-    ...plans.nutrition.map((v) => ({ ...v, icon: "🥗", label: "تغذية", domain: "nutrition" })),
-    ...plans.exercise.map((v) => ({ ...v, icon: "🏋️", label: "رياضة", domain: "exercise" })),
+    ...(plans.nutrition || []).filter(v => v.status !== "archived").map((v) => ({ ...v, icon: "🥗", label: "تغذية", domain: "nutrition" })),
+    ...(plans.exercise || []).filter(v => v.status !== "archived").map((v) => ({ ...v, icon: "🏋️", label: "رياضة", domain: "exercise" })),
   ];
   return (
     <section className="dash-panel">

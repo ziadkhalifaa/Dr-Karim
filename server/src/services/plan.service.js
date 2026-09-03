@@ -59,7 +59,7 @@ async function loadPlan(domain, planId, tenantId, transaction, lock = false) {
 }
 
 function assertVersionTransition(status, next) {
-  const allowed = { draft: ["doctor_review"], doctor_review: ["approved"], approved: ["active", "archived"], active: ["archived"], archived: [] };
+  const allowed = { draft: ["doctor_review", "archived"], doctor_review: ["approved", "archived"], approved: ["active", "archived"], active: ["archived"], archived: [] };
   if (!allowed[status]?.includes(next)) throw new AppError(409, "PLAN_INVALID_TRANSITION", `Cannot transition plan version from ${status} to ${next}`);
 }
 
