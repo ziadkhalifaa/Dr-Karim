@@ -1,8 +1,10 @@
 import { ok } from "../middleware/api-response.js";
+import { models } from "../models/index.js";
 import { careProgramService } from "../services/care-program.service.js";
 import { careService } from "../services/care.service.js";
 import { careExecutionService } from "../services/care-execution.service.js";
 import { carePointsService } from "../services/care-points.service.js";
+const { CareProgram } = models;
 
 export const careController = {
   // Doctor authoring
@@ -28,7 +30,17 @@ export const careController = {
   // Points & rewards
   async balance(req, res, next) { try { return ok(res, 200, await carePointsService.getBalance(String(req.auth.user.patient_id), req.tenant.id, req.query.programId)); } catch (err) { return next(err); } },
   async leaderboard(req, res, next) { try { return ok(res, 200, await carePointsService.getLeaderboard(req.tenant.id, req.query.programId)); } catch (err) { return next(err); } },
-  async redeem(req, res, next) { try { return ok(res, 201, await carePointsService.redeem({ tenantId: req.tenant.id, patientId: String(req.auth.user.patient_id), programId: req.body.programId, productId: req.body.productId, pointsToSpend: Number(req.body.pointsToSpend), transaction: null })); } catch (err) { return next(err); } },
+  async redeem(req, res, next) {
+    try {
+      const patientId = String(req.auth.user.patient_id);
+      let programId = req.body.programId;
+      if (!programId) {
+        const prog = await CareProgram.findOne({ where: { patient_id: patientId, tenant_id: req.tenant.id, status: "active", deleted_at: null }, order: [["id", "DESC"]], raw: true });
+        programId = prog ? String(prog.id) : null;
+      }
+      return ok(res, 201, await carePointsService.redeem({ tenantId: req.tenant.id, patientId, programId, productId: req.body.productId, pointsToSpend: Number(req.body.pointsToSpend), transaction: null }));
+    } catch (err) { return next(err); }
+  },
 };
 
 export default careController;

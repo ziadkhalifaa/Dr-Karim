@@ -14,6 +14,8 @@ import {
   Video,
   Send,
   ShoppingBag,
+  Trophy,
+  Coins,
 } from "lucide-react";
 import DashboardShell from "../shared/DashboardShell";
 import NotificationsPanel from "../shared/NotificationsPanel";
@@ -22,6 +24,7 @@ import DailyCare from "./DailyCare";
 import PatientProgress from "./Progress";
 import BookSlotPage from "./BookSlotPage";
 import PatientOrders from "./PatientOrders";
+import PointsPage from "./PointsPage";
 import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
 import {
@@ -543,6 +546,7 @@ export default function PatientDashboard({ path }) {
     { path: "/patient/checkin", label: t("dashboard.patient.checkinTitle"), icon: ClipboardCheck },
     { path: "/patient/payments", label: t("dashboard.nav.payments"), icon: Wallet },
     { path: "/patient/orders", label: "طلباتي", icon: ShoppingBag },
+    { path: "/patient/points", label: "نقاطي", icon: Trophy },
     { path: "/patient/notifications", label: t("dashboard.nav.notifications"), icon: Bell },
   ];
 
@@ -550,8 +554,9 @@ export default function PatientDashboard({ path }) {
   if (path === "/patient/care") page = <DailyCare />;
   else if (path === "/patient/progress") page = <PatientProgress />;
   else if (path === "/patient/payments") page = <PaymentCenter />;
-  else if (path === "/patient/orders") page = <PatientOrders />;
-  else if (path === "/patient/notifications") page = <NotificationsPanel />;
+    else if (path === "/patient/orders") page = <PatientOrders />;
+    else if (path === "/patient/points") page = <PointsPage />;
+    else if (path === "/patient/notifications") page = <NotificationsPanel />;
   else if (path === "/patient/book") page = <BookSlotPage />;
   else if (path === "/patient/plan")
     page = (

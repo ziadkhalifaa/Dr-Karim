@@ -120,6 +120,9 @@ export const careApi = {
   correct: (executionId, body) => api.post(`/care/executions/${executionId}/correct`, body),
   checkin: (dayId, body) => api.post(`/care/days/${dayId}/checkin`, body),
   programSummary: (id, query = "") => api.get(`/care/programs/${id}/summary${query}`),
+  pointsBalance: (programId) => api.get(`/care/points/balance${programId ? `?programId=${programId}` : ""}`),
+  pointsLeaderboard: (programId) => api.get(`/care/points/leaderboard${programId ? `?programId=${programId}` : ""}`),
+  redeemPoints: (body) => api.post("/care/redeem", body),
 };
 export const progressApi = {
   dashboard: (patientId) => api.get(`/progress/dashboard${patientId ? `?patientId=${patientId}` : ""}`),
