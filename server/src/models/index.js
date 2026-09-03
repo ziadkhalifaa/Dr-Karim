@@ -44,7 +44,7 @@ const {
 const {
   ServiceCategory, ServiceCategoryTranslation, Service, ServiceTranslation,
   ContentCategory, ContentCategoryTranslation, Content, ContentTranslation,
-  ClinicInfo, WorkingHour, PlatformSetting, _FeatureFlag,
+  ClinicInfo, WorkingHour, PlatformSetting, _FeatureFlag, Testimonial,
 } = GROUP_07;
 const { Appointment, AppointmentSlot } = GROUP_08;
 const { VideoMeetingProvider, VideoMeeting, LiveSession, SessionNote, SessionNoteClarification } = GROUP_09;
@@ -59,7 +59,7 @@ const { PatientCheckin, PatientCheckinMeasurement, PatientCheckinAdherence } = G
 const _AuditLog = GROUP_13.AuditLog;
 const { AuthUser, AuthUserTenant, AuthRefreshToken, AuthPasswordReset } = GROUP_14;
 const { DoctorReviewNote } = GROUP_15;
-const { Package, PackageEntitlement, Subscription, SubscriptionEntitlement, Payment, PaymentReceipt, PaymentReview } = GROUP_16;
+const { Package, PackageEntitlement, Subscription, SubscriptionEntitlement, Payment, PaymentReceipt, PaymentReview, Coupon } = GROUP_16;
 const { Notification, NotificationPreference } = GROUP_17;
 const {
   CareProgram, CareProgramVersion, CareDay, CareActivityDefinition,
@@ -85,6 +85,7 @@ const TENANT_SCOPED = [
   ExercisePlan, ExercisePlanVersion, ExerciseSubstitution, ExercisePlanNote,
   PatientCheckin, PatientCheckinMeasurement, PatientCheckinAdherence,
   Package, PackageEntitlement, Subscription, SubscriptionEntitlement, Payment, PaymentReceipt, PaymentReview,
+  Coupon, Testimonial,
   Notification, NotificationPreference,
   CareProgram, CareProgramVersion, CareDay, CareActivityDefinition,
   CareActivityInstance, CareActivityExecution, CareDailyCheckin,
@@ -380,6 +381,25 @@ ProductReview.belongsTo(Patient, { foreignKey: "patient_id", as: "author" });
 StoreOrder.hasMany(ProductReview, { foreignKey: "order_id", as: "reviews" });
 
 import { GROUP_21 } from "./21_plan_templates.js";
+import { GROUP_22 } from "./22_messaging.js";
+
+const { ChatSession, ChatMessage } = GROUP_22;
+
+// ---- Chat (tenant-scoped) ----
+ChatSession.belongsTo(Tenant, { foreignKey: "tenant_id", as: "tenant" });
+Tenant.hasMany(ChatSession, { foreignKey: "tenant_id" });
+ChatMessage.belongsTo(Tenant, { foreignKey: "tenant_id", as: "tenant" });
+Tenant.hasMany(ChatMessage, { foreignKey: "tenant_id" });
+
+// ---- Chat associations ----
+Patient.hasOne(ChatSession, { foreignKey: "patient_id", as: "chatSession" });
+ChatSession.belongsTo(Patient, { foreignKey: "patient_id", as: "patient" });
+ChatSession.hasMany(ChatMessage, { foreignKey: "session_id", as: "messages" });
+ChatMessage.belongsTo(ChatSession, { foreignKey: "session_id", as: "session" });
+
+// ---- Testimonial association ----
+Testimonial.belongsTo(Patient, { foreignKey: "patient_id", as: "patient" });
+Patient.hasMany(Testimonial, { foreignKey: "patient_id", as: "testimonials" });
 
 export const models = {
   ...sequelize.models,
@@ -404,14 +424,15 @@ export const models = {
   ...GROUP_19,
   ...GROUP_20,
   ...GROUP_21,
+  ...GROUP_22,
 };
 
 export { sequelize };
 export const MODEL_GROUPS = {
   GROUP_01, GROUP_02, GROUP_03, GROUP_04, GROUP_05, GROUP_06,
   GROUP_07, GROUP_08, GROUP_09, GROUP_10, GROUP_11, GROUP_12, GROUP_13,
-  GROUP_14, GROUP_15, GROUP_16, GROUP_17,   GROUP_18, GROUP_19,
-  GROUP_20,
+  GROUP_14, GROUP_15, GROUP_16, GROUP_17, GROUP_18, GROUP_19,
+  GROUP_20, GROUP_21, GROUP_22,
 };
 
 export default models;

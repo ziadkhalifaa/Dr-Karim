@@ -219,6 +219,24 @@ export const FeatureFlag = sequelize.define(
   { tableName: "feature_flag", underscored: true }
 );
 
+// ---- testimonial ----
+export const Testimonial = sequelize.define(
+  "testimonial",
+  {
+    id: BIGID,
+    tenant_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    patient_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
+    patient_name: { type: DataTypes.STRING(150), allowNull: false },
+    patient_subtitle: { type: DataTypes.STRING(200), allowNull: true }, // e.g. "فقدت 20 كجم في 3 أشهر"
+    content: { type: DataTypes.TEXT, allowNull: false },
+    rating: { type: DataTypes.TINYINT.UNSIGNED, allowNull: true, defaultValue: 5 },
+    image_url: { type: DataTypes.STRING(400), allowNull: true },
+    is_published: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    sort_order: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+  },
+  { tableName: "testimonial", underscored: true }
+);
+
 export const GROUP_07 = {
   ServiceCategory,
   ServiceCategoryTranslation,
@@ -232,4 +250,5 @@ export const GROUP_07 = {
   WorkingHour,
   PlatformSetting,
   FeatureFlag,
+  Testimonial,
 };

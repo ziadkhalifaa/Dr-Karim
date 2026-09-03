@@ -10,4 +10,21 @@ export const SubscriptionEntitlement = sequelize.define("subscription_entitlemen
 export const Payment = sequelize.define("payment", { id: ID, tenant_id: tenant, patient_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false }, package_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false }, subscription_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true }, amount: { type: DataTypes.DECIMAL(12, 2), allowNull: false }, currency: { type: DataTypes.STRING(8), allowNull: false }, method: { type: DataTypes.ENUM("vodafone_cash", "instapay"), allowNull: false }, sender_phone: { type: DataTypes.STRING(20), allowNull: false }, transaction_reference: DataTypes.STRING(120), upgrade_json: DataTypes.JSON, submitted_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW }, reviewed_at: DataTypes.DATE, reviewed_by: DataTypes.BIGINT.UNSIGNED, rejection_reason: DataTypes.TEXT, status: { type: DataTypes.ENUM("pending", "approved", "rejected"), allowNull: false, defaultValue: "pending" } }, { tableName: "payment", underscored: true });
 export const PaymentReceipt = sequelize.define("payment_receipt", { id: ID, tenant_id: tenant, payment_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false }, storage_key: { type: DataTypes.STRING(255), allowNull: false }, original_name: { type: DataTypes.STRING(190), allowNull: false }, mime_type: { type: DataTypes.STRING(80), allowNull: false }, size_bytes: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false } }, { tableName: "payment_receipt", underscored: true });
 export const PaymentReview = sequelize.define("payment_review", { id: ID, tenant_id: tenant, payment_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false }, status: { type: DataTypes.ENUM("approved", "rejected"), allowNull: false }, reviewed_by: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false }, reason: DataTypes.TEXT }, { tableName: "payment_review", underscored: true });
-export const GROUP_16 = { Package, PackageEntitlement, Subscription, SubscriptionEntitlement, Payment, PaymentReceipt, PaymentReview };
+
+export const Coupon = sequelize.define("coupon", {
+  id: ID,
+  tenant_id: tenant,
+  code: { type: DataTypes.STRING(50), allowNull: false },
+  discount_type: { type: DataTypes.ENUM("percentage", "fixed"), allowNull: false },
+  discount_value: { type: DataTypes.DECIMAL(12, 2), allowNull: false },
+  max_uses: { type: DataTypes.INTEGER.UNSIGNED, allowNull: true },
+  used_count: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
+  expires_at: { type: DataTypes.DATE, allowNull: true },
+  active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true }
+}, {
+  tableName: "coupon",
+  underscored: true,
+  indexes: [{ unique: true, fields: ["tenant_id", "code"] }]
+});
+
+export const GROUP_16 = { Package, PackageEntitlement, Subscription, SubscriptionEntitlement, Payment, PaymentReceipt, PaymentReview, Coupon };
