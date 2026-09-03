@@ -1772,3 +1772,87 @@ html[dir="rtl"] .contact-info__item:hover { transform: translateX(4px); }
   .footer-bottom { flex-direction: column; text-align: center; }
   .footer-legal { flex-wrap: wrap; justify-content: center; gap: 14px; }
 }
+
+/* ============================================================
+   TESTIMONIALS
+   ============================================================ */
+.testi-card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+  border: 1px solid var(--line-soft);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.testi-card__img {
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  background: var(--bg-soft);
+}
+
+.testi-card__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.testi-card:hover .testi-card__img img {
+  transform: scale(1.04);
+}
+
+.testi-card__content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.testi-card__rating {
+  display: flex;
+  gap: 4px;
+}
+
+.testi-card__text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.testi-card__author {
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+  display: flex;
+  flex-direction: column;
+}
+
+.testi-card__author strong {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.testi-card__author span {
+  font-size: 13px;
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+
+.testi__slide {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+.testi__slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+}

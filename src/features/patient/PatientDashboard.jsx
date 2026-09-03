@@ -25,6 +25,7 @@ import PatientProgress from "./Progress";
 import BookSlotPage from "./BookSlotPage";
 import PatientOrders from "./PatientOrders";
 import PointsPage from "./PointsPage";
+import PatientChat from "./PatientChat";
 import { useAuth } from "../../context/AuthProvider";
 import { navigate } from "../../lib/router";
 import {
@@ -542,6 +543,7 @@ export default function PatientDashboard({ path }) {
     { path: "/patient/care", label: t("dailyCare.nav"), icon: ClipboardList },
     { path: "/patient/progress", label: t("patientProgress.nav"), icon: Scale },
     { path: "/patient/plan", label: t("dashboard.nav.myPlan"), icon: Salad },
+    { path: "/patient/chat", label: "تواصل مع الطبيب", icon: MessageCircle },
     { path: "/patient/book", label: "احجز جلسة", icon: Video },
     { path: "/patient/checkin", label: t("dashboard.patient.checkinTitle"), icon: ClipboardCheck },
     { path: "/patient/payments", label: t("dashboard.nav.payments"), icon: Wallet },
@@ -552,6 +554,7 @@ export default function PatientDashboard({ path }) {
 
   let page;
   if (path === "/patient/care") page = <DailyCare />;
+  else if (path === "/patient/chat") page = <PatientChat />;
   else if (path === "/patient/progress") page = <PatientProgress />;
   else if (path === "/patient/payments") page = <PaymentCenter />;
     else if (path === "/patient/orders") page = <PatientOrders />;

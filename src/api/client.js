@@ -152,9 +152,36 @@ export const publicApi = {
   settings: () => api.get("/public/settings"),
   /** Submit a contact form message */
   contact: (body) => api.post("/public/contact", body),
+  /** Testimonials */
+  testimonials: () => api.get("/public/testimonials"),
   // Doctor only
   contacts: (query = "") => api.get(`/public/doctor/contacts${query}`),
   markRead: (id) => api.patch(`/public/doctor/contacts/${id}/read`, {}),
+};
+
+export const testimonialAdminApi = {
+  list: () => api.get("/testimonials"),
+  create: (body) => api.post("/testimonials", body),
+  update: (id, body) => api.put(`/testimonials/${id}`, body),
+  delete: (id) => api.delete(`/testimonials/${id}`),
+};
+
+export const couponApi = {
+  validate: (code) => api.post("/coupons/validate", { code }),
+  list: () => api.get("/coupons"),
+  create: (body) => api.post("/coupons", body),
+  update: (id, body) => api.put(`/coupons/${id}`, body),
+  delete: (id) => api.delete(`/coupons/${id}`),
+};
+
+export const chatApi = {
+  // Patient
+  session: () => api.get("/chat/session"),
+  sendMessage: (body) => api.post("/chat/messages", body),
+  // Doctor
+  listSessions: () => api.get("/chat/sessions"),
+  listMessages: (sid, before) => api.get(`/chat/sessions/${sid}/messages${before ? `?before=${before}` : ""}`),
+  doctorReply: (sid, body) => api.post(`/chat/sessions/${sid}/messages`, body),
 };
 
 /** Doctor Packages CRUD API */

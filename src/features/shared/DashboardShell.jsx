@@ -115,8 +115,8 @@ export default function DashboardShell({ title, nav, navLabel, children }) {
 
   const BottomNav = () => {
     if (user?.role !== "patient") return null;
-    // For mobile, only show top 4 essential items
-    const bottomNavItems = nav.slice(0, 4);
+    // For mobile, show top 5 essential items
+    const bottomNavItems = nav.slice(0, 5);
     
     return (
       <nav className="dash-bottom-nav">

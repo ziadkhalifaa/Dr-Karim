@@ -40,6 +40,9 @@ import PackagesManager from "./PackagesManager";
 import SlotManager from "./SlotManager";
 import StoreManager from "./StoreManager";
 import DoctorOverview from "./DoctorOverview";
+import TestimonialManager from "./TestimonialManager";
+import CouponsManager from "./CouponsManager";
+import ChatManager from "./ChatManager";
 import { reviewApi, appointmentApi, liveSessionApi, patientApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 import { useAuth } from "../../context/AuthProvider";
@@ -421,8 +424,11 @@ export default function DoctorDashboard({ path }) {
     { path: "/doctor/articles", label: "نصائح طبية", icon: FileText },
     { path: "/doctor/services", label: "إدارة الخدمات", icon: ClipboardList },
     { path: "/doctor/packages", label: "إدارة الباقات", icon: Wallet },
+    { path: "/doctor/coupons", label: "كوبونات الخصم", icon: Wallet },
     { path: "/doctor/store", label: "المتجر", icon: ShoppingBag },
+    { path: "/doctor/chat", label: "المحادثات المباشرة", icon: MessageCircle },
     { path: "/doctor/messages", label: "رسائل التواصل", icon: MessageCircle },
+    { path: "/doctor/testimonials", label: "آراء العملاء", icon: ListChecks },
     { path: "/doctor/payments", label: t("dashboard.nav.payments"), icon: Wallet },
     { path: "/doctor/configuration", label: t("dashboard.nav.configuration"), icon: Settings },
     { path: "/doctor/appointments", label: t("dashboard.nav.appointments"), icon: CalendarDays },
@@ -451,7 +457,10 @@ export default function DoctorDashboard({ path }) {
   else if (path === "/doctor/articles") page = <ArticleManager />;
   else if (path === "/doctor/services") page = <ServicesManager />;
   else if (path === "/doctor/packages") page = <PackagesManager />;
+  else if (path === "/doctor/coupons") page = <CouponsManager />;
+  else if (path === "/doctor/chat") page = <ChatManager />;
   else if (path === "/doctor/messages") page = <ContactMessages />;
+  else if (path === "/doctor/testimonials") page = <TestimonialManager />;
   else if (path === "/doctor/appointments") page = (<>
       <SlotManager />
       <Appointments rows={appointments} reload={reload} subscriptions={subscriptions} />

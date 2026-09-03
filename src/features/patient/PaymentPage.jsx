@@ -31,6 +31,13 @@ export default function PaymentPage({ path }) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [upgradeInfo, setUpgradeInfo] = useState(null);
+  
+  // Coupon state
+  const [couponCode, setCouponCode] = useState("");
+  const [couponValid, setCouponValid] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+
   const fileRef = useRef();
   const { user } = useAuth();
 
@@ -100,6 +107,29 @@ export default function PaymentPage({ path }) {
     reader.readAsDataURL(f);
   };
 
+  const validateCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponError("");
+    try {
+      // Import couponApi from client.js in the next chunk or at top of file
+      const { couponApi } = await import("../../api/client");
+      const res = await couponApi.validate(couponCode.trim());
+      const c = res.data.data;
+      setCouponValid(true);
+      
+      const basePrice = upgradeInfo ? upgradeInfo.upgraded : Number(pkg.price);
+      if (c.discount_type === "percentage") {
+        setCouponDiscount(Math.round(basePrice * (c.discount_value / 100)));
+      } else {
+        setCouponDiscount(Math.min(basePrice, c.discount_value));
+      }
+    } catch (e) {
+      setCouponValid(false);
+      setCouponDiscount(0);
+      setCouponError(e.response?.data?.error?.message || "كود غير صالح");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!method) { setError("اختر طريقة الدفع"); return; }
@@ -113,6 +143,7 @@ export default function PaymentPage({ path }) {
         method,
         senderPhone: senderPhone.trim(),
         transactionReference: txRef.trim() || undefined,
+        coupon_code: couponValid ? couponCode.trim() : undefined,
       });
       if (receiptFile) {
         // The API expects JSON { mimeType, data } with a base64 data URL —
@@ -245,6 +276,47 @@ export default function PaymentPage({ path }) {
           </motion.div>
         )}
 
+        {/* Promo Code section */}
+        {pkg && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            style={{ background: "var(--card-bg)", border: "1px solid var(--line)", borderRadius: "16px", padding: "20px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: "200px" }}>
+              <input
+                type="text"
+                placeholder="لديك كود خصم؟"
+                value={couponCode}
+                onChange={(e) => { setCouponCode(e.target.value); setCouponValid(false); setCouponDiscount(0); setCouponError(""); }}
+                style={{ width: "100%", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--line)", background: "var(--bg-soft)", fontSize: "14px", outline: "none" }}
+                disabled={couponValid}
+              />
+            </div>
+            {!couponValid ? (
+              <button
+                type="button"
+                onClick={validateCoupon}
+                disabled={!couponCode.trim()}
+                style={{ background: "var(--text)", color: "var(--bg)", border: "none", padding: "12px 24px", borderRadius: "12px", fontWeight: "700", cursor: "pointer", opacity: !couponCode.trim() ? 0.5 : 1 }}
+              >
+                تفعيل
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => { setCouponCode(""); setCouponValid(false); setCouponDiscount(0); }}
+                style={{ background: "#fee2e2", color: "#b91c1c", border: "none", padding: "12px 24px", borderRadius: "12px", fontWeight: "700", cursor: "pointer" }}
+              >
+                إلغاء الكود
+              </button>
+            )}
+            {couponError && <div style={{ width: "100%", color: "#b91c1c", fontSize: "13px", marginTop: "4px" }}>{couponError}</div>}
+            {couponValid && (
+              <div style={{ width: "100%", color: "#15803d", fontSize: "14px", fontWeight: "700", marginTop: "4px" }}>
+                ✅ تم تفعيل الكود بنجاح! تم خصم {couponDiscount.toLocaleString("ar-EG")} {pkg.currency || "EGP"}
+              </div>
+            )}
+          </motion.div>
+        )}
+
         {/* Prorated upgrade note */}
         {upgradeInfo && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -294,7 +366,7 @@ export default function PaymentPage({ path }) {
                 style={{ background: "#e6fbc2", border: "1px solid #c2f753", borderRadius: "14px", padding: "16px 18px", marginBottom: "20px" }}>
                 <p style={{ fontSize: "14px", fontWeight: "700", color: "#2e7d00", lineHeight: "1.7" }}>
                   📋 <strong>خطوات الدفع:</strong><br />
-                  1. افتح تطبيق {currentMethod?.label} وابعت {pkg ? (upgradeInfo ? upgradeInfo.upgraded : Number(pkg.price)).toLocaleString("ar-EG") + " " + (pkg.currency || "EGP") : ""} على الرقم/الحساب:<br />
+                  1. افتح تطبيق {currentMethod?.label} وابعت {pkg ? Math.max(0, (upgradeInfo ? upgradeInfo.upgraded : Number(pkg.price)) - couponDiscount).toLocaleString("ar-EG") + " " + (pkg.currency || "EGP") : ""} على الرقم/الحساب:<br />
                   <strong style={{ direction: "ltr", display: "inline-block", fontSize: "16px", marginTop: "4px" }}>{currentMethodAccount}</strong><br />
                   2. صوّر الإيصال وارفعه في الخانة أدناه<br />
                   3. اضغط "إرسال الدفع"
