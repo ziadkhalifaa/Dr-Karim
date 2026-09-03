@@ -1,8 +1,9 @@
 // Migration 043 — Add coupon, testimonial, chat_session, chat_message tables
 // Forward-only. Adds new tables without touching any existing ones.
 
-export async function up(queryInterface, Sequelize) {
-  const { DataTypes } = Sequelize;
+import { DataTypes, Sequelize } from "sequelize";
+
+export async function up(queryInterface) {
 
   // ---- coupon ----
   await queryInterface.createTable("coupon", {
