@@ -113,6 +113,19 @@ export default function NutritionBuilder({ planId, patientId }) {
     return apiMeals;
   };
 
+  const handleCopyToAllDays = () => {
+    const activeMeals = meals.filter(m => m.dayId === activeDay);
+    if (activeMeals.length === 0) return alert("حدد وجبات اليوم أولاً قبل النسخ");
+    const byCode = new Map(activeMeals.map(m => [m.code, m.items]));
+    const updated = [];
+    for (const day of DAYS) {
+      for (const mt of MEAL_TYPES) {
+        updated.push({ dayId: day.id, code: mt.code, items: byCode.has(mt.code) ? [...byCode.get(mt.code)] : [] });
+      }
+    }
+    setMeals(updated);
+  };
+
   const handleSaveTemplate = async () => {
     if (!templateName.trim()) return alert("يرجى إدخال اسم القالب");
     try {
@@ -462,6 +475,17 @@ export default function NutritionBuilder({ planId, patientId }) {
       <div style={{ display: "flex", gap: "24px" }}>
         {/* Days Sidebar */}
         <div style={{ width: "200px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
+          <button
+            onClick={handleCopyToAllDays}
+            style={{
+              background: "var(--dash-primary-soft)", color: "var(--dash-primary)",
+              border: "1.5px dashed var(--dash-primary)", padding: "8px", borderRadius: "10px",
+              fontSize: "12px", fontWeight: "800", cursor: "pointer", width: "100%",
+              fontFamily: "inherit"
+            }}
+          >
+            📋 نسخ هذا اليوم للأسبوع كامل
+          </button>
           {DAYS.map(day => (
             <button
               key={day.id}

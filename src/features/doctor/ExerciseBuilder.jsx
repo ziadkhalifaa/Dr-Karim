@@ -209,6 +209,19 @@ export default function ExerciseBuilder({ planId, patientId }) {
 
   const currentDayExercises = useMemo(() => exercises.filter(m => m.dayId === activeDay), [exercises, activeDay]);
 
+  const handleCopyToAllDays = () => {
+    const dayExercises = exercises.filter(e => e.dayId === activeDay);
+    if (dayExercises.length === 0) return alert("أضف تمرينيات لهذا اليوم أولاً قبل النسخ");
+    const updated = [];
+    let counter = 0;
+    for (const day of DAYS) {
+      for (const ex of dayExercises) {
+        updated.push({ ...ex, dayId: day.id, id: `copy-${Date.now()}-${counter++}` });
+      }
+    }
+    setExercises(updated);
+  };
+
   const handleAddExercise = (exerciseItem) => {
     setExercises(prev => [
       ...prev,
@@ -361,6 +374,17 @@ export default function ExerciseBuilder({ planId, patientId }) {
       <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
         {/* Days Sidebar */}
         <div style={{ width: "190px", flexShrink: 0, display: "flex", flexDirection: "column", gap: "8px", position: "sticky", top: "20px" }}>
+          <button
+            onClick={handleCopyToAllDays}
+            style={{
+              background: "var(--dash-primary-soft)", color: "var(--dash-primary)",
+              border: "1.5px dashed var(--dash-primary)", padding: "8px", borderRadius: "10px",
+              fontSize: "12px", fontWeight: "800", cursor: "pointer", width: "100%",
+              fontFamily: "inherit"
+            }}
+          >
+            📋 نسخ هذا اليوم للأسبوع كامل
+          </button>
           {DAYS.map(day => {
             const count = exercises.filter(e => e.dayId === day.id).length;
             const isActive = activeDay === day.id;
