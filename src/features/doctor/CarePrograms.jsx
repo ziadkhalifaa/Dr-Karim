@@ -11,6 +11,9 @@ import { templateStore } from "../../lib/templateStore";
 const statusTone = (s) =>
   ({ draft: "dash-badge--neutral", scheduled: "dash-badge--info", active: "dash-badge--primary", paused: "dash-badge--warning", completed: "dash-badge--success", cancelled: "dash-badge--danger", expired: "dash-badge--neutral" }[s] || "dash-badge--neutral");
 
+const STATUS_AR = { draft: "مسودة", scheduled: "مجدول", active: "نشط", paused: "موقوف", completed: "مكتمل", cancelled: "ملغي", expired: "منتهي" };
+const MEASURE_AR = { boolean: "نعم / لا", count: "عدد", duration_min: "مدة (دقيقة)", calories: "سعرات", grams: "جرام", ml: "ملل" };
+
 // Phase 6D: patient-contextual. The patient is picked by name/phone from the
 // directory (never by typing an internal id). When `patientId` is provided the
 // workspace is already scoped to that patient.
@@ -452,7 +455,7 @@ function ProgramDetail({ id, patientLabel, onBack, onChanged }) {
           <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={deleteThis} disabled={busy} style={{ color: "var(--dash-danger)" }}>
             <Trash2 size={16} /> حذف
           </button>
-          <span className={`dash-badge ${statusTone(program.status)}`}>{program.status}</span>
+          <span className={`dash-badge ${statusTone(program.status)}`}>{STATUS_AR[program.status] || program.status}</span>
         </div>
       </div>
       {error && <p className="dash-muted" style={{ color: "var(--dash-danger)" }}>{error}</p>}
@@ -465,28 +468,35 @@ function ProgramDetail({ id, patientLabel, onBack, onChanged }) {
                 <h3 className="dash-panel__title">
                   {t("doctorCare.version", { n: version.version_no })}
                 </h3>
-                <span className={`dash-badge ${statusTone(version.status)}`}>{version.status}</span>
+                <span className={`dash-badge ${statusTone(version.status)}`}>{STATUS_AR[version.status] || version.status}</span>
               </div>
               <div className="dash-panel__body">
                 <p className="dash-muted">
                   {version.effective_from} → {version.effective_to || "∞"}
                 </p>
-                {draft && (
-                  <div className="dash-row-actions">
+                <div className="dash-row-actions">
+                  {draft && (
+                    <>
+                      <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={() => setShowAdd((s) => !s)}>
+                        <Plus />{t("doctorCare.addDefinition")}
+                      </button>
+                      <button className="dash-btn dash-btn--primary dash-btn--sm" disabled={busy} onClick={() => activate(version.version_no)}>
+                        <Play />{t("doctorCare.activate")}
+                      </button>
+                    </>
+                  )}
+                  {!draft && (
                     <button className="dash-btn dash-btn--ghost dash-btn--sm" onClick={() => setShowAdd((s) => !s)}>
-                      <Plus />{t("doctorCare.addDefinition")}
+                      <Plus /> إضافة تعريفات
                     </button>
-                    <button className="dash-btn dash-btn--primary dash-btn--sm" disabled={busy} onClick={() => activate(version.version_no)}>
-                      <Play />{t("doctorCare.activate")}
-                    </button>
-                  </div>
-                )}
+                  )}
+                </div>
                 {version.definitions.length ? (
                   <ul className="dash-list">
                     {version.definitions.map((d) => (
                       <li key={d.id}>
                         <strong>{d.name_ar || d.name_en}</strong>
-                        <span className="dash-muted"> · {d.measure}{d.planned_target_json?.value != null ? ` (${d.planned_target_json.value}${d.planned_target_json.unit ? ` ${d.planned_target_json.unit}` : ""})` : ""}</span>
+                        <span className="dash-muted"> · {MEASURE_AR[d.measure] || d.measure}{d.planned_target_json?.value != null ? ` (${d.planned_target_json.value}${d.planned_target_json.unit ? ` ${d.planned_target_json.unit}` : ""})` : ""}</span>
                       </li>
                     ))}
                   </ul>
