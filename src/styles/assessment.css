@@ -1616,7 +1616,7 @@
 }
 
 /* ---------- Responsive (intake) ---------- */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .aq-plate {
     gap: 14px;
     padding: 14px;
@@ -1639,5 +1639,23 @@
   .aq-row2 {
     grid-template-columns: 1fr;
     gap: 14px;
+  }
+  
+  /* Touch target optimizations */
+  .aq-choice, .aq-btn, .aq-input {
+    min-height: 48px;
+  }
+  
+  .aq-choice {
+    padding: 12px 14px;
+  }
+  
+  .aq-stepper {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .aq-main {
+    padding: 20px 16px;
   }
 }

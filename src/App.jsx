@@ -1,3 +1,4 @@
+import React, { Suspense, lazy } from "react";
 import { AppProvider } from "./context/AppProvider";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
@@ -14,84 +15,101 @@ import PackagesSection from "./components/PackagesSection";
 import StoreSection from "./components/StoreSection";
 import Footer from "./components/Footer";
 import { useRoute } from "./lib/router";
-import AssessmentPage from "./features/assessment/pages/AssessmentPage";
 import { AuthProvider } from "./context/AuthProvider";
-import LoginPage from "./features/auth/LoginPage";
-import RegisterPage from "./features/auth/RegisterPage";
-import DoctorDashboard from "./features/doctor/DoctorDashboard";
-import PatientDashboard from "./features/patient/PatientDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AboutPage from "./pages/AboutPage";
-import ServicesPage from "./pages/ServicesPage";
-import ServiceSinglePage from "./pages/ServiceSinglePage";
-import ArticlesPage from "./pages/ArticlesPage";
-import ArticleSinglePage from "./pages/ArticleSinglePage";
-import ContactPage from "./pages/ContactPage";
-import ContentPage from "./pages/ContentPage";
-import PackagesPage from "./features/patient/PackagesPage";
-import PaymentPage from "./features/patient/PaymentPage";
-import StoreFront from "./features/store/StoreFront";
-import ProductDetail from "./features/store/ProductDetail";
-import Checkout from "./features/store/Checkout";
 import { CartProvider } from "./features/store/CartContext";
+import { RefreshCw } from "lucide-react";
+
+// Lazy Loaded Pages
+const AssessmentPage = lazy(() => import("./features/assessment/pages/AssessmentPage"));
+const LoginPage = lazy(() => import("./features/auth/LoginPage"));
+const RegisterPage = lazy(() => import("./features/auth/RegisterPage"));
+const DoctorDashboard = lazy(() => import("./features/doctor/DoctorDashboard"));
+const PatientDashboard = lazy(() => import("./features/patient/PatientDashboard"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const ServicesPage = lazy(() => import("./pages/ServicesPage"));
+const ServiceSinglePage = lazy(() => import("./pages/ServiceSinglePage"));
+const ArticlesPage = lazy(() => import("./pages/ArticlesPage"));
+const ArticleSinglePage = lazy(() => import("./pages/ArticleSinglePage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const ContentPage = lazy(() => import("./pages/ContentPage"));
+const PackagesPage = lazy(() => import("./features/patient/PackagesPage"));
+const PaymentPage = lazy(() => import("./features/patient/PaymentPage"));
+const StoreFront = lazy(() => import("./features/store/StoreFront"));
+const ProductDetail = lazy(() => import("./features/store/ProductDetail"));
+const Checkout = lazy(() => import("./features/store/Checkout"));
+
+const SuspenseFallback = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
+    <RefreshCw size={40} className="spin" style={{ color: "var(--dash-primary)" }} />
+  </div>
+);
 
 export default function App() {
   const path = useRoute();
 
-  if (path === "/login") return <AppProvider><AuthProvider><LoginPage /></AuthProvider></AppProvider>;
-  if (path === "/register") return <AppProvider><AuthProvider><RegisterPage /></AuthProvider></AppProvider>;
-  if (path.startsWith("/doctor")) return <AppProvider><AuthProvider><ProtectedRoute roles={["doctor", "staff"]}><DoctorDashboard path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
-  if (path.startsWith("/patient")) return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PatientDashboard path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
+  const renderContent = () => {
+    if (path === "/login") return <AppProvider><AuthProvider><LoginPage /></AuthProvider></AppProvider>;
+    if (path === "/register") return <AppProvider><AuthProvider><RegisterPage /></AuthProvider></AppProvider>;
+    if (path.startsWith("/doctor")) return <AppProvider><AuthProvider><ProtectedRoute roles={["doctor", "staff"]}><DoctorDashboard path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
+    if (path.startsWith("/patient")) return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PatientDashboard path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
 
-  if (path === "/assessment") {
+    if (path === "/assessment") {
+      return (
+        <AppProvider>
+          <AuthProvider>
+            <AssessmentPage />
+          </AuthProvider>
+        </AppProvider>
+      );
+    }
+    if (path === "/packages") return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PackagesPage /></ProtectedRoute></AuthProvider></AppProvider>;
+    if (path.startsWith("/payment")) return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PaymentPage path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
+
+    if (path === "/about") return <PublicSite><AboutPage /></PublicSite>;
+    if (path === "/services") return <PublicSite><ServicesPage /></PublicSite>;
+    if (path.startsWith("/services/")) return <PublicSite><ServiceSinglePage code={path.replace("/services/", "")} /></PublicSite>;
+    if (path === "/articles") return <PublicSite><ArticlesPage /></PublicSite>;
+    if (path.startsWith("/tips/")) return <PublicSite><ArticleSinglePage slug={path.replace("/tips/", "")} /></PublicSite>;
+    if (path === "/contact") return <PublicSite><ContactPage /></PublicSite>;
+    if (path === "/privacy") return <PublicSite><ContentPage title="سياسة الخصوصية" slug="privacy-policy" /></PublicSite>;
+    if (path === "/terms") return <PublicSite><ContentPage title="شروط الاستخدام" slug="terms-of-use" /></PublicSite>;
+    if (path === "/faq") return <PublicSite><ContentPage title="الأسئلة الشائعة" slug="faq" /></PublicSite>;
+
+    if (path === "/store") return <PublicSite><Header /><CartProvider><StoreFront /></CartProvider><Footer /></PublicSite>;
+    if (path.startsWith("/store/")) {
+      const slug = decodeURIComponent(path.replace("/store/", ""));
+      return <PublicSite><Header /><CartProvider><ProductDetail slug={slug} /></CartProvider><Footer /></PublicSite>;
+    }
+    if (path === "/checkout") return <PublicSite><Header /><CartProvider><Checkout /></CartProvider><Footer /></PublicSite>;
+
     return (
-      <AppProvider>
-        <AuthProvider>
-          <AssessmentPage />
-        </AuthProvider>
-      </AppProvider>
+      <PublicSite>
+        <Header />
+        <main>
+          <Hero />
+          <Mission />
+          <AssessmentSection />
+          <ValuesSection />
+          <Banner />
+          <CareSection />
+          <ServicesSection />
+          <PackagesSection />
+          <StoreSection />
+          <MedicalTipsSection />
+          <TestimonialsSection />
+          <WarningSection />
+          <div className="spacer" />
+        </main>
+        <Footer />
+      </PublicSite>
     );
-  }
-  if (path === "/packages") return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PackagesPage /></ProtectedRoute></AuthProvider></AppProvider>;
-  if (path.startsWith("/payment")) return <AppProvider><AuthProvider><ProtectedRoute roles={["patient"]}><PaymentPage path={path} /></ProtectedRoute></AuthProvider></AppProvider>;
-
-  if (path === "/about") return <PublicSite><AboutPage /></PublicSite>;
-  if (path === "/services") return <PublicSite><ServicesPage /></PublicSite>;
-  if (path.startsWith("/services/")) return <PublicSite><ServiceSinglePage code={path.replace("/services/", "")} /></PublicSite>;
-  if (path === "/articles") return <PublicSite><ArticlesPage /></PublicSite>;
-  if (path.startsWith("/tips/")) return <PublicSite><ArticleSinglePage slug={path.replace("/tips/", "")} /></PublicSite>;
-  if (path === "/contact") return <PublicSite><ContactPage /></PublicSite>;
-  if (path === "/privacy") return <PublicSite><ContentPage title="سياسة الخصوصية" slug="privacy-policy" /></PublicSite>;
-  if (path === "/terms") return <PublicSite><ContentPage title="شروط الاستخدام" slug="terms-of-use" /></PublicSite>;
-  if (path === "/faq") return <PublicSite><ContentPage title="الأسئلة الشائعة" slug="faq" /></PublicSite>;
-
-  if (path === "/store") return <PublicSite><Header /><CartProvider><StoreFront /></CartProvider><Footer /></PublicSite>;
-  if (path.startsWith("/store/")) {
-    const slug = decodeURIComponent(path.replace("/store/", ""));
-    return <PublicSite><Header /><CartProvider><ProductDetail slug={slug} /></CartProvider><Footer /></PublicSite>;
-  }
-  if (path === "/checkout") return <PublicSite><Header /><CartProvider><Checkout /></CartProvider><Footer /></PublicSite>;
+  };
 
   return (
-    <PublicSite>
-      <Header />
-      <main>
-        <Hero />
-        <Mission />
-        <AssessmentSection />
-        <ValuesSection />
-        <Banner />
-        <CareSection />
-        <ServicesSection />
-        <PackagesSection />
-        <StoreSection />
-        <MedicalTipsSection />
-        <TestimonialsSection />
-        <WarningSection />
-        <div className="spacer" />
-      </main>
-      <Footer />
-    </PublicSite>
+    <Suspense fallback={<SuspenseFallback />}>
+      {renderContent()}
+    </Suspense>
   );
 }
 

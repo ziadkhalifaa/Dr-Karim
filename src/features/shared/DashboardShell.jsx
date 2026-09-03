@@ -113,6 +113,31 @@ export default function DashboardShell({ title, nav, navLabel, children }) {
     </>
   );
 
+  const BottomNav = () => {
+    if (user?.role !== "patient") return null;
+    // For mobile, only show top 4 essential items
+    const bottomNavItems = nav.slice(0, 4);
+    
+    return (
+      <nav className="dash-bottom-nav">
+        {bottomNavItems.map((item) => {
+          const Icon = item.icon;
+          const active = isActive(item.path);
+          return (
+            <button
+              key={item.path}
+              className={`dash-bottom-nav__item${active ? " active" : ""}`}
+              onClick={() => navigate(item.path)}
+            >
+              <Icon size={20} />
+              <span className="dash-bottom-nav__label">{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+    );
+  };
+
   return (
     <div className="dash">
       <aside className={`dash-sidebar${open ? "" : " dash-sidebar--hidden"}`}>
@@ -172,6 +197,7 @@ export default function DashboardShell({ title, nav, navLabel, children }) {
 
         <main className="dash-content">{children}</main>
       </div>
+      <BottomNav />
     </div>
   );
 }
