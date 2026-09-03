@@ -3,6 +3,7 @@ import { useCart } from "./CartContext";
 import { storeApi } from "../../api/client";
 import { navigate } from "../../lib/router";
 import { useAuth } from "../../context/AuthProvider";
+import { useToast } from "../../context/ToastContext";
 import { ShoppingCart, X, Plus, Minus, ArrowRight, Truck, ShieldCheck, RotateCcw, Star, ImagePlus } from "lucide-react";
 
 const fmt = (n) => `${Number(n).toLocaleString("ar-EG")} ج`;
@@ -47,9 +48,14 @@ export default function ProductDetail({ slug }) {
     storeApi.reviews(slug).then((r) => setReviews(r.reviews || [])).catch(() => {});
   }, [slug]);
 
+  const toast = useToast();
+
   const submitReview = async (e) => {
     e.preventDefault();
-    if (!myRating) { setReviewMsg("من فضلك اختر تقييماً بالنجوم"); return; }
+    if (!myRating) {
+      toast.warning("من فضلك اختر تقييماً بالنجوم");
+      return;
+    }
     setReviewSending(true);
     setReviewMsg("");
     try {
@@ -64,10 +70,10 @@ export default function ProductDetail({ slug }) {
       setMyComment("");
       setMyFiles([]);
       setMyFilePreviews([]);
-      setReviewMsg("✅ شكراً لتقييمك");
+      toast.success("شكراً لك! تم إضافة تقييمك بنجاح");
     } catch (err) {
       const msg = err?.response?.data?.error?.message || err?.message || "تعذّر إرسال التقييم";
-      setReviewMsg(msg);
+      toast.error(msg);
     } finally {
       setReviewSending(false);
     }
@@ -249,10 +255,9 @@ export default function ProductDetail({ slug }) {
               </div>
             )}
             <div className="st-review-form__foot">
-              <button type="submit" className="st-btn st-btn--primary" disabled={reviewSending || uploading}>
-                {reviewSending || uploading ? "جاري الإرسال..." : "إرسال التقييم"}
+              <button type="submit" className="st-btn st-btn--primary" disabled={reviewSending}>
+                {reviewSending ? "جاري الإرسال..." : "إرسال التقييم"}
               </button>
-              {reviewMsg && <span className="st-review-form__msg">{reviewMsg}</span>}
             </div>
           </form>
         ) : (
