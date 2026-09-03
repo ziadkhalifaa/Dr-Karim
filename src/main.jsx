@@ -8,10 +8,14 @@ import "./styles/site.css";
 import "./styles/assessment.css";
 import "./styles/dashboard.css";
 
+import { ToastProvider } from "./context/ToastContext";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <App />
+      <ToastProvider>
+        <App />
+      </ToastProvider>
     </ErrorBoundary>
   </React.StrictMode>
 );

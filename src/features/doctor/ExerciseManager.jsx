@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Search, Edit2, Save, X, RefreshCw, Dumbbell, Play, Check, ImageIcon, UploadCloud, Link as LinkIcon } from "lucide-react";
 import { exerciseCatalogApi } from "../../api/client";
+import { useToast } from "../../context/ToastContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function ExerciseManager() {
@@ -49,6 +50,8 @@ export default function ExerciseManager() {
     setEditValue("");
   };
 
+  const toast = useToast();
+
   const saveEdit = async (ex) => {
     if (!editValue.trim()) return;
     setSaving(true);
@@ -60,8 +63,9 @@ export default function ExerciseManager() {
       setSavedIds(prev => new Set([...prev, ex.id]));
       setTimeout(() => setSavedIds(prev => { const s = new Set(prev); s.delete(ex.id); return s; }), 2000);
       setEditingId(null);
+      toast.success("تم تحديث الاسم العربي بنجاح");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || "حدث خطأ أثناء الحفظ");
     } finally {
       setSaving(false);
     }
@@ -89,8 +93,9 @@ export default function ExerciseManager() {
         prev.map(e => e.id === selectedEx.id ? { ...e, gifUrl: newUrl, imageUrl: newUrl } : e)
       );
       setMediaModalOpen(false);
+      toast.success("تم تحديث وسائط التمرين بنجاح");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || "حدث خطأ أثناء حفظ الوسائط");
     } finally {
       setMediaSaving(false);
     }

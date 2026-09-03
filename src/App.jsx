@@ -48,6 +48,40 @@ const SuspenseFallback = () => (
 export default function App() {
   const path = useRoute();
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const titles = {
+      "/": "د. كريم الليثي | استشاري التغذية العلاجية والرياضية",
+      "/about": "عن الدكتور | د. كريم الليثي",
+      "/services": "خدماتنا | د. كريم الليثي",
+      "/articles": "المقالات والنصائح الطبية | د. كريم الليثي",
+      "/contact": "تواصل معنا | د. كريم الليثي",
+      "/login": "تسجيل الدخول | د. كريم الليثي",
+      "/register": "حساب جديد | د. كريم الليثي",
+      "/assessment": "التقييم الطبي الشامل | د. كريم الليثي",
+      "/store": "المتجر | د. كريم الليثي",
+      "/checkout": "إتمام الطلب | د. كريم الليثي",
+      "/privacy": "سياسة الخصوصية | د. كريم الليثي",
+      "/terms": "شروط الاستخدام | د. كريم الليثي",
+      "/faq": "الأسئلة الشائعة | د. كريم الليثي",
+    };
+
+    if (titles[path]) {
+      document.title = titles[path];
+    } else if (path.startsWith("/doctor")) {
+      document.title = "لوحة تحكم الدكتور | د. كريم الليثي";
+    } else if (path.startsWith("/patient")) {
+      document.title = "لوحة تحكم المريض | د. كريم الليثي";
+    } else if (path.startsWith("/services/")) {
+      document.title = "تفاصيل الخدمة | د. كريم الليثي";
+    } else if (path.startsWith("/tips/")) {
+      document.title = "المقال الطبي | د. كريم الليثي";
+    } else if (path.startsWith("/store/")) {
+      document.title = "تفاصيل المنتج | د. كريم الليثي";
+    }
+  }, [path]);
+
   const renderContent = () => {
     if (path === "/login") return <AppProvider><AuthProvider><LoginPage /></AuthProvider></AppProvider>;
     if (path === "/register") return <AppProvider><AuthProvider><RegisterPage /></AuthProvider></AppProvider>;

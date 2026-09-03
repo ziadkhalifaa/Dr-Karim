@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Search, Edit2, Trash2, X, Save, RefreshCw, Flame, Beef, Wheat, Droplet } from "lucide-react";
 import { foodApi } from "../../api/client";
+import { useToast } from "../../context/ToastContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function FoodManager() {
@@ -71,13 +72,16 @@ export default function FoodManager() {
     setModalOpen(true);
   };
 
+  const toast = useToast();
+
   const handleDelete = async (id, name) => {
     if (!window.confirm(`هل أنت متأكد من حذف أو تعطيل "${name}"؟`)) return;
     try {
       await foodApi.delete(id);
       setFoods(foods.filter(f => f.id !== id));
+      toast.success("تم حذف العنصر بنجاح");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || "حدث خطأ أثناء الحذف");
     }
   };
 
@@ -101,13 +105,15 @@ export default function FoodManager() {
 
       if (editingId) {
         await foodApi.update(editingId, payload);
+        toast.success("تم تحديث بيانات الطعام بنجاح");
       } else {
         await foodApi.create(payload);
+        toast.success("تم إضافة الطعام الجديد بنجاح");
       }
       setModalOpen(false);
       fetchFoods();
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message || "حدث خطأ أثناء الحفظ");
     } finally {
       setSubmitting(false);
     }
