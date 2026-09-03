@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Clock, User, BookOpen } from "lucide-react";
+import { Clock, User, BookOpen, Search } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { articleApi } from "../api/client";
@@ -50,13 +50,25 @@ export default function ArticlesPage() {
   const { t } = useTranslation();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    articleApi.list("?limit=20")
+    articleApi.list("?limit=50")
       .then((res) => setArticles(res.articles || []))
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  const filteredArticles = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return articles;
+    return articles.filter(
+      (a) =>
+        a.title?.toLowerCase().includes(q) ||
+        a.excerpt?.toLowerCase().includes(q) ||
+        a.tags?.some((t) => t.toLowerCase().includes(q))
+    );
+  }, [articles, searchQuery]);
 
   return (
     <>
@@ -77,17 +89,44 @@ export default function ArticlesPage() {
 
         <section className="section">
           <div className="container">
+            <div style={{ maxWidth: 540, margin: "0 auto 40px", position: "relative" }}>
+              <Search
+                size={20}
+                style={{
+                  position: "absolute",
+                  right: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "var(--text-muted)",
+                  pointerEvents: "none",
+                }}
+              />
+              <input
+                type="text"
+                className="input"
+                placeholder="ابحث في المقالات والنصائح الطبية..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  paddingRight: 48,
+                  borderRadius: 100,
+                  boxShadow: "var(--shadow-sm)",
+                  background: "var(--card-bg)",
+                }}
+              />
+            </div>
+
             {loading ? (
               <div style={{ display: "flex", justifyContent: "center", padding: "80px 0" }}>
                 <div className="spinner" />
               </div>
-            ) : articles.length === 0 ? (
+            ) : filteredArticles.length === 0 ? (
               <div style={{ textAlign: "center", padding: "80px 0", color: "var(--text-muted)", fontWeight: 700 }}>
-                {t("tips.empty")}
+                {searchQuery ? "لم نجد مقالات تطابق بحثك" : t("tips.empty")}
               </div>
             ) : (
               <div className="articles__grid">
-                {articles.map((art) => (
+                {filteredArticles.map((art) => (
                   <ArticleCard key={art.id} article={art} />
                 ))}
               </div>

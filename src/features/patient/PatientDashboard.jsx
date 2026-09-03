@@ -17,6 +17,7 @@ import {
   Trophy,
   Coins,
   MessageCircle,
+  Printer,
 } from "lucide-react";
 import DashboardShell from "../shared/DashboardShell";
 import NotificationsPanel from "../shared/NotificationsPanel";
@@ -133,9 +134,22 @@ function PlanCard({ title, version, icon: Icon }) {
           <Icon />
           {title}
         </h3>
-        <span className={`dash-badge ${version ? "dash-badge--primary" : ""}`}>
-          {version ? t("dashboard.status.active") : t("dashboard.patient.noPlan", "لا توجد خطة")}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {version && (
+            <button
+              onClick={() => window.print()}
+              className="dash-btn dash-btn--ghost dash-btn--sm pp-print-btn"
+              title="طباعة الخطة / حفظ PDF"
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, padding: "4px 10px" }}
+            >
+              <Printer size={14} />
+              طباعة / PDF
+            </button>
+          )}
+          <span className={`dash-badge ${version ? "dash-badge--primary" : ""}`}>
+            {version ? t("dashboard.status.active") : t("dashboard.patient.noPlan", "لا توجد خطة")}
+          </span>
+        </div>
       </div>
       <div className="pp-card__body">
         {!version && (
