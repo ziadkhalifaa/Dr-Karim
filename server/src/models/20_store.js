@@ -44,6 +44,7 @@ export const Product = sequelize.define(
     featured: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     images_json: { type: DataTypes.JSON, allowNull: true },
     weight_grams: { type: DataTypes.INTEGER, allowNull: true },
+    points_price: { type: DataTypes.DECIMAL(10, 2), allowNull: true },
     sort_order: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     ...ts,
   },

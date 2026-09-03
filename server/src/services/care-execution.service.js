@@ -11,6 +11,7 @@ import { AppError } from "../utils/errors.js";
 import { auditService } from "./audit.service.js";
 import { notificationService } from "./notification.service.js";
 import { entitlementService } from "./entitlement.service.js";
+import { awardCompletionPoints } from "./care-points.service.js";
 import { tenantTimezone, todayInTimeZone } from "../utils/care-time.js";
 
 const {
@@ -217,6 +218,13 @@ export const careExecutionService = {
         idempotency_key: key,
         metadata_json: body.metadata || null,
       }, { transaction });
+      if (status === "completed") {
+        await awardCompletionPoints({
+          tenantId, programId: program.id, patientId: program.patient_id,
+          activityType: instance.activity_type, careDayId: day.id,
+          activityInstanceId: instance.id, transaction,
+        });
+      }
       await auditService.record({ tenantId, action: "care_execution.created", entity: "care_activity_execution", entityRef: String(row.id), metadata: { dayId: String(day.id), instanceId: String(instance.id), status, kind: "initial" }, actorType: current.role, actorId: current.userId, ip, transaction });
       await notificationService.emitForPatient({ tenantId, patientId: program.patient_id, type: "care_progress_recorded", relatedEntity: "care_activity_execution", relatedRef: String(row.id), transaction });
       return row.toJSON();
@@ -316,6 +324,10 @@ export const careExecutionService = {
           submitted_at: new Date(),
         }, { transaction });
         await auditService.record({ tenantId, action: "care_checkin.created", entity: "care_daily_checkin", entityRef: String(checkin.id), metadata: { dayId: String(day.id) }, actorType: "patient", actorId: current.userId, ip, transaction });
+        await awardCompletionPoints({
+          tenantId, programId: program.id, patientId: program.patient_id,
+          activityType: "checkin", careDayId: day.id, activityInstanceId: null, transaction,
+        });
       }
       return checkin.toJSON();
     });

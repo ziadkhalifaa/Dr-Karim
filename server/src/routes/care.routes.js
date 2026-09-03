@@ -29,6 +29,11 @@ export function careRouter() {
   router.post("/care/instances/:instanceId/record", careController.record);
   router.post("/care/executions/:executionId/correct", careController.correct);
 
+  // Points & rewards
+  router.get("/care/points/balance", careController.balance);
+  router.get("/care/points/leaderboard", careController.leaderboard);
+  router.post("/care/redeem", careController.redeem);
+
   return router;
 }
 

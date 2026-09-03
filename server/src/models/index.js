@@ -64,6 +64,7 @@ const { Notification, NotificationPreference } = GROUP_17;
 const {
   CareProgram, CareProgramVersion, CareDay, CareActivityDefinition,
   CareActivityInstance, CareActivityExecution, CareDailyCheckin,
+  CarePoints, CareReward,
 } = GROUP_18;
 const {
   PatientProgress, ProgressMeasurement, PatientProgressGoal, PatientProgressGoalVersion,
@@ -87,6 +88,7 @@ const TENANT_SCOPED = [
   Notification, NotificationPreference,
   CareProgram, CareProgramVersion, CareDay, CareActivityDefinition,
   CareActivityInstance, CareActivityExecution, CareDailyCheckin,
+  CarePoints, CareReward,
   PatientProgress, ProgressMeasurement, PatientProgressGoal, PatientProgressGoalVersion,
   ProductCategory, Product, StoreOrder, StoreOrderItem, StorePayment,
 ];
@@ -304,6 +306,14 @@ CareActivityExecution.belongsTo(CareActivityExecution, { foreignKey: "correction
 CareDailyCheckin.belongsTo(CareProgram, { foreignKey: "care_program_id" });
 CareDailyCheckin.belongsTo(CareDay, { foreignKey: "care_day_id" });
 CareDailyCheckin.belongsTo(Patient, { foreignKey: "patient_id" });
+
+CarePoints.belongsTo(CareProgram, { foreignKey: "care_program_id" });
+CarePoints.belongsTo(CareDay, { foreignKey: "care_day_id" });
+CarePoints.belongsTo(CareActivityInstance, { foreignKey: "activity_instance_id" });
+CarePoints.belongsTo(Patient, { foreignKey: "patient_id" });
+CareReward.belongsTo(CareProgram, { foreignKey: "care_program_id" });
+CareReward.belongsTo(Patient, { foreignKey: "patient_id" });
+CareReward.belongsTo(Product, { foreignKey: "product_id" });
 
 // ---- Progress & measurements (Phase 6C) ----
 Patient.hasOne(PatientProgress, { foreignKey: "patient_id" });

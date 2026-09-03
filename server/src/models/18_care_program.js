@@ -122,6 +122,7 @@ export const CareActivityDefinition = sequelize.define(
     planned_target_json: { type: DataTypes.JSON, allowNull: true }, // { sessions } | { quantity, unit } | { duration_min }
     sort_order: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
     active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+    points_reward: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
   },
   {
     tableName: "care_activity_definition",
@@ -226,6 +227,62 @@ export const CareDailyCheckin = sequelize.define(
   }
 );
 
+// ---- care_points (patient point ledger) ----
+export const CarePoints = sequelize.define(
+  "care_points",
+  {
+    id: BIGID,
+    tenant_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    patient_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    care_program_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    care_day_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
+    activity_instance_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: true },
+    points: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    reason: {
+      type: DataTypes.ENUM(
+        "program_join", "exercise_completed", "nutrition_completed",
+        "checkin", "streak_bonus", "redeemed", "custom"
+      ),
+      allowNull: false,
+    },
+    reference_id: { type: DataTypes.STRING(120), allowNull: true },
+  },
+  {
+    tableName: "care_points",
+    underscored: true,
+    indexes: [
+      { name: "cp_patient_program", fields: ["patient_id", "care_program_id"] },
+      { name: "cp_tenant_patient", fields: ["tenant_id", "patient_id"] },
+      { name: "cp_reason", fields: ["reason"] },
+    ],
+  }
+);
+
+// ---- care_reward (point redemption) ----
+export const CareReward = sequelize.define(
+  "care_reward",
+  {
+    id: BIGID,
+    tenant_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    patient_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    product_id: { type: DataTypes.BIGINT.UNSIGNED, allowNull: false },
+    points_spent: { type: DataTypes.INTEGER, allowNull: false },
+    status: {
+      type: DataTypes.ENUM("approved", "claimed", "cancelled"),
+      allowNull: false,
+      defaultValue: "approved",
+    },
+  },
+  {
+    tableName: "care_reward",
+    underscored: true,
+    indexes: [
+      { name: "cr_patient", fields: ["patient_id"] },
+      { name: "cr_status", fields: ["status"] },
+    ],
+  }
+);
+
 export const GROUP_18 = {
   CareProgram,
   CareProgramVersion,
@@ -234,4 +291,6 @@ export const GROUP_18 = {
   CareActivityInstance,
   CareActivityExecution,
   CareDailyCheckin,
+  CarePoints,
+  CareReward,
 };

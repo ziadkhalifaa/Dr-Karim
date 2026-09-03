@@ -13,14 +13,25 @@ import { AppError } from "../utils/errors.js";
 import { ENUM } from "../config/constants.js";
 import { auditService } from "./audit.service.js";
 import { notificationService } from "./notification.service.js";
+import { carePointsService, awardProgramJoinPoints } from "./care-points.service.js";
 import { dateRange, tenantTimezone, todayInTimeZone, addDays } from "../utils/care-time.js";
 
 const {
   Tenant, Patient,
   NutritionPlan, NutritionPlanVersion, ExercisePlan, ExercisePlanVersion,
+  MealTemplate, MealItem,
   CareProgram, CareProgramVersion, CareDay,
-  CareActivityDefinition, CareActivityInstance,
+  CareActivityDefinition, CareActivityInstance, CareActivityExecution,
+  CarePoints, CareReward,
 } = models;
+
+const POINTS = {
+  program_join: 50,
+  exercise_completed: 10,
+  nutrition_completed: 5,
+  checkin: 5,
+  streak_bonus: 20,
+};
 
 function actor(auth) {
   if (!auth) throw new AppError(401, "AUTH_REQUIRED", "Authentication required");
@@ -159,6 +170,51 @@ function programStatusMessage(program) {
   return { programId: String(program.id), status: program.status, startDate: program.start_date, endDate: program.end_date };
 }
 
+async function deriveDefinitionsFromPlans(version, tenantId, transaction) {
+  const definitions = [];
+  let sortCounter = 0;
+  if (version.nutrition_plan_version_id) {
+    const meals = await MealTemplate.findAll({
+      where: { plan_version_id: version.nutrition_plan_version_id, tenant_id: tenantId },
+      order: [["sort_order", "ASC"], ["id", "ASC"]], transaction, raw: true,
+    });
+    for (const meal of meals) {
+      definitions.push({
+        activity_type: "nutrition",
+        code: "meal_" + String(meal.code).toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 40),
+        name_ar: meal.name_ar, name_en: meal.name_en,
+        measure: "boolean",
+        planned_target_json: { mealTemplateId: meal.id, dayNumber: meal.day_number },
+        sort_order: sortCounter++,
+        points_reward: POINTS.nutrition_completed,
+      });
+    }
+  }
+  if (version.exercise_plan_version_id) {
+    const pv = await ExercisePlanVersion.findOne({
+      where: { id: version.exercise_plan_version_id, tenant_id: tenantId },
+      transaction, raw: true,
+    });
+    if (pv && pv.exercises_json) {
+      const exercises = Array.isArray(pv.exercises_json) ? pv.exercises_json : [];
+      for (let i = 0; i < exercises.length; i++) {
+        const ex = exercises[i];
+        const exercise = ex.exercise || ex;
+        definitions.push({
+          activity_type: "exercise",
+          code: "exercise_" + (exercise.code || String(exercise.id)),
+          name_ar: exercise.name_ar, name_en: exercise.name_en,
+          measure: "boolean",
+          planned_target_json: { exerciseId: exercise.id, sets: ex.sets, reps: ex.reps, rest: ex.rest, duration: ex.duration },
+          sort_order: sortCounter++,
+          points_reward: POINTS.exercise_completed,
+        });
+      }
+    }
+  }
+  return definitions;
+}
+
 export const careProgramService = {
   // ---- Materialization (lazy, up to the requested date) ----
   async ensureMaterializedUpTo(program, tenant, upToDate, transaction) {
@@ -175,6 +231,18 @@ export const careProgramService = {
       attributes: ["date", "care_program_version_id", "day_index"], transaction, raw: true,
     });
     const bound = new Map(existing.map((d) => [d.date, d]));
+    const defsCache = new Map();
+    const getDefs = async (version) => {
+      const key = String(version.id);
+      if (defsCache.has(key)) return defsCache.get(key);
+      let defs = await CareActivityDefinition.findAll({
+        where: { care_program_version_id: version.id, tenant_id: program.tenant_id, active: true },
+        order: [["sort_order", "ASC"], ["id", "ASC"]], transaction, raw: true,
+      });
+      if (!defs.length) defs = await deriveDefinitionsFromPlans(version, program.tenant_id, transaction);
+      defsCache.set(key, defs);
+      return defs;
+    };
 
     const daysNeeded = dateRange(start, end);
     let dayIndex = existing.reduce((m, d) => Math.max(m, Number(d.day_index)), 0);
@@ -187,10 +255,7 @@ export const careProgramService = {
         tenant_id: program.tenant_id, care_program_id: program.id,
         care_program_version_id: version.id, date, day_index: dayIndex,
       }, { transaction });
-      const definitions = await CareActivityDefinition.findAll({
-        where: { care_program_version_id: version.id, tenant_id: program.tenant_id, active: true },
-        order: [["sort_order", "ASC"], ["id", "ASC"]], transaction, raw: true,
-      });
+      const definitions = await getDefs(version);
       for (const def of definitions) {
         await CareActivityInstance.create({
           tenant_id: program.tenant_id, care_day_id: day.id, care_activity_definition_id: def.id,
@@ -432,6 +497,8 @@ export const careProgramService = {
 
       // Lazy materialization: days up to and including today become real.
       await this.ensureMaterializedUpTo(p.toJSON(), tenant, today, transaction);
+
+      await awardProgramJoinPoints(tenantId, program.id, program.patient_id, transaction);
 
       await auditService.record({ tenantId, action: "care_program.activated", entity: "care_program", entityRef: String(program.id), metadata: programStatusMessage(p), actorType: "doctor", actorId: current.userId, transaction });
       await notificationService.emitForPatient({ tenantId, patientId: program.patient_id, type: "care_program_activated", relatedEntity: "care_program", relatedRef: String(program.id), transaction });
